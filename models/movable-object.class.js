@@ -31,7 +31,7 @@ class MovableObject {
     }
 
     isAboveGround() {
-        return this.y < 170;
+        return this.isAboveGroundActive;
     }
 
     loadImage(imagePath) {
@@ -56,14 +56,14 @@ class MovableObject {
 
     moveRight(moveSpeed = this.speed) {
         this.x += moveSpeed;
-        this.otherDirection = false;
+        
         setInterval(() => {
         }, 1000 / 60);
     }
 
     moveLeft(moveSpeed = this.speed) {
         this.x -= moveSpeed;
-        this.otherDirection = true;
+        
         setInterval(() => {
         }, 1000 / 60);
     }

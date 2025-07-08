@@ -35,15 +35,17 @@ class Character extends MovableObject {
     world;
     lastAnimation = '';
     currentImage = 0;
-    isJumping = false;
+    isAboveGroundActive = false;
     startJumpX = 0;
-    JUMP_DELAYS = [20, 30, 40, 55, 70, 70, 55, 40, 30, 20];
+    JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
+    JUMP_DELAYS_DOWN = [...this.JUMP_DELAYS].reverse();
 
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
         this.x = 0;
+        this.isAboveGroundActive = false; // Status-Flag initialisieren
         this.animate();
     }
 
@@ -51,12 +53,13 @@ class Character extends MovableObject {
         setInterval(() => {
             let moveSpeed = this.speed;
 
-            if (this.isJumping && this.world.keyboard.UP) {
+            if (this.isAboveGround() && this.world.keyboard.UP) {
                 moveSpeed = this.speed * 1.5; 
             }
 
             if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x - 100) {
                 this.moveRight(moveSpeed);
+                this.otherDirection = false;
             }
             if (this.world.keyboard.LEFT && this.x > 0 ) {
                 this.moveLeft(moveSpeed);
@@ -65,15 +68,15 @@ class Character extends MovableObject {
 
             this.world.camera_x = -this.x;
 
-            if (this.world.keyboard.UP && !this.isJumping) {
-                this.isJumping = true;
+            if (this.world.keyboard.UP && !this.isAboveGround()) {
+                this.isAboveGroundActive = true;
                 this.currentImage = 0;
                 this.playJumpAnimation();
             }
         }, 1000 / 60);
 
         setInterval(() => {
-            if (!this.isJumping) {
+            if (!this.isAboveGround()) {
                 if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
                     this.playAnimation(this.IMAGES_WALKING);
                     this.lastAnimation = 'walk';
@@ -87,31 +90,48 @@ class Character extends MovableObject {
     }
 
     playJumpAnimation() {
-        if (!this.isJumping) return;
+        if (!this.isAboveGround()) return;
+        this.startJumpX = this.x;
         let frame = 0;
         const self = this;
 
-        function animateFrame() {
+        function animateUp() {
             self.img = self.imageCache[self.IMAGES_JUMPING[frame]];
             let delay = self.JUMP_DELAYS[frame] || 70;
-
-            if (frame < self.IMAGES_JUMPING.length - 1) {
-                frame++;
-                setTimeout(animateFrame, delay);
+            frame++;
+            if (frame < self.IMAGES_JUMPING.length) {
+                setTimeout(animateUp, delay);
             } else {
-                const maxJumpDistance = 130;
-                const distance = Math.abs(self.x - self.startJumpX);
-                if (self.world.keyboard.UP && distance < maxJumpDistance) {
-                    setTimeout(animateFrame, 20);
-                } else {
-                    self.isJumping = false;
-                    self.currentImage = 0;
-                    self.lastAnimation = '';
-                }
+                frame = self.IMAGES_JUMPING.length - 1;
+                holdOnTop();
             }
         }
 
-        this.startJumpX = this.x;
-        animateFrame();
+        function holdOnTop() {
+            const maxJumpDistance = 120;
+            const distance = Math.abs(self.x - self.startJumpX);
+            const isMoving = self.world.keyboard.RIGHT || self.world.keyboard.LEFT;
+
+            if (self.world.keyboard.UP && isMoving && distance < maxJumpDistance) {
+                setTimeout(holdOnTop, 20);
+            } else {
+                animateDown();
+            }
+        }
+
+        function animateDown() {
+            let delay = self.JUMP_DELAYS.slice().reverse()[self.IMAGES_JUMPING.length - 1 - frame] || 70;
+            self.img = self.imageCache[self.IMAGES_JUMPING[frame]];
+            frame--;
+            if (frame >= 0) {
+                setTimeout(animateDown, delay);
+            } else {
+                self.isAboveGroundActive = false;
+                self.currentImage = 0;
+                self.lastAnimation = '';
+            }
+        }
+
+        animateUp();
     }
 }
