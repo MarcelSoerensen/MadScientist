@@ -13,6 +13,8 @@ const level1 = new Level(
         new BackgroundObject('img/Backgrounds/2.png', 1952, 0, 480, 1955),
         new BackgroundObject('img/Backgrounds/9.png', 1952, 0, 80, 1957),
         new BackgroundObject('img/Backgrounds/10.png', 1952, 25, 455, 1955),
+        new BackgroundObject('img/Backgrounds/7.png', 1952*2, 0, 80, 1955),
+        new BackgroundObject('img/Backgrounds/8.png', 1952*2, 422, 58, 1957),
     ]
 );
 
