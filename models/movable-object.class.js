@@ -47,6 +47,19 @@ class MovableObject {
         });
     }
 
+    draw(ctx) {
+        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    }
+
+    drawFrame(ctx) {
+
+        if(this instanceof Character || this instanceof EnemyOne) {
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
+        }
+    }
+
     playAnimation(images) {
         let currentImageIndex = this.currentImage % images .length;
         let imagePath = images[currentImageIndex];
