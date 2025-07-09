@@ -40,6 +40,53 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Jump/Jump_09.png',   
     ];
 
+    IMAGES_DEAD = [
+        'img/Main Characters/Gun01/Death/Death_00.png',
+        'img/Main Characters/Gun01/Death/Death_01.png',
+        'img/Main Characters/Gun01/Death/Death_02.png',
+        'img/Main Characters/Gun01/Death/Death_03.png',
+        'img/Main Characters/Gun01/Death/Death_04.png',
+        'img/Main Characters/Gun01/Death/Death_05.png',
+        'img/Main Characters/Gun01/Death/Death_06.png',
+        'img/Main Characters/Gun01/Death/Death_07.png',
+        'img/Main Characters/Gun01/Death/Death_08.png',
+        'img/Main Characters/Gun01/Death/Death_09.png',
+        'img/Main Characters/Gun01/Death/Death_10.png',
+        'img/Main Characters/Gun01/Death/Death_11.png',
+        'img/Main Characters/Gun01/Death/Death_12.png',
+        'img/Main Characters/Gun01/Death/Death_13.png',
+        'img/Main Characters/Gun01/Death/Death_14.png',
+        'img/Main Characters/Gun01/Death/Death_15.png',
+        'img/Main Characters/Gun01/Death/Death_16.png',
+        'img/Main Characters/Gun01/Death/Death_17.png',
+        'img/Main Characters/Gun01/Death/Death_18.png',
+        'img/Main Characters/Gun01/Death/Death_19.png',
+        'img/Main Characters/Gun01/Death/Death_20.png',
+        'img/Main Characters/Gun01/Death/Death_21.png',
+        'img/Main Characters/Gun01/Death/Death_22.png',
+        'img/Main Characters/Gun01/Death/Death_23.png',
+        'img/Main Characters/Gun01/Death/Death_24.png',
+        'img/Main Characters/Gun01/Death/Death_25.png',
+        'img/Main Characters/Gun01/Death/Death_26.png',
+        'img/Main Characters/Gun01/Death/Death_27.png',
+        'img/Main Characters/Gun01/Death/Death_28.png',
+        'img/Main Characters/Gun01/Death/Death_29.png',
+        'img/Main Characters/Gun01/Death/Death_30.png',
+        'img/Main Characters/Gun01/Death/Death_31.png',
+        'img/Main Characters/Gun01/Death/Death_32.png',
+        'img/Main Characters/Gun01/Death/Death_33.png',
+        'img/Main Characters/Gun01/Death/Death_34.png',
+        'img/Main Characters/Gun01/Death/Death_35.png',
+        'img/Main Characters/Gun01/Death/Death_36.png',
+        'img/Main Characters/Gun01/Death/Death_37.png',
+        'img/Main Characters/Gun01/Death/Death_38.png',
+        'img/Main Characters/Gun01/Death/Death_39.png',
+        'img/Main Characters/Gun01/Death/Death_40.png',
+        'img/Main Characters/Gun01/Death/Death_41.png',
+        'img/Main Characters/Gun01/Death/Death_42.png',
+        'img/Main Characters/Gun01/Death/Death_43.png',
+    ];
+
     world;
     lastAnimation = '';
     currentImage = 0;
@@ -53,6 +100,7 @@ class Character extends CollidableObject {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
+        this.loadImages(this.IMAGES_DEAD);
         this.x = 0;
         this.isAboveGroundActive = false; // Status-Flag initialisieren
         this.animate();
@@ -85,7 +133,7 @@ class Character extends CollidableObject {
         }, 1000 / 60);
 
         setInterval(() => {
-            if (!this.isAboveGround()) {
+            if (!this.isDead() && !this.isAboveGround()) {
                 if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
                     this.playAnimation(this.IMAGES_WALKING);
                     this.lastAnimation = 'walk';
@@ -95,7 +143,14 @@ class Character extends CollidableObject {
                     this.currentImage = 0;
                 }
             }
-        }, 70);
+        }, 60);
+
+        setInterval(() => {
+            if (this.isDead()) {
+                this.playAnimation(this.IMAGES_DEAD);
+                this.lastAnimation = 'dead';
+            }
+        }, 30);
     }
 
     playJumpAnimation() {
@@ -103,7 +158,7 @@ class Character extends CollidableObject {
         this.startJumpX = this.x;
         let frame = 0;
         const self = this;
-        const maxJumpHeight = 100; // Maximale Sprunghöhe
+        const maxJumpHeight = 100;
         const totalFrames = this.IMAGES_JUMPING.length;
 
         function animateUp() {
@@ -111,7 +166,7 @@ class Character extends CollidableObject {
             
             self.jumpOffsetY = -(frame / totalFrames) * maxJumpHeight;
             
-            let delay = self.JUMP_DELAYS[frame] || 70;
+            let delay = self.JUMP_DELAYS[frame] || 60;
             frame++;
             if (frame < self.IMAGES_JUMPING.length) {
                 setTimeout(animateUp, delay);
@@ -137,10 +192,8 @@ class Character extends CollidableObject {
         }
 
         function animateDown() {
-            let delay = self.JUMP_DELAYS.slice().reverse()[self.IMAGES_JUMPING.length - 1 - frame] || 70;
+            let delay = self.JUMP_DELAYS.slice().reverse()[self.IMAGES_JUMPING.length - 1 - frame] || 60;
             self.img = self.imageCache[self.IMAGES_JUMPING[frame]];
-            
-            // Y-Offset berechnen (nach unten während des Falls)
             self.jumpOffsetY = -(frame / totalFrames) * maxJumpHeight;
             
             frame--;
@@ -150,7 +203,7 @@ class Character extends CollidableObject {
                 self.isAboveGroundActive = false;
                 self.currentImage = 0;
                 self.lastAnimation = '';
-                self.jumpOffsetY = 0; // Zurück zur normalen Position
+                self.jumpOffsetY = 0; 
             }
         }
 

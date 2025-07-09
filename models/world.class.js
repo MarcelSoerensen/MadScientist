@@ -26,8 +26,8 @@ class World{
         setInterval(() => {
             this.level.enemies.forEach(enemy => {
                if( this.character.isColliding(enemy)) {
-                   this.character.energy -= 5;
-                   console.log(`Collision detected! Character energy: ${this.character.energy}`);   
+                    this.character.hit();
+                    console.log(`Collision detected! Character energy: ${this.character.energy}`);   
                }
             });
         },200);
@@ -96,7 +96,7 @@ class World{
             
             movableObject.draw(this.ctx);
             movableObject.drawFrame(this.ctx); 
-            
+
             if (movableObject.drawCollisionFrame) {
                 movableObject.drawCollisionFrame(this.ctx);
             }

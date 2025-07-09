@@ -19,7 +19,7 @@ class MovableObject {
 
         function animateFrame() {
             self.img = self.imageCache[images[frame]];
-            let delay = delays[frame] || 70;
+            let delay = delays[frame] || 60;
             frame++;
             if (frame < images.length) {
                 setTimeout(animateFrame, delay);
@@ -82,6 +82,17 @@ class MovableObject {
                     this.x < movableObject.x + movableObject.width &&
                     this.y < movableObject.y + movableObject.height;
         }
+    }
+
+    hit() {
+        this.energy -= 5;
+        if (this.energy < 0) {
+            this.energy = 0;
+        }
+    }
+
+    isDead() {
+        return this.energy == 0;
     }
 
     playAnimation(images) {
