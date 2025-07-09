@@ -19,7 +19,6 @@ class CollidableObject extends MovableObject {
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         
-        // Y-Position berücksichtigt Jump-Offset falls vorhanden
         let yPos = this.y + this.offset.top;
         if (this.jumpOffsetY !== undefined) {
             yPos += this.jumpOffsetY;

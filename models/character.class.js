@@ -106,6 +106,7 @@ class Character extends CollidableObject {
     isAboveGroundActive = false;
     startJumpX = 0;
     jumpOffsetY = 0;
+    deathAnimationPlayed = false;  // Flag um zu verfolgen ob Death-Animation schon gespielt wurde
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
     JUMP_DELAYS_DOWN = [...this.JUMP_DELAYS].reverse();
 
@@ -122,6 +123,11 @@ class Character extends CollidableObject {
 
     animate() {
         setInterval(() => {
+
+            if (this.isDead()) {
+                return;
+            }
+
             let moveSpeed = this.speed;
 
             if (this.isAboveGround() && this.world.keyboard.UP) {
@@ -160,9 +166,9 @@ class Character extends CollidableObject {
         }, 60);
 
         setInterval(() => {
-            if (this.isDead()) {
-                this.playAnimation(this.IMAGES_DEAD);
-                this.lastAnimation = 'dead';
+            if (this.isDead() && !this.deathAnimationPlayed) {
+                this.playDeathAnimation();
+                this.deathAnimationPlayed = true;
             } else if (this.isHurt()) {
                 this.playAnimation(this.IMAGES_HURT);
             }
@@ -224,5 +230,28 @@ class Character extends CollidableObject {
         }
 
         animateUp();
+    }
+
+    /**
+     * Spielt die Death-Animation nur einmal ab
+     */
+    playDeathAnimation() {
+        let frame = 0;
+        const self = this;
+        const delays = new Array(this.IMAGES_DEAD.length).fill(30); // 30ms pro Frame für schnelle Death-Animation
+
+        function animateFrame() {
+            if (frame < self.IMAGES_DEAD.length) {
+                self.img = self.imageCache[self.IMAGES_DEAD[frame]];
+                let delay = delays[frame];
+                frame++;
+                setTimeout(animateFrame, delay);
+            } else {
+                // Animation beendet - bleibt beim letzten Frame stehen
+                self.lastAnimation = 'dead';
+            }
+        }
+
+        animateFrame();
     }
 }
