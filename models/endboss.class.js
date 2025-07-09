@@ -1,8 +1,16 @@
+/**
+ * Represents the end boss enemy
+ * @extends MovableObject
+ */
 class Endboss extends MovableObject {
+    /** @type {number} Height of the endboss */
     height = 600;
+    /** @type {number} Width of the endboss */
     width = 600;
+    /** @type {number} Y position of the endboss */
     y = -60;
 
+    /** @type {string[]} Array of idle animation image paths */
     IMAGES_WALKING = [
         'img/Enemy Characters/Enemy Character07/Idle/Idle_00.png',
         'img/Enemy Characters/Enemy Character07/Idle/Idle_01.png',
@@ -20,6 +28,10 @@ class Endboss extends MovableObject {
         'img/Enemy Characters/Enemy Character07/Idle/Idle_13.png',
     ];
 
+    /**
+     * Creates a new Endboss instance
+     * Initializes position and starts animation
+     */
     constructor() {
         super().loadImage('img/Enemy Characters/Enemy Character07/Walk/Walk_00.png');
         this.loadImages(this.IMAGES_WALKING);
@@ -27,6 +39,10 @@ class Endboss extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Starts the endboss idle animation
+     * Sets up interval for cycling through idle frames
+     */
     animate() {
         setInterval(() => {
             this.playAnimation(this.IMAGES_WALKING);

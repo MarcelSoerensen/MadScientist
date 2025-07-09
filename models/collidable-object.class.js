@@ -1,9 +1,22 @@
+/**
+ * Represents a collidable object that extends MovableObject with collision detection capabilities
+ * @extends MovableObject
+ */
 class CollidableObject extends MovableObject {
 
+    /** @type {boolean} Whether this object can collide with others */
     collidable = true;
 
+    /** @type {number} Damage dealt by this object */
     damage = 0;
 
+    /** 
+     * @type {Object} Collision offset values for precise hit detection
+     * @property {number} top - Top offset in pixels
+     * @property {number} left - Left offset in pixels
+     * @property {number} right - Right offset in pixels
+     * @property {number} bottom - Bottom offset in pixels
+     */
     offset = {
         top: 80,
         left: 50,
@@ -11,6 +24,10 @@ class CollidableObject extends MovableObject {
         bottom: 20   
     };
 
+    /**
+     * Draws a red frame around the actual collision area
+     * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+     */
     drawCollisionFrame(ctx) {
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;

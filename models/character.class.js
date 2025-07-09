@@ -1,8 +1,22 @@
+/**
+ * Represents the main character that the player controls
+ * @extends CollidableObject
+ */
 class Character extends CollidableObject {
+    /** @type {number} Y position of the character */
     y= 110;
+    /** @type {number} Height of the character */
     height = 380;
+    /** @type {number} Movement speed of the character */
     speed = 2;
 
+    /** 
+     * @type {Object} Collision offset values for the character
+     * @property {number} top - Top offset in pixels
+     * @property {number} left - Left offset in pixels
+     * @property {number} right - Right offset in pixels
+     * @property {number} bottom - Bottom offset in pixels
+     */
     offset = {
         top: 185,
         left: 100,
@@ -10,6 +24,7 @@ class Character extends CollidableObject {
         bottom: 110
     };
     
+    /** @type {string[]} Array of walking animation image paths */
     IMAGES_WALKING = [
         'img/Main Characters/Gun01/Walk/Walk_00.png',
         'img/Main Characters/Gun01/Walk/Walk_01.png',
@@ -27,6 +42,7 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Walk/Walk_13.png',
     ];
 
+    /** @type {string[]} Array of jumping animation image paths */
     IMAGES_JUMPING = [
         'img/Main Characters/Gun01/Jump/Jump_00.png',
         'img/Main Characters/Gun01/Jump/Jump_01.png',
@@ -40,6 +56,7 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Jump/Jump_09.png',   
     ];
 
+    /** @type {string[]} Array of death animation image paths */
     IMAGES_DEAD = [
         'img/Main Characters/Gun01/Death/Death_00.png',
         'img/Main Characters/Gun01/Death/Death_01.png',
@@ -87,6 +104,7 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Death/Death_43.png',
     ];
 
+    /** @type {string[]} Array of hurt animation image paths */
     IMAGES_HURT = [
         'img/Main Characters/Gun01/Get Hit/Get Hit_00.png',
         'img/Main Characters/Gun01/Get Hit/Get Hit_01.png',
@@ -100,16 +118,29 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Get Hit/Get Hit_09.png',
     ];
 
+    /** @type {World} Reference to the game world */
     world;
+    /** @type {string} Last played animation name */
     lastAnimation = '';
+    /** @type {number} Current animation frame index */
     currentImage = 0;
+    /** @type {boolean} Whether the character is currently above ground */
     isAboveGroundActive = false;
+    /** @type {number} X position where the jump started */
     startJumpX = 0;
+    /** @type {number} Y offset for jump animation */
     jumpOffsetY = 0;
+    /** @type {boolean} Flag to track if death animation has been played */
     deathAnimationPlayed = false;
+    /** @type {number[]} Array of delays for jump animation frames */
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
+    /** @type {number[]} Reversed jump delays for downward animation */
     JUMP_DELAYS_DOWN = [...this.JUMP_DELAYS].reverse();
 
+    /**
+     * Creates a new Character instance
+     * Initializes images and starts animation
+     */
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
@@ -121,6 +152,10 @@ class Character extends CollidableObject {
         this.animate();
     }
 
+    /**
+     * Starts and manages all character animations and movement
+     * Sets up intervals for movement, animation, and state management
+     */
     animate() {
         setInterval(() => {
 
@@ -175,6 +210,10 @@ class Character extends CollidableObject {
         }, 30);
     }
 
+    /**
+     * Plays the jumping animation with physics simulation
+     * Handles upward motion, hovering at peak, and downward motion
+     */
     playJumpAnimation() {
         if (!this.isAboveGround()) return;
         this.startJumpX = this.x;
@@ -231,6 +270,10 @@ class Character extends CollidableObject {
         animateUp();
     }
 
+    /**
+     * Plays the death animation once
+     * Animation plays through all frames and stops at the last frame
+     */
     playDeathAnimation() {
         let frame = 0;
         const self = this;
