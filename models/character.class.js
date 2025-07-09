@@ -87,12 +87,25 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Death/Death_43.png',
     ];
 
+    IMAGES_HURT = [
+        'img/Main Characters/Gun01/Get Hit/Get Hit_00.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_01.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_02.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_03.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_04.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_05.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_06.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_07.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_08.png',
+        'img/Main Characters/Gun01/Get Hit/Get Hit_09.png',
+    ];
+
     world;
     lastAnimation = '';
     currentImage = 0;
     isAboveGroundActive = false;
     startJumpX = 0;
-    jumpOffsetY = 0;  // Y-Verschiebung während des Sprungs
+    jumpOffsetY = 0;
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
     JUMP_DELAYS_DOWN = [...this.JUMP_DELAYS].reverse();
 
@@ -101,8 +114,9 @@ class Character extends CollidableObject {
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
         this.loadImages(this.IMAGES_DEAD);
+        this.loadImages(this.IMAGES_HURT);
         this.x = 0;
-        this.isAboveGroundActive = false; // Status-Flag initialisieren
+        this.isAboveGroundActive = false;
         this.animate();
     }
 
@@ -149,6 +163,8 @@ class Character extends CollidableObject {
             if (this.isDead()) {
                 this.playAnimation(this.IMAGES_DEAD);
                 this.lastAnimation = 'dead';
+            } else if (this.isHurt()) {
+                this.playAnimation(this.IMAGES_HURT);
             }
         }, 30);
     }
