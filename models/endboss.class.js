@@ -2,13 +2,27 @@
  * Represents the end boss enemy
  * @extends MovableObject
  */
-class Endboss extends MovableObject {
+class Endboss extends CollidableObject {
     /** @type {number} Height of the endboss */
     height = 600;
     /** @type {number} Width of the endboss */
     width = 600;
     /** @type {number} Y position of the endboss */
     y = -60;
+
+    /**
+     * @type {Object} Collision offset values for precise hit detection
+     * @property {number} top - Top offset in pixels
+     * @property {number} left - Left offset in pixels
+     * @property {number} right - Right offset in pixels
+     * @property {number} bottom - Bottom offset in pixels
+     */
+    offset = {
+        top: 280,
+        left: 245,
+        right: 225,
+        bottom: 160
+    };
 
     /** @type {string[]} Array of idle animation image paths */
     IMAGES_WALKING = [
