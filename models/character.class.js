@@ -45,6 +45,7 @@ class Character extends CollidableObject {
     currentImage = 0;
     isAboveGroundActive = false;
     startJumpX = 0;
+    jumpOffsetY = 0;  // Y-Verschiebung während des Sprungs
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
     JUMP_DELAYS_DOWN = [...this.JUMP_DELAYS].reverse();
 
@@ -102,9 +103,14 @@ class Character extends CollidableObject {
         this.startJumpX = this.x;
         let frame = 0;
         const self = this;
+        const maxJumpHeight = 100; // Maximale Sprunghöhe
+        const totalFrames = this.IMAGES_JUMPING.length;
 
         function animateUp() {
             self.img = self.imageCache[self.IMAGES_JUMPING[frame]];
+            
+            self.jumpOffsetY = -(frame / totalFrames) * maxJumpHeight;
+            
             let delay = self.JUMP_DELAYS[frame] || 70;
             frame++;
             if (frame < self.IMAGES_JUMPING.length) {
@@ -120,6 +126,9 @@ class Character extends CollidableObject {
             const distance = Math.abs(self.x - self.startJumpX);
             const isMoving = self.world.keyboard.RIGHT || self.world.keyboard.LEFT;
 
+            // Y-Offset bleibt am höchsten Punkt
+            self.jumpOffsetY = -maxJumpHeight;
+
             if (self.world.keyboard.UP && isMoving && distance < maxJumpDistance) {
                 setTimeout(holdOnTop, 20);
             } else {
@@ -130,6 +139,10 @@ class Character extends CollidableObject {
         function animateDown() {
             let delay = self.JUMP_DELAYS.slice().reverse()[self.IMAGES_JUMPING.length - 1 - frame] || 70;
             self.img = self.imageCache[self.IMAGES_JUMPING[frame]];
+            
+            // Y-Offset berechnen (nach unten während des Falls)
+            self.jumpOffsetY = -(frame / totalFrames) * maxJumpHeight;
+            
             frame--;
             if (frame >= 0) {
                 setTimeout(animateDown, delay);
@@ -137,6 +150,7 @@ class Character extends CollidableObject {
                 self.isAboveGroundActive = false;
                 self.currentImage = 0;
                 self.lastAnimation = '';
+                self.jumpOffsetY = 0; // Zurück zur normalen Position
             }
         }
 

@@ -18,12 +18,20 @@ class CollidableObject extends MovableObject {
     drawCollisionFrame(ctx) {
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
+        
+        // Y-Position berücksichtigt Jump-Offset falls vorhanden
+        let yPos = this.y + this.offset.top;
+        if (this.jumpOffsetY !== undefined) {
+            yPos += this.jumpOffsetY;
+        }
+        
         ctx.strokeRect(
             this.x + this.offset.left,
-            this.y + this.offset.top,
+            yPos,
             this.width - this.offset.left - this.offset.right,
             this.height - this.offset.top - this.offset.bottom
         );
     }
+
 }
 

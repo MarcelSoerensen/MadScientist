@@ -55,17 +55,33 @@ class MovableObject {
     drawFrame(ctx) {
 
         if(this instanceof Character || this instanceof EnemyOne) {
-        ctx.strokeStyle = 'blue';
+        ctx.strokeStyle = 'transparent';
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
         }
     }
 
     isColliding(movableObject){
-        return  this.x + this.width > movableObject.x &&
-                this.y + this.height > movableObject.y &&
-                this.x < movableObject.x + movableObject.width &&
-                this.y < movableObject.y + movableObject.height;
+
+        if (this.offset && movableObject.offset && 
+            this.offset.left !== undefined && this.offset.right !== undefined &&
+            this.offset.top !== undefined && this.offset.bottom !== undefined &&
+            movableObject.offset.left !== undefined && movableObject.offset.right !== undefined &&
+            movableObject.offset.top !== undefined && movableObject.offset.bottom !== undefined) {
+            
+            return (
+                this.x + this.offset.left < movableObject.x + movableObject.width - movableObject.offset.right &&
+                this.x + this.width - this.offset.right > movableObject.x + movableObject.offset.left &&
+                this.y + this.offset.top < movableObject.y + movableObject.height - movableObject.offset.bottom &&
+                this.y + this.height - this.offset.bottom > movableObject.y + movableObject.offset.top
+            );
+        } else {
+
+            return  this.x + this.width > movableObject.x &&
+                    this.y + this.height > movableObject.y &&
+                    this.x < movableObject.x + movableObject.width &&
+                    this.y < movableObject.y + movableObject.height;
+        }
     }
 
     playAnimation(images) {
