@@ -1,7 +1,15 @@
-class Character extends MovableObject {
+class Character extends CollidableObject {
     y= 110;
     height = 380;
     speed = 2;
+
+    offset = {
+        top: 185,
+        left: 100,
+        right: 130,
+        bottom: 105
+    };
+    
     IMAGES_WALKING = [
         'img/Main Characters/Gun01/Walk/Walk_00.png',
         'img/Main Characters/Gun01/Walk/Walk_01.png',

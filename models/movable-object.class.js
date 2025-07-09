@@ -10,6 +10,7 @@ class MovableObject {
     otherDirection = false;
     speedY = 0;
     acceleration = 1;
+    energy = 100;
 
 
     applyGravityForAnimation(images, delays, onDone) {
@@ -58,6 +59,13 @@ class MovableObject {
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
         }
+    }
+
+    isColliding(movableObject){
+        return  this.x + this.width > movableObject.x &&
+                this.y + this.height > movableObject.y &&
+                this.x < movableObject.x + movableObject.width &&
+                this.y < movableObject.y + movableObject.height;
     }
 
     playAnimation(images) {

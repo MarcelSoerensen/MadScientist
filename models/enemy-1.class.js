@@ -1,4 +1,11 @@
-class EnemyOne extends MovableObject {
+class EnemyOne extends CollidableObject {
+
+    offset = {
+        top: 135,      // Enemies sind vielleicht kleiner
+        left: 103,     // Angepasst für Enemy-Proportionen
+        right: 115,    // Angepasst für Enemy-Proportionen
+        bottom: 80    // Angepasst für Enemy-Proportionen
+    };
 
     IMAGES_WALKING = [
         'img/Enemy Characters/Enemy Character01/Walk/Walk_00.png',
