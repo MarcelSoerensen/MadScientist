@@ -11,17 +11,13 @@ class CollidableObject extends MovableObject {
         bottom: 20   
     };
 
-    /**
-     * Zeichnet einen roten Rahmen um den tatsächlichen Collision-Bereich
-     * @param {CanvasRenderingContext2D} ctx 
-     */
     drawCollisionFrame(ctx) {
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         
         let yPos = this.y + this.offset.top;
         if (this.jumpOffsetY !== undefined) {
-            yPos += this.jumpOffsetY;
+            yPos += this.jumpOffsetY * 1.5;
         }
         
         ctx.strokeRect(

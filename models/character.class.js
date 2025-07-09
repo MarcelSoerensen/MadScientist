@@ -7,7 +7,7 @@ class Character extends CollidableObject {
         top: 185,
         left: 100,
         right: 130,
-        bottom: 105
+        bottom: 110
     };
     
     IMAGES_WALKING = [
@@ -106,7 +106,7 @@ class Character extends CollidableObject {
     isAboveGroundActive = false;
     startJumpX = 0;
     jumpOffsetY = 0;
-    deathAnimationPlayed = false;  // Flag um zu verfolgen ob Death-Animation schon gespielt wurde
+    deathAnimationPlayed = false;
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
     JUMP_DELAYS_DOWN = [...this.JUMP_DELAYS].reverse();
 
@@ -199,12 +199,11 @@ class Character extends CollidableObject {
         }
 
         function holdOnTop() {
-            const maxJumpDistance = 120;
+            const maxJumpDistance = 150;
             const distance = Math.abs(self.x - self.startJumpX);
             const isMoving = self.world.keyboard.RIGHT || self.world.keyboard.LEFT;
 
-            // Y-Offset bleibt am höchsten Punkt
-            self.jumpOffsetY = -maxJumpHeight;
+            self.jumpOffsetY = -maxJumpHeight / 1.5;
 
             if (self.world.keyboard.UP && isMoving && distance < maxJumpDistance) {
                 setTimeout(holdOnTop, 20);
@@ -232,13 +231,10 @@ class Character extends CollidableObject {
         animateUp();
     }
 
-    /**
-     * Spielt die Death-Animation nur einmal ab
-     */
     playDeathAnimation() {
         let frame = 0;
         const self = this;
-        const delays = new Array(this.IMAGES_DEAD.length).fill(30); // 30ms pro Frame für schnelle Death-Animation
+        const delays = new Array(this.IMAGES_DEAD.length).fill(30);
 
         function animateFrame() {
             if (frame < self.IMAGES_DEAD.length) {
@@ -247,7 +243,6 @@ class Character extends CollidableObject {
                 frame++;
                 setTimeout(animateFrame, delay);
             } else {
-                // Animation beendet - bleibt beim letzten Frame stehen
                 self.lastAnimation = 'dead';
             }
         }

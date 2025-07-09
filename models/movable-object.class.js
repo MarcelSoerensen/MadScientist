@@ -70,14 +70,23 @@ class MovableObject {
             movableObject.offset.left !== undefined && movableObject.offset.right !== undefined &&
             movableObject.offset.top !== undefined && movableObject.offset.bottom !== undefined) {
             
+            let thisYPos = this.y;
+            let otherYPos = movableObject.y;
+            
+            if (this.jumpOffsetY !== undefined) {
+                thisYPos += this.jumpOffsetY * 1.5;
+            }
+            if (movableObject.jumpOffsetY !== undefined) {
+                otherYPos += movableObject.jumpOffsetY * 1.5;
+            }
+            
             return (
                 this.x + this.offset.left < movableObject.x + movableObject.width - movableObject.offset.right &&
                 this.x + this.width - this.offset.right > movableObject.x + movableObject.offset.left &&
-                this.y + this.offset.top < movableObject.y + movableObject.height - movableObject.offset.bottom &&
-                this.y + this.height - this.offset.bottom > movableObject.y + movableObject.offset.top
+                thisYPos + this.offset.top < otherYPos + movableObject.height - movableObject.offset.bottom &&
+                thisYPos + this.height - this.offset.bottom > otherYPos + movableObject.offset.top
             );
         } else {
-
             return  this.x + this.width > movableObject.x &&
                     this.y + this.height > movableObject.y &&
                     this.x < movableObject.x + movableObject.width &&
