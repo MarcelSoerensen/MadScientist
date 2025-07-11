@@ -31,6 +31,7 @@ class World{
         this.ctx = canvas.getContext('2d');
         this.canvas = canvas;
         this.keyboard = keyboard;
+        
         this.draw();
         this.setWorld();
         this.checkCollisions();
@@ -94,9 +95,51 @@ class World{
 
     /**
      * Draws the status bar on the map
+     * Renders the status bar image and overlays a custom HP bar with trapezoid shape
      */
     drawStatusBar() {
         this.addToMap(this.statusBar);
+        
+        /** Draw the green HP bar overlay based on character's health percentage */
+        if (this.character.energy > 0) {
+            /** Use the pre-calculated HP width from the StatusBar */
+            const currentHPWidth = this.statusBar.currentHPWidth;
+            
+            this.ctx.save();
+            
+            /** Create slanted clipping path for HP-based width */
+            const clipStartX = this.statusBar.x + 47;
+            const clipWidth = currentHPWidth;
+            const widthRatio = clipWidth / 148; // 148 = trapezWidth (195 - 47)
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(clipStartX, this.statusBar.y + 4);
+            this.ctx.lineTo(clipStartX + clipWidth, this.statusBar.y + 4);
+            this.ctx.lineTo(clipStartX + clipWidth - (3 * widthRatio), this.statusBar.y + 22);
+            this.ctx.lineTo(clipStartX, this.statusBar.y + 28);
+            this.ctx.closePath();
+            this.ctx.clip();
+            
+            /** Create trapezoid path for HP bar shape */
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.statusBar.x + 46, this.statusBar.y + 6.9);    // topLeft
+            this.ctx.lineTo(this.statusBar.x + 195, this.statusBar.y + 4);     // topRight
+            this.ctx.lineTo(this.statusBar.x + 192, this.statusBar.y + 22);    // bottomRight
+            this.ctx.lineTo(this.statusBar.x + 49, this.statusBar.y + 22);     // bottomLeft
+            this.ctx.closePath();
+            
+            /** Create sharp gradient with "kink" effect for HP bar color */
+            const gradient = this.ctx.createLinearGradient(0, this.statusBar.y + 6, 0, this.statusBar.y + 22);
+            gradient.addColorStop(0, 'rgb(117, 197, 27)');
+            gradient.addColorStop(0.4, 'rgb(117, 197, 27)');
+            gradient.addColorStop(0.6, 'rgb(103, 178, 27)');
+            gradient.addColorStop(1, 'rgb(103, 178, 27)');
+            
+            this.ctx.fillStyle = gradient;
+            this.ctx.fill();
+            
+            this.ctx.restore();
+        }
     }
 
     /**
