@@ -23,7 +23,7 @@ class Character extends CollidableObject {
         right: 130,
         bottom: 110
     };
-    
+
     /** @type {string[]} Array of walking animation image paths */
     IMAGES_WALKING = [
         'img/Main Characters/Gun01/Walk/Walk_00.png',
@@ -118,6 +118,24 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Get Hit/Get Hit_09.png',
     ];
 
+    /** @type {string[]} Array of idle animation image paths */
+    IMAGES_IDLE = [
+        'img/Main Characters/Gun01/Idle/Idle_00.png',
+        'img/Main Characters/Gun01/Idle/Idle_01.png',
+        'img/Main Characters/Gun01/Idle/Idle_02.png',
+        'img/Main Characters/Gun01/Idle/Idle_03.png',
+        'img/Main Characters/Gun01/Idle/Idle_04.png',
+        'img/Main Characters/Gun01/Idle/Idle_05.png',
+        'img/Main Characters/Gun01/Idle/Idle_06.png',
+        'img/Main Characters/Gun01/Idle/Idle_07.png',
+        'img/Main Characters/Gun01/Idle/Idle_08.png',
+        'img/Main Characters/Gun01/Idle/Idle_09.png',
+        'img/Main Characters/Gun01/Idle/Idle_10.png',   
+        'img/Main Characters/Gun01/Idle/Idle_11.png',
+        'img/Main Characters/Gun01/Idle/Idle_12.png',
+        'img/Main Characters/Gun01/Idle/Idle_13.png',
+    ];  
+
     /** @type {World} Reference to the game world */
     world;
     /** @type {string} Last played animation name */
@@ -147,6 +165,7 @@ class Character extends CollidableObject {
         this.loadImages(this.IMAGES_JUMPING);
         this.loadImages(this.IMAGES_DEAD);
         this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_IDLE);
         this.x = 0;
         this.isAboveGroundActive = false;
         this.animate();
@@ -193,9 +212,8 @@ class Character extends CollidableObject {
                     this.playAnimation(this.IMAGES_WALKING);
                     this.lastAnimation = 'walk';
                 } else {
-                    this.img = this.imageCache[this.IMAGES_WALKING[0]];
+                    this.playAnimation(this.IMAGES_IDLE);
                     this.lastAnimation = 'idle';
-                    this.currentImage = 0;
                 }
             }
         }, 60);
@@ -237,6 +255,10 @@ class Character extends CollidableObject {
             }
         }
 
+        /**
+         * Holds the character at the peak of the jump
+         * Allows extended hovering while moving and UP key is held
+         */
         function holdOnTop() {
             const maxJumpDistance = 150;
             const distance = Math.abs(self.x - self.startJumpX);
@@ -251,6 +273,10 @@ class Character extends CollidableObject {
             }
         }
 
+        /**
+         * Animates the character falling down from the jump peak
+         * Plays jump frames in reverse order with corresponding delays
+         */
         function animateDown() {
             let delay = self.JUMP_DELAYS.slice().reverse()[self.IMAGES_JUMPING.length - 1 - frame] || 60;
             self.img = self.imageCache[self.IMAGES_JUMPING[frame]];
