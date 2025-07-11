@@ -19,6 +19,8 @@ class World{
     keyboard;
     /** @type {number} Camera X position for scrolling */
     camera_x = 0;
+    /** @type {StatusBar} The status bar for displaying game stats */
+    statusBar = new StatusBar();
 
     /**
      * Creates a new World instance
@@ -50,6 +52,7 @@ class World{
             this.level.enemies.forEach(enemy => {
                if( this.character.isColliding(enemy)) {
                     this.character.hit();
+                    this.statusBar.setPercentage(this.character.energy);
                     console.log(`Collision detected! Character energy: ${this.character.energy}`);   
                }
             });
@@ -65,13 +68,15 @@ class World{
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.ctx.translate(this.camera_x, 0);
-        
+
         this.drawMainBackground();
         this.drawGameObjects();
         this.drawParallaxTop();
         this.drawParallaxBottom();
 
         this.ctx.translate(-this.camera_x, 0);
+
+        this.drawStatusBar();
 
         let self = this;
         requestAnimationFrame(function() {
@@ -85,6 +90,13 @@ class World{
     drawMainBackground() {
         this.addToMap(this.backgroundObjects[3]);
         this.addToMap(this.backgroundObjects[0]);
+    }
+
+    /**
+     * Draws the status bar on the map
+     */
+    drawStatusBar() {
+        this.addToMap(this.statusBar);
     }
 
     /**

@@ -1,6 +1,6 @@
 /**
  * Represents the end boss enemy
- * @extends MovableObject
+ * @extends CollidableObject
  */
 class Endboss extends CollidableObject {
     /** @type {number} Height of the endboss */
