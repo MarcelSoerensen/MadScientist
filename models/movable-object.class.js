@@ -16,6 +16,12 @@ class MovableObject extends DrawableObject {
     /** @type {number} Timestamp of last hit */
     lastHit = 0;
 
+    applyGravity() {
+        setInterval(() => {
+            this.y -= this.speedY;
+            this.speedY -= this.acceleration;
+        }, 1000 / 60);
+    }
 
     /**
      * Applies gravity animation with custom delays

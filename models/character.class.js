@@ -134,7 +134,32 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Idle/Idle_11.png',
         'img/Main Characters/Gun01/Idle/Idle_12.png',
         'img/Main Characters/Gun01/Idle/Idle_13.png',
-    ];  
+    ]; 
+    
+    /** @type {string[]} Array of throw bomb animation image paths */
+    IMAGES_THROW_BOMB = [
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_00.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_01.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_02.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_03.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_04.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_05.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_06.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_07.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_08.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_09.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_10.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_11.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_12.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_13.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_14.png', 
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_15.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_16.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_17.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_18.png',
+        'img/Main Characters/Gun01/Throw bomb/Throw bomb_19.png',
+    ];
+
 
     /** @type {World} Reference to the game world */
     world;
@@ -150,6 +175,8 @@ class Character extends CollidableObject {
     jumpOffsetY = 0;
     /** @type {boolean} Flag to track if death animation has been played */
     deathAnimationPlayed = false;
+    /** @type {boolean} Flag to track if throw animation is currently playing */
+    throwAnimationPlaying = false;
     /** @type {number[]} Array of delays for jump animation frames */
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
     /** @type {number[]} Reversed jump delays for downward animation */
@@ -166,6 +193,7 @@ class Character extends CollidableObject {
         this.loadImages(this.IMAGES_DEAD);
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_IDLE);
+        this.loadImages(this.IMAGES_THROW_BOMB);
         this.x = 0;
         this.isAboveGroundActive = false;
         this.animate();
@@ -207,7 +235,7 @@ class Character extends CollidableObject {
         }, 1000 / 60);
 
         setInterval(() => {
-            if (!this.isDead() && !this.isAboveGround()) {
+            if (!this.isDead() && !this.isAboveGround() && !this.throwAnimationPlaying) {
                 if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
                     this.playAnimation(this.IMAGES_WALKING);
                     this.lastAnimation = 'walk';
@@ -313,6 +341,33 @@ class Character extends CollidableObject {
                 setTimeout(animateFrame, delay);
             } else {
                 self.lastAnimation = 'dead';
+            }
+        }
+
+        animateFrame();
+    }
+
+    /**
+     * Plays the throw bomb animation once
+     * Animation plays through all frames with 30ms delay
+     */
+    playThrowBombAnimation() {
+        if (this.throwAnimationPlaying) return;
+        
+        this.throwAnimationPlaying = true;
+        let frame = 0;
+        const self = this;
+        const delays = new Array(this.IMAGES_THROW_BOMB.length).fill(30);
+
+        function animateFrame() {
+            if (frame < self.IMAGES_THROW_BOMB.length) {
+                self.img = self.imageCache[self.IMAGES_THROW_BOMB[frame]];
+                let delay = delays[frame];
+                frame++;
+                setTimeout(animateFrame, delay);
+            } else {
+                self.lastAnimation = 'throw';
+                self.throwAnimationPlaying = false;
             }
         }
 

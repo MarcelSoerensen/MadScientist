@@ -12,4 +12,6 @@ class Keyboard {
     DOWN = false;
     /** @type {boolean} Spacebar key state */
     SPACE = false;
+    /** @type {boolean} D key state */
+    D = false;
 }

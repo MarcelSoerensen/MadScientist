@@ -21,6 +21,11 @@ class World{
     camera_x = 0;
     /** @type {StatusBar} The status bar for displaying game stats */
     statusBar = new StatusBar();
+    /** @type {Array} Array of throwable objects */
+    throwableObjects = [];
+
+    /** @type {boolean} Flag to track if D key was pressed in previous frame */
+    lastDKeyState = false;
 
     /**
      * Creates a new World instance
@@ -34,7 +39,7 @@ class World{
         
         this.draw();
         this.setWorld();
-        this.checkCollisions();
+        this.run();
     }
     
     /**
@@ -45,20 +50,52 @@ class World{
     }
 
     /**
-     * Checks for collisions between character and enemies
-     * Runs at 200ms intervals
+     * Starts the main game loop
+     * Runs collision detection and throwable object checks at different intervals
+     */
+    run() {
+        setInterval(() => {
+            this.checkCollisions();
+        }, 200);
+        
+        setInterval(() => {
+            this.checkThrowableObjects();
+        }, 1000 / 60);
+    }
+
+    /**
+     * Checks for throwable object creation when D key is pressed
+     * Ensures only one projectile is created per key press and starts throw animation
+     */
+    checkThrowableObjects() {
+        if (this.keyboard.D && !this.lastDKeyState && !this.character.throwAnimationPlaying) {
+            this.character.playThrowBombAnimation();
+            
+            setTimeout(() => {
+                let bomb = new ThrowableObjects(
+                    this.character.x + 160, 
+                    this.character.y + 180,
+                    this.character.otherDirection
+                );
+                this.throwableObjects.push(bomb);
+            }, 500);
+        }
+        this.lastDKeyState = this.keyboard.D;
+    }
+
+    /**
+     * Checks for collisions between the character and enemies
+     * Reduces character energy and updates status bar when collision occurs
      */
     checkCollisions() {
-        setInterval(() => {
-            this.level.enemies.forEach(enemy => {
+        this.level.enemies.forEach(enemy => {
                if( this.character.isColliding(enemy)) {
                     this.character.hit();
                     this.statusBar.setPercentage(this.character.energy);
                     console.log(`Collision detected! Character energy: ${this.character.energy}`);   
                }
             });
-        },200);
-    }
+        }
 
     /**
      * Main rendering loop for the game
@@ -148,6 +185,7 @@ class World{
     drawGameObjects() {
         this.addObjectsToMap(this.enemies);
         this.addToMap(this.character);
+        this.addObjectsToMap(this.throwableObjects);
     }
 
     /**
