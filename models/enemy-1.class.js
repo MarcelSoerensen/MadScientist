@@ -181,7 +181,7 @@ class EnemyOne extends CollidableObject {
             clearInterval(this.animInterval);
             this.animInterval = null;
         }
-        // Death-Animation als eigene Schleife
+
         let deathFrame = 0;
         this.deathAnimInterval = setInterval(() => {
             if (deathFrame < this.IMAGES_DEATH.length) {
@@ -193,7 +193,6 @@ class EnemyOne extends CollidableObject {
             }
         }, 50);
 
-        // Timer für Blinken und Entfernen
         setTimeout(() => {
             this.startBlinking();
         }, 2500);
@@ -202,14 +201,12 @@ class EnemyOne extends CollidableObject {
         }, 4000);
     }
 
-    // Blinkt den Gegner (sichtbar/unsichtbar im Intervall)
     startBlinking() {
         this.blinkInterval = setInterval(() => {
             this.visible = !this.visible;
         }, 200);
     }
 
-    // Entfernt den Gegner (macht ihn komplett unsichtbar und stoppt Blinken)
     removeEnemy() {
         this.visible = false;
         if (this.blinkInterval) {
