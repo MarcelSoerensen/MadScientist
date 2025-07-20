@@ -122,13 +122,23 @@ class World{
      */
     checkCollisions() {
         this.level.enemies.forEach(enemy => {
-               if( this.character.isColliding(enemy)) {
-                    this.character.hit();
-                    this.statusBar.setPercentage(this.character.energy);
-                    console.log(`Collision detected! Character energy: ${this.character.energy}`);   
-               }
+            // Charakter-Enemy-Kollision
+            if (this.character.isColliding(enemy)) {
+                this.character.hit();
+                this.statusBar.setPercentage(this.character.energy);
+                console.log(`Collision detected! Character energy: ${this.character.energy}`);
+            }
+
+            // Laser-Enemy-Kollision
+            this.laserBeams.forEach(laser => {
+                if (laser.isColliding(enemy)) {
+                    if (typeof enemy.triggerElectricHurt === 'function') {
+                        enemy.triggerElectricHurt();
+                    }
+                }
             });
-        }
+        });
+    }
 
     /**
      * Main rendering loop for the game

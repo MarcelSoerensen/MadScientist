@@ -78,12 +78,35 @@ class MovableObject extends DrawableObject {
                 otherYPos += movableObject.jumpOffsetY * 1.5;
             }
             
-            return (
-                this.x + this.offset.left < movableObject.x + movableObject.width - movableObject.offset.right &&
-                this.x + this.width - this.offset.right > movableObject.x + movableObject.offset.left &&
-                thisYPos + this.offset.top < otherYPos + movableObject.height - movableObject.offset.bottom &&
-                thisYPos + this.height - this.offset.bottom > otherYPos + movableObject.offset.top
-            );
+            const leftA = this.x + this.offset.left;
+            const rightA = this.x + this.width - this.offset.right;
+            const topA = thisYPos + this.offset.top;
+            const bottomA = thisYPos + this.height - this.offset.bottom;
+
+            const leftB = movableObject.x + movableObject.offset.left;
+            const rightB = movableObject.x + movableObject.width - movableObject.offset.right;
+            const topB = otherYPos + movableObject.offset.top;
+            const bottomB = otherYPos + movableObject.height - movableObject.offset.bottom;
+
+            /**
+             * Standard collision: bounding boxes overlap
+             */
+            const collision =
+                leftA < rightB &&
+                rightA > leftB &&
+                topA < bottomB &&
+                bottomA > topB;
+
+            /**
+             * Containment: A is fully inside B
+             */
+            const contained =
+                leftA >= leftB &&
+                rightA <= rightB &&
+                topA >= topB &&
+                bottomA <= bottomB;
+
+            return collision || contained;
         } else {
             return  this.x + this.width > movableObject.x &&
                     this.y + this.height > movableObject.y &&

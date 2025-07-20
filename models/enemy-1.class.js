@@ -37,6 +37,25 @@ class EnemyOne extends CollidableObject {
     ];
 
     /**
+     * Indicates if the enemy is currently hit by a laser
+     * @type {boolean}
+     */
+    isElectricHurt = false;
+
+    /**
+     * Timeout handler for electric hurt animation
+     * @type {number|null}
+     */
+    electricHurtTimeout = null;
+
+    IMAGES_GET_ELECTRIC = [
+        'img/Enemy Characters/Enemy Character01/Get Electric/Get Electric_0.png',
+        'img/Enemy Characters/Enemy Character01/Get Electric/Get Electric_1.png',
+        'img/Enemy Characters/Enemy Character01/Get Electric/Get Electric_2.png',
+        'img/Enemy Characters/Enemy Character01/Get Electric/Get Electric_3.png',
+    ];
+
+    /**
      * Creates a new EnemyOne instance
      * Initializes position, speed, and starts animation
      */
@@ -48,6 +67,7 @@ class EnemyOne extends CollidableObject {
 
         this.speed = 0.15 + Math.random() * 0.25;
 
+        this.loadImages(this.IMAGES_GET_ELECTRIC);
         this.animate();
     }
 
@@ -61,8 +81,27 @@ class EnemyOne extends CollidableObject {
         }, 1000 / 60);
 
         setInterval(() => {
-            this.playAnimation(this.IMAGES_WALKING);
+            if (this.isElectricHurt) {
+                this.playAnimation(this.IMAGES_GET_ELECTRIC);
+            } else {
+                this.playAnimation(this.IMAGES_WALKING);
+            }
         }, 100);
+    }
+
+    /**
+     * Triggers the electric hurt animation (e.g. on laser collision)
+     * Animation runs for 500ms and then returns to normal state
+     */
+    triggerElectricHurt() {
+        if (this.electricHurtTimeout) {
+            clearTimeout(this.electricHurtTimeout);
+        }
+        this.isElectricHurt = true;
+        this.electricHurtTimeout = setTimeout(() => {
+            this.isElectricHurt = false;
+            this.electricHurtTimeout = null;
+        }, 500);
     }
 
 }
