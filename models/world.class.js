@@ -1,14 +1,22 @@
 /**
- * Represents the game world that manages all game objects and rendering
+ * Import EnergyBallManager and EnergyBall if using modules:
+ * import { EnergyBallManager, EnergyBall } from './energy-balls.class.js';
+ * If not using ES6 modules, ensure this file is loaded before world.class.js
+ */
+/**
+ * Represents the game world. Manages all game objects, rendering, and main game loop.
+ * @class World
  */
 class World{
     /** @type {Character} The player character */
     character = new Character();
-    /** @type {Level} Current game level */
+    /** @type {Level} The current game level */
     level = level1;
-    /** @type {Array} Array of enemy objects */
+    /** @type {Array<EnemyOne>} Array of enemy objects */
     enemies = level1.enemies;
-    /** @type {Array} Array of background objects */
+    /** @type {EnergyBallManager} Manages all energy balls */
+    energyBallManager;
+    /** @type {Array<DrawableObject>} Array of background objects */
     backgroundObjects = level1.backgroundObjects;
 
     /** @type {HTMLCanvasElement} The game canvas */
@@ -19,20 +27,20 @@ class World{
     keyboard;
     /** @type {number} Camera X position for scrolling */
     camera_x = 0;
-    /** @type {StatusBar} The status bar for displaying game stats */
+    /** @type {StatusBar} Displays game stats */
     statusBar = new StatusBar();
-    /** @type {Array} Array of throwable objects */
+    /** @type {Array<ThrowableObjects>} Array of throwable objects */
     throwableObjects = [];
-    /** @type {Array} Array of laser beam objects */
+    /** @type {Array<LaserBeam>} Array of laser beam objects */
     laserBeams = [];
 
-    /** @type {boolean} Flag to track if D key was pressed in previous frame */
+    /** @type {boolean} Tracks if D key was pressed in previous frame */
     lastDKeyState = false;
-    /** @type {boolean} Flag to track if Y key was pressed in previous frame */
+    /** @type {boolean} Tracks if Y key was pressed in previous frame */
     lastYKeyState = false;
 
     /**
-     * Creates a new World instance
+     * Creates a new World instance.
      * @param {HTMLCanvasElement} canvas - The game canvas
      * @param {Keyboard} keyboard - The keyboard input handler
      */
@@ -40,22 +48,24 @@ class World{
         this.ctx = canvas.getContext('2d');
         this.canvas = canvas;
         this.keyboard = keyboard;
-        
-        this.draw();
         this.setWorld();
+        /** Initialize EnergyBallManager with character */
+        this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
+        this.draw();
         this.run();
     }
     
     /**
-     * Sets up bidirectional reference between world and character
+     * Sets up bidirectional reference between world and character.
+     * @returns {void}
      */
     setWorld() {
         this.character.world = this;
     }
 
     /**
-     * Starts the main game loop
-     * Runs collision detection and throwable object checks at different intervals
+     * Starts the main game loop. Runs collision detection and throwable object checks at different intervals.
+     * @returns {void}
      */
     run() {
         setInterval(() => {
@@ -69,18 +79,15 @@ class World{
     }
 
     /**
-     * Checks for throwable object creation when D key is pressed
-     * Ensures only one projectile is created per key press and starts throw animation
+     * Checks for throwable object creation when D key is pressed.
+     * Ensures only one projectile is created per key press and starts throw animation.
+     * @returns {void}
      */
     checkThrowableObjects() {
         if (this.keyboard.D && !this.lastDKeyState && !this.character.throwAnimationPlaying) {
             this.character.playThrowBombAnimation();
-            
             setTimeout(() => {
-                let bombX = this.character.otherDirection ? 
-                    this.character.x + 100 :  // Nach links: etwas weiter rechts
-                    this.character.x + 160; // Nach rechts: normale Position
-                    
+                let bombX = this.character.otherDirection ? this.character.x + 100 : this.character.x + 160;
                 let bomb = new ThrowableObjects(
                     bombX, 
                     this.character.y + 180,
@@ -93,12 +100,12 @@ class World{
     }
 
     /**
-     * Checks for laser beam creation when Y key is pressed
-     * Creates animated laser beam while Y is held, removes when released
+     * Checks for laser beam creation when Y key is pressed.
+     * Creates animated laser beam while Y is held, removes when released.
+     * @returns {void}
      */
     checkLaserBeams() {
         if (this.keyboard.Y && !this.lastYKeyState) {
-            // Y-Taste wurde gerade gedrückt - Laser erstellen
             let laser = new LaserBeam(
                 this.character.x + 220,
                 this.character.y + 205,
@@ -107,7 +114,6 @@ class World{
             );
             this.laserBeams.push(laser);
         } else if (!this.keyboard.Y && this.lastYKeyState) {
-            // Y-Taste wurde gerade losgelassen - alle Laser entfernen
             this.laserBeams.forEach(laser => {
                 laser.stopAnimation();
             });
@@ -117,19 +123,17 @@ class World{
     }
 
     /**
-     * Checks for collisions between the character and enemies
-     * Reduces character energy and updates status bar when collision occurs
+     * Checks for collisions between the character and enemies.
+     * Reduces character energy and updates status bar when collision occurs.
+     * @returns {void}
      */
     checkCollisions() {
         this.level.enemies.forEach(enemy => {
-            // Charakter-Enemy-Kollision
             if (this.character.isColliding(enemy)) {
                 this.character.hit();
                 this.statusBar.setPercentage(this.character.energy);
                 console.log(`Collision detected! Character energy: ${this.character.energy}`);
             }
-
-            // Laser-Enemy-Kollision
             this.laserBeams.forEach(laser => {
                 if (laser.isColliding(enemy)) {
                     if (typeof enemy.triggerElectricHurt === 'function') {
@@ -141,8 +145,8 @@ class World{
     }
 
     /**
-     * Main rendering loop for the game
-     * Handles camera translation and draws all game objects
+     * Main rendering loop for the game. Handles camera translation and draws all game objects.
+     * @returns {void}
      */
     draw() {
 
@@ -166,7 +170,8 @@ class World{
     }
 
     /**
-     * Draws the main background layers
+     * Draws the main background layers.
+     * @returns {void}
      */
     drawMainBackground() {
         this.addToMap(this.backgroundObjects[3]);
@@ -174,8 +179,8 @@ class World{
     }
 
     /**
-     * Draws the status bar on the map
-     * Renders the status bar image and overlays a custom HP bar with trapezoid shape
+     * Draws the status bar on the map. Renders the status bar image and overlays a custom HP bar with trapezoid shape.
+     * @returns {void}
      */
     drawStatusBar() {
         this.addToMap(this.statusBar);
@@ -223,17 +228,24 @@ class World{
     }
 
     /**
-     * Draws all game objects (enemies and character)
+     * Draws all game objects (enemies, character, projectiles, energy balls).
+     * @returns {void}
      */
     drawGameObjects() {
         this.addObjectsToMap(this.enemies);
         this.addToMap(this.character);
         this.addObjectsToMap(this.throwableObjects);
         this.addObjectsToMap(this.laserBeams);
+        /** Draw energy balls */
+        if (this.energyBallManager) {
+            this.energyBallManager.update(this.character);
+            this.energyBallManager.draw(this.ctx);
+        }
     }
 
     /**
-     * Draws parallax background layers for the top portion
+     * Draws parallax background layers for the top portion.
+     * @returns {void}
      */
     drawParallaxTop() {
         this.ctx.translate(this.camera_x * 0.25, 0);
@@ -244,7 +256,8 @@ class World{
     }
 
     /**
-     * Draws parallax background layers for the bottom portion
+     * Draws parallax background layers for the bottom portion.
+     * @returns {void}
      */
     drawParallaxBottom() {
         this.ctx.translate(this.camera_x * 0.5, 0);
@@ -255,8 +268,9 @@ class World{
     }
 
     /**
-     * Adds an array of objects to the map
-     * @param {Array} objects - Array of objects to draw
+     * Adds an array of objects to the map.
+     * @param {Array<DrawableObject>} objects - Array of objects to draw
+     * @returns {void}
      */
     addObjectsToMap(objects) {
         objects.forEach(object => {
@@ -265,8 +279,9 @@ class World{
     }
 
     /**
-     * Adds a single movable object to the map with proper flipping and collision frames
+     * Adds a single movable object to the map with proper flipping and collision frames.
      * @param {MovableObject} movableObject - The object to add to the map
+     * @returns {void}
      */
     addToMap(movableObject) {
         if (
@@ -292,8 +307,9 @@ class World{
     }
 
     /**
-     * Flips the image horizontally for objects facing the opposite direction
+     * Flips the image horizontally for objects facing the opposite direction.
      * @param {MovableObject} movableObject - The object to flip
+     * @returns {void}
      */
     flipImage(movableObject) {
         this.ctx.save();
@@ -303,8 +319,9 @@ class World{
     }
 
     /**
-     * Restores the canvas state after flipping an image
+     * Restores the canvas state after flipping an image.
      * @param {MovableObject} movableObject - The object to restore
+     * @returns {void}
      */
     flipImageBack(movableObject) {
         movableObject.x = movableObject.x * -1;

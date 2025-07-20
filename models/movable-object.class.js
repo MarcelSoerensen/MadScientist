@@ -61,7 +61,6 @@ class MovableObject extends DrawableObject {
      * @returns {boolean} True if objects are colliding
      */
     isColliding(movableObject){
-
         // Prüfe, ob beide Objekte collidable sind
         if (this.collidable === false || movableObject.collidable === false) {
             return false;
@@ -99,12 +98,25 @@ class MovableObject extends DrawableObject {
                 rightA <= rightB &&
                 topA >= topB &&
                 bottomA <= bottomB;
+            if (collision || contained) {
+                console.log('isColliding detected:', {
+                    objectA: {leftA, rightA, topA, bottomA, x: this.x, y: this.y, w: this.width, h: this.height, offset: this.offset},
+                    objectB: {leftB, rightB, topB, bottomB, x: movableObject.x, y: movableObject.y, w: movableObject.width, h: movableObject.height, offset: movableObject.offset}
+                });
+            }
             return collision || contained;
         } else {
-            return  this.x + this.width > movableObject.x &&
+            const collision =  this.x + this.width > movableObject.x &&
                     this.y + this.height > movableObject.y &&
                     this.x < movableObject.x + movableObject.width &&
                     this.y < movableObject.y + movableObject.height;
+            if (collision) {
+                console.log('isColliding detected:', {
+                    objectA: {x: this.x, y: this.y, w: this.width, h: this.height},
+                    objectB: {x: movableObject.x, y: movableObject.y, w: movableObject.width, h: movableObject.height}
+                });
+            }
+            return collision;
         }
     }
 
