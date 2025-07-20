@@ -49,7 +49,7 @@ class Endboss extends CollidableObject {
     constructor() {
         super().loadImage('img/Enemy Characters/Enemy Character07/Walk/Walk_00.png');
         this.loadImages(this.IMAGES_WALKING);
-        this.x = (1952 * 2 - 500);
+        this.x = (1952 * 2 - 900);
         this.animate();
     }
 

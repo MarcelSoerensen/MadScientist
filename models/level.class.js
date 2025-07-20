@@ -7,7 +7,7 @@ class Level {
     /** @type {Array} Array of background objects in this level */
     backgroundObjects;
     /** @type {number} X coordinate where the level ends */
-    level_end_x = 1952*2-620;
+    level_end_x = (1952*2-400 + 80); // Level-Ende = rechtes Ende des letzten Backgrounds
 
     /**
      * Creates a new Level instance

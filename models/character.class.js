@@ -3,19 +3,49 @@
  * @extends CollidableObject
  */
 class Character extends CollidableObject {
-    /** @type {number} Y position of the character */
+    /**
+     * Moves the character to the right by the given speed
+     * @param {number} speed - Movement speed
+     */
+    /**
+     * Moves the character to the left by the given speed
+     * @param {number} speed - Movement speed
+     */
+    /**
+     * Checks if the character is dead
+     * @returns {boolean}
+     */
+    /**
+     * Checks if the character is above ground
+     * @returns {boolean}
+     */
+    /**
+     * Checks if the character is hurt
+     * @returns {boolean}
+     */
+    /**
+     * Plays the specified animation sequence
+     * @param {string[]} images - Array of image paths
+     */
+    /**
+     * Y position of the character
+     * @type {number}
+     */
     y= 110;
-    /** @type {number} Height of the character */
+    /**
+     * Height of the character
+     * @type {number}
+     */
     height = 380;
-    /** @type {number} Movement speed of the character */
+    /**
+     * Movement speed of the character
+     * @type {number}
+     */
     speed = 2;
 
-    /** 
-     * @type {Object} Collision offset values for the character
-     * @property {number} top - Top offset in pixels
-     * @property {number} left - Left offset in pixels
-     * @property {number} right - Right offset in pixels
-     * @property {number} bottom - Bottom offset in pixels
+    /**
+     * Collision offset values for the character
+     * @type {{top: number, left: number, right: number, bottom: number}}
      */
     offset = {
         top: 185,
@@ -24,7 +54,10 @@ class Character extends CollidableObject {
         bottom: 110
     };
 
-    /** @type {string[]} Array of walking animation image paths */
+    /**
+     * Array of walking animation image paths
+     * @type {string[]}
+     */
     IMAGES_WALKING = [
         'img/Main Characters/Gun01/Walk/Walk_00.png',
         'img/Main Characters/Gun01/Walk/Walk_01.png',
@@ -42,7 +75,10 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Walk/Walk_13.png',
     ];
 
-    /** @type {string[]} Array of jumping animation image paths */
+    /**
+     * Array of jumping animation image paths
+     * @type {string[]}
+     */
     IMAGES_JUMPING = [
         'img/Main Characters/Gun01/Jump/Jump_00.png',
         'img/Main Characters/Gun01/Jump/Jump_01.png',
@@ -56,7 +92,10 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Jump/Jump_09.png',   
     ];
 
-    /** @type {string[]} Array of death animation image paths */
+    /**
+     * Array of death animation image paths
+     * @type {string[]}
+     */
     IMAGES_DEAD = [
         'img/Main Characters/Gun01/Death/Death_00.png',
         'img/Main Characters/Gun01/Death/Death_01.png',
@@ -104,7 +143,10 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Death/Death_43.png',
     ];
 
-    /** @type {string[]} Array of hurt animation image paths */
+    /**
+     * Array of hurt animation image paths
+     * @type {string[]}
+     */
     IMAGES_HURT = [
         'img/Main Characters/Gun01/Get Hit/Get Hit_00.png',
         'img/Main Characters/Gun01/Get Hit/Get Hit_01.png',
@@ -118,7 +160,10 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Get Hit/Get Hit_09.png',
     ];
 
-    /** @type {string[]} Array of idle animation image paths */
+    /**
+     * Array of idle animation image paths
+     * @type {string[]}
+     */
     IMAGES_IDLE = [
         'img/Main Characters/Gun01/Idle/Idle_00.png',
         'img/Main Characters/Gun01/Idle/Idle_01.png',
@@ -136,7 +181,10 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Idle/Idle_13.png',
     ]; 
     
-    /** @type {string[]} Array of throw bomb animation image paths */
+    /**
+     * Array of throw bomb animation image paths
+     * @type {string[]}
+     */
     IMAGES_THROW_BOMB = [
         'img/Main Characters/Gun01/Throw bomb/Throw bomb_00.png',
         'img/Main Characters/Gun01/Throw bomb/Throw bomb_01.png',
@@ -160,25 +208,55 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Throw bomb/Throw bomb_19.png',
     ];
 
-    /** @type {World} Reference to the game world */
+    /**
+     * Reference to the game world
+     * @type {World}
+     */
     world;
-    /** @type {string} Last played animation name */
+    /**
+     * Last played animation name
+     * @type {string}
+     */
     lastAnimation = '';
-    /** @type {number} Current animation frame index */
+    /**
+     * Current animation frame index
+     * @type {number}
+     */
     currentImage = 0;
-    /** @type {boolean} Whether the character is currently above ground */
+    /**
+     * Whether the character is currently above ground
+     * @type {boolean}
+     */
     isAboveGroundActive = false;
-    /** @type {number} X position where the jump started */
+    /**
+     * X position where the jump started
+     * @type {number}
+     */
     startJumpX = 0;
-    /** @type {number} Y offset for jump animation */
+    /**
+     * Y offset for jump animation
+     * @type {number}
+     */
     jumpOffsetY = 0;
-    /** @type {boolean} Flag to track if death animation has been played */
+    /**
+     * Flag to track if death animation has been played
+     * @type {boolean}
+     */
     deathAnimationPlayed = false;
-    /** @type {boolean} Flag to track if throw animation is currently playing */
+    /**
+     * Flag to track if throw animation is currently playing
+     * @type {boolean}
+     */
     throwAnimationPlaying = false;
-    /** @type {number[]} Array of delays for jump animation frames */
+    /**
+     * Array of delays for jump animation frames
+     * @type {number[]}
+     */
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
-    /** @type {number[]} Reversed jump delays for downward animation */
+    /**
+     * Reversed jump delays for downward animation
+     * @type {number[]}
+     */
     JUMP_DELAYS_DOWN = [...this.JUMP_DELAYS].reverse();
 
     /**
@@ -215,7 +293,7 @@ class Character extends CollidableObject {
                 moveSpeed = this.speed * 1.5; 
             }
 
-            if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x - 100) {
+            if (this.world.keyboard.RIGHT && this.x < 3250) {
                 this.moveRight(moveSpeed);
                 this.otherDirection = false;
             }
@@ -224,7 +302,20 @@ class Character extends CollidableObject {
                 this.otherDirection = true;
             }
 
-            this.world.camera_x = -this.x;
+            let targetCameraX;
+            if (this.otherDirection) {
+                targetCameraX = -this.x + 400;
+            } else {
+                targetCameraX = -this.x;
+            }
+            const canvasWidth = 1100;
+            const charWidth = this.width;
+            const maxCameraX = -(this.world.level.level_end_x - canvasWidth + charWidth);
+            if (targetCameraX < maxCameraX) {
+                targetCameraX = maxCameraX;
+            }
+            const cameraSpeed = 0.02;
+            this.world.camera_x += (targetCameraX - this.world.camera_x) * cameraSpeed;
 
             if (this.world.keyboard.UP && !this.isAboveGround()) {
                 this.isAboveGroundActive = true;
@@ -267,6 +358,10 @@ class Character extends CollidableObject {
         const maxJumpHeight = 100;
         const totalFrames = this.IMAGES_JUMPING.length;
 
+        /**
+         * Animates the character moving upward during a jump
+         * @private
+         */
         function animateUp() {
             self.img = self.imageCache[self.IMAGES_JUMPING[frame]];
             
@@ -283,8 +378,8 @@ class Character extends CollidableObject {
         }
 
         /**
-         * Holds the character at the peak of the jump
-         * Allows extended hovering while moving and UP key is held
+         * Holds the character at the peak of the jump, allowing extended hovering
+         * @private
          */
         function holdOnTop() {
             const maxJumpDistance = 150;
@@ -302,7 +397,7 @@ class Character extends CollidableObject {
 
         /**
          * Animates the character falling down from the jump peak
-         * Plays jump frames in reverse order with corresponding delays
+         * @private
          */
         function animateDown() {
             let delay = self.JUMP_DELAYS.slice().reverse()[self.IMAGES_JUMPING.length - 1 - frame] || 60;
@@ -332,6 +427,10 @@ class Character extends CollidableObject {
         const self = this;
         const delays = new Array(this.IMAGES_DEAD.length).fill(30);
 
+        /**
+         * Animates the character's death sequence frame by frame
+         * @private
+         */
         function animateFrame() {
             if (frame < self.IMAGES_DEAD.length) {
                 self.img = self.imageCache[self.IMAGES_DEAD[frame]];
@@ -358,6 +457,10 @@ class Character extends CollidableObject {
         const self = this;
         const delays = new Array(this.IMAGES_THROW_BOMB.length).fill(30);
 
+        /**
+         * Animates the character's throw bomb sequence frame by frame
+         * @private
+         */
         function animateFrame() {
             if (frame < self.IMAGES_THROW_BOMB.length) {
                 self.img = self.imageCache[self.IMAGES_THROW_BOMB[frame]];
