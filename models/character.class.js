@@ -160,7 +160,6 @@ class Character extends CollidableObject {
         'img/Main Characters/Gun01/Throw bomb/Throw bomb_19.png',
     ];
 
-
     /** @type {World} Reference to the game world */
     world;
     /** @type {string} Last played animation name */

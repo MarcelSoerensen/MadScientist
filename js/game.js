@@ -41,6 +41,10 @@ window.addEventListener('keydown', (event) => {
         keyboard.D = true;
     }
 
+    if (event.key === 'y') {
+        keyboard.Y = true;
+    }
+
 
     console.log('key pressed', event);
 
@@ -70,6 +74,10 @@ window.addEventListener('keyup', (event) => {
 
     if (event.key === 'd') {
         keyboard.D = false;
+    }
+
+    if (event.key === 'y') {
+        keyboard.Y = false;
     }
 
 

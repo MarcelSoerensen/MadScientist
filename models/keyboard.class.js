@@ -14,4 +14,6 @@ class Keyboard {
     SPACE = false;
     /** @type {boolean} D key state */
     D = false;
+    /** @type {boolean} Y key state */
+    Y = false;
 }

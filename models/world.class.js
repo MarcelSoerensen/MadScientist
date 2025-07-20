@@ -23,9 +23,13 @@ class World{
     statusBar = new StatusBar();
     /** @type {Array} Array of throwable objects */
     throwableObjects = [];
+    /** @type {Array} Array of laser beam objects */
+    laserBeams = [];
 
     /** @type {boolean} Flag to track if D key was pressed in previous frame */
     lastDKeyState = false;
+    /** @type {boolean} Flag to track if Y key was pressed in previous frame */
+    lastYKeyState = false;
 
     /**
      * Creates a new World instance
@@ -60,6 +64,7 @@ class World{
         
         setInterval(() => {
             this.checkThrowableObjects();
+            this.checkLaserBeams();
         }, 1000 / 60);
     }
 
@@ -72,8 +77,12 @@ class World{
             this.character.playThrowBombAnimation();
             
             setTimeout(() => {
+                let bombX = this.character.otherDirection ? 
+                    this.character.x + 100 :  // Nach links: etwas weiter rechts
+                    this.character.x + 160; // Nach rechts: normale Position
+                    
                 let bomb = new ThrowableObjects(
-                    this.character.x + 160, 
+                    bombX, 
                     this.character.y + 180,
                     this.character.otherDirection
                 );
@@ -81,6 +90,30 @@ class World{
             }, 500);
         }
         this.lastDKeyState = this.keyboard.D;
+    }
+
+    /**
+     * Checks for laser beam creation when Y key is pressed
+     * Creates animated laser beam while Y is held, removes when released
+     */
+    checkLaserBeams() {
+        if (this.keyboard.Y && !this.lastYKeyState) {
+            // Y-Taste wurde gerade gedrückt - Laser erstellen
+            let laser = new LaserBeam(
+                this.character.x + 220,
+                this.character.y + 205,
+                this.character.otherDirection,
+                this.character
+            );
+            this.laserBeams.push(laser);
+        } else if (!this.keyboard.Y && this.lastYKeyState) {
+            // Y-Taste wurde gerade losgelassen - alle Laser entfernen
+            this.laserBeams.forEach(laser => {
+                laser.stopAnimation();
+            });
+            this.laserBeams = [];
+        }
+        this.lastYKeyState = this.keyboard.Y;
     }
 
     /**
@@ -186,6 +219,7 @@ class World{
         this.addObjectsToMap(this.enemies);
         this.addToMap(this.character);
         this.addObjectsToMap(this.throwableObjects);
+        this.addObjectsToMap(this.laserBeams);
     }
 
     /**
