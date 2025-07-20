@@ -42,6 +42,25 @@ class Endboss extends CollidableObject {
         'img/Enemy Characters/Enemy Character07/Idle/Idle_13.png',
     ];
 
+    IMAGE_GET_ELECTRIC = [
+        'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_0.png',
+        'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_1.png',
+        'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_2.png',
+    ];
+    
+    /**
+     * Indicates if the endboss is currently hit by a laser
+     * @type {boolean}
+     */
+    isElectricHurt = false;
+    
+    /**
+     * Timeout handler for electric hurt animation
+     * @type {number|null}
+     */
+    electricHurtTimeout = null;
+
+
     /**
      * Creates a new Endboss instance
      * Initializes position and starts animation
@@ -50,6 +69,7 @@ class Endboss extends CollidableObject {
         super().loadImage('img/Enemy Characters/Enemy Character07/Walk/Walk_00.png');
         this.loadImages(this.IMAGES_WALKING);
         this.x = (1952 * 2 - 900);
+        this.loadImages(this.IMAGE_GET_ELECTRIC);
         this.animate();
     }
 
@@ -59,7 +79,26 @@ class Endboss extends CollidableObject {
      */
     animate() {
         setInterval(() => {
-            this.playAnimation(this.IMAGES_WALKING);
+            if (this.isElectricHurt) {
+                this.playAnimation(this.IMAGE_GET_ELECTRIC);
+            } else {
+                this.playAnimation(this.IMAGES_WALKING);
+            }
         }, 100);
+    }
+    
+    /**
+     * Triggers the electric hurt animation (e.g. on laser collision)
+     * Animation runs for 500ms and then returns to normal state
+     */
+    triggerElectricHurt() {
+        if (this.electricHurtTimeout) {
+            clearTimeout(this.electricHurtTimeout);
+        }
+        this.isElectricHurt = true;
+        this.electricHurtTimeout = setTimeout(() => {
+            this.isElectricHurt = false;
+            this.electricHurtTimeout = null;
+        }, 500);
     }
 }

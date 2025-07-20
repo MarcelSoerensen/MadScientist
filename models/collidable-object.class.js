@@ -29,14 +29,15 @@ class CollidableObject extends MovableObject {
      * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
      */
     drawCollisionFrame(ctx) {
+        if (!this.collidable) return;
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
-        
+
         let yPos = this.y + this.offset.top;
         if (this.jumpOffsetY !== undefined) {
             yPos += this.jumpOffsetY * 1.5;
         }
-        
+
         ctx.strokeRect(
             this.x + this.offset.left,
             yPos,
