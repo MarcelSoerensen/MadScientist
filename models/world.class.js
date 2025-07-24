@@ -231,7 +231,7 @@ class World {
                 const barY = this.superShotBar.y || 0;
                 const barWidth = this.superShotBar.width || 120;
                 const textX = barX + barWidth - 21;
-                const textY = barY + (this.superShotBar.height ? this.superShotBar.height / 2 + 5 : 35);
+                const textY = barY + (this.superShotBar.height ? this.superShotBar.height / 2 + 6 : 37);
                 this.ctx.lineWidth = 4;
                 this.ctx.strokeStyle = 'black';
                 this.ctx.strokeText(superShots, textX, textY);

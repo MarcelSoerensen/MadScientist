@@ -214,7 +214,6 @@ class Endboss extends CollidableObject {
             }
             if (this.isElectricHurt) {
                 this.playAnimation(this.IMAGES_GET_ELECTRIC);
-                pendingMoveRight = true;
                 return;
             }
             /**
