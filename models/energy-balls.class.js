@@ -1,4 +1,14 @@
+/**
+ * Represents an energy ball that can be collected and used for shooting.
+ * Handles pulse animation and drawing.
+ * @extends CollidableObject
+ */
 class EnergyBall extends CollidableObject {
+    /**
+     * Creates an EnergyBall instance.
+     * @param {number} x - The x position of the energy ball.
+     * @param {number} y - The y position of the energy ball.
+     */
     constructor(x, y) {
         super();
         this.x = x;
@@ -19,6 +29,9 @@ class EnergyBall extends CollidableObject {
         };
     }
 
+    /**
+     * Updates the pulse animation for the energy ball.
+     */
     updatePulse() {
         const step = 0.2;
         if (this.pulseUp) {
@@ -32,6 +45,10 @@ class EnergyBall extends CollidableObject {
         }
     }
 
+    /**
+     * Draws the energy ball on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         const offsetX = (this.baseSize - this.width) / 2;
         const offsetY = (this.baseSize - this.height) / 2;
@@ -58,23 +75,28 @@ class EnergyBall extends CollidableObject {
         ctx.restore();
 
         ctx.drawImage(this.img, this.x + offsetX, this.y + offsetY, this.width, this.height);
-        // Kollisionslinien entfernt
     }
 }
 
 class EnergyBallManager {
+    /**
+     * Creates an EnergyBallManager instance.
+     * @param {number} worldWidth - The width of the game world.
+     * @param {number} worldHeight - The height of the game world.
+     * @param {object} character - The main character object.
+     * @param {Array} enemies - Array of enemy objects.
+     */
     constructor(worldWidth, worldHeight, character, enemies = []) {
         console.log('[EnergyBallManager] Character-Objekt:', character);
         this.balls = [];
         this.collectedCount = 0;
+        this.maxBalls = 5;
         const minDist = 60;
         let tries = 0;
 
-        let charHeight = character && typeof character.height === 'number' ? character.height : 300;
         let jumpHeight = character && typeof character.jumpHeight === 'number' ? character.jumpHeight : 100;
         let ballsToPlace = 20;
         let lowerCount = Math.floor(ballsToPlace / 2);
-        let upperCount = ballsToPlace - lowerCount;
         let lowerY = 330;
         let upperY = 170 + jumpHeight / 2;
         let minX = character && typeof character.x === 'number' && typeof character.width === 'number'
@@ -127,17 +149,28 @@ class EnergyBallManager {
         }
     }
 
+    /**
+     * Updates all energy balls and handles collection by the character.
+     * @param {object} character - The main character object.
+     */
     update(character) {
         for (let i = this.balls.length - 1; i >= 0; i--) {
             const ball = this.balls[i];
             ball.updatePulse();
             if (character && ball.isColliding(character)) {
-                this.balls.splice(i, 1);
-                this.collectedCount++;
+                if (this.collectedCount < this.maxBalls) {
+                    this.balls.splice(i, 1);
+                    this.collectedCount++;
+                    console.log('[EnergyBallManager] Ball collected, total:', this.collectedCount);
+                }
             }
         }
     }
 
+    /**
+     * Draws all energy balls managed by this manager.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         this.balls.forEach(ball => ball.draw(ctx));
     }

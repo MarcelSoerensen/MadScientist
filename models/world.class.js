@@ -16,6 +16,8 @@ class World{
     enemies = level1.enemies;
     /** @type {EnergyBallManager} Manages all energy balls */
     energyBallManager;
+    /** @type {EnergyBallBar} Displays collected energy balls as a bar */
+    energyBallBar;
     /** @type {Array<DrawableObject>} Array of background objects */
     backgroundObjects = level1.backgroundObjects;
 
@@ -38,6 +40,8 @@ class World{
     lastDKeyState = false;
     /** @type {boolean} Tracks if Y key was pressed in previous frame */
     lastYKeyState = false;
+    /** @type {boolean} Indicates if laser is currently active */
+    laserActive = false;
 
     /**
      * Creates a new World instance.
@@ -51,6 +55,8 @@ class World{
         this.setWorld();
         /** Initialize EnergyBallManager with character */
         this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
+        /** Initialize EnergyBallBar */
+        this.energyBallBar = new EnergyBallBar();
         this.draw();
         this.run();
     }
@@ -105,19 +111,34 @@ class World{
      * @returns {void}
      */
     checkLaserBeams() {
-        if (this.keyboard.Y && !this.lastYKeyState) {
-            let laser = new LaserBeam(
-                this.character.x + 220,
-                this.character.y + 205,
-                this.character.otherDirection,
-                this.character
-            );
-            this.laserBeams.push(laser);
-        } else if (!this.keyboard.Y && this.lastYKeyState) {
-            this.laserBeams.forEach(laser => {
-                laser.stopAnimation();
-            });
-            this.laserBeams = [];
+        if (!this.laserActive) {
+            if (this.keyboard.Y && !this.lastYKeyState && this.energyBallManager.collectedCount > 0 && this.laserBeams.length === 0) {
+                this.laserActive = true;
+                this.laserBeams.forEach(laser => {
+                    laser.stopAnimation();
+                });
+                this.laserBeams = [];
+                let laser = new LaserBeam(
+                    this.character.x + 220,
+                    this.character.y + 205,
+                    this.character.otherDirection,
+                    this.character
+                );
+                this.laserBeams.push(laser);
+                this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 1);
+                setTimeout(() => {
+                    this.laserBeams.forEach(laser => {
+                        laser.stopAnimation();
+                    });
+                    this.laserBeams = [];
+                    this.laserActive = false;
+                }, 500);
+            } else if (!this.keyboard.Y && this.lastYKeyState) {
+                this.laserBeams.forEach(laser => {
+                    laser.stopAnimation();
+                });
+                this.laserBeams = [];
+            }
         }
         this.lastYKeyState = this.keyboard.Y;
     }
@@ -132,7 +153,6 @@ class World{
             if (this.character.isColliding(enemy)) {
                 this.character.hit();
                 this.statusBar.setPercentage(this.character.energy);
-                console.log(`Collision detected! Character energy: ${this.character.energy}`);
             }
             this.laserBeams.forEach(laser => {
                 if (laser.isColliding(enemy)) {
@@ -185,18 +205,12 @@ class World{
     drawStatusBar() {
         this.addToMap(this.statusBar);
         
-        /** Draw the green HP bar overlay based on character's health percentage */
         if (this.character.energy > 0) {
-            /** Use the pre-calculated HP width from the StatusBar */
             const currentHPWidth = this.statusBar.currentHPWidth;
-            
             this.ctx.save();
-            
-            /** Create slanted clipping path for HP-based width */
             const clipStartX = this.statusBar.x + 47;
             const clipWidth = currentHPWidth;
-            const widthRatio = clipWidth / 148; // 148 = trapezWidth (195 - 47)
-            
+            const widthRatio = clipWidth / 148;
             this.ctx.beginPath();
             this.ctx.moveTo(clipStartX, this.statusBar.y + 4);
             this.ctx.lineTo(clipStartX + clipWidth, this.statusBar.y + 4);
@@ -204,26 +218,24 @@ class World{
             this.ctx.lineTo(clipStartX, this.statusBar.y + 28);
             this.ctx.closePath();
             this.ctx.clip();
-            
-            /** Create trapezoid path for HP bar shape */
             this.ctx.beginPath();
-            this.ctx.moveTo(this.statusBar.x + 46, this.statusBar.y + 6.9);    // topLeft
-            this.ctx.lineTo(this.statusBar.x + 195, this.statusBar.y + 4);     // topRight
-            this.ctx.lineTo(this.statusBar.x + 192, this.statusBar.y + 22);    // bottomRight
-            this.ctx.lineTo(this.statusBar.x + 49, this.statusBar.y + 22);     // bottomLeft
+            this.ctx.moveTo(this.statusBar.x + 46, this.statusBar.y + 6.9);
+            this.ctx.lineTo(this.statusBar.x + 195, this.statusBar.y + 4);
+            this.ctx.lineTo(this.statusBar.x + 192, this.statusBar.y + 22);
+            this.ctx.lineTo(this.statusBar.x + 49, this.statusBar.y + 22);
             this.ctx.closePath();
-            
-            /** Create sharp gradient with "kink" effect for HP bar color */
             const gradient = this.ctx.createLinearGradient(0, this.statusBar.y + 6, 0, this.statusBar.y + 22);
             gradient.addColorStop(0, 'rgb(117, 197, 27)');
             gradient.addColorStop(0.4, 'rgb(117, 197, 27)');
             gradient.addColorStop(0.6, 'rgb(103, 178, 27)');
             gradient.addColorStop(1, 'rgb(103, 178, 27)');
-            
             this.ctx.fillStyle = gradient;
             this.ctx.fill();
-            
             this.ctx.restore();
+        }
+        
+        if (this.energyBallBar) {
+            this.energyBallBar.draw(this.ctx);
         }
     }
 
@@ -236,10 +248,12 @@ class World{
         this.addToMap(this.character);
         this.addObjectsToMap(this.throwableObjects);
         this.addObjectsToMap(this.laserBeams);
-        /** Draw energy balls */
         if (this.energyBallManager) {
             this.energyBallManager.update(this.character);
             this.energyBallManager.draw(this.ctx);
+            if (this.energyBallBar) {
+                this.energyBallBar.setBalls(this.energyBallManager.collectedCount);
+            }
         }
     }
 
