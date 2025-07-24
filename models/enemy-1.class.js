@@ -143,19 +143,16 @@ class EnemyOne extends CollidableObject {
     }
 
     /**
-     * Triggers the electric hurt animation (e.g. on laser collision)
-     * Animation runs for 500ms and then returns to normal state
+     * Registers an electric laser hit. force ist die Trefferanzahl (1=normal, 5=superschuss)
+     * @param {number} [force=1] - Anzahl der Treffer
      */
-    /**
-     * Registers an electric laser hit. If force=true, counts hit regardless of cooldown.
-     * @param {boolean} [force=false] - If true, hit is counted immediately.
-     */
-    triggerElectricHurt(force = false) {
+    triggerElectricHurt(force = 1) {
         const now = Date.now();
         if (this.laserHitCount >= 3) return;
-        if (!force && (now - this.lastHitTime < 500)) return;
+        if (force === 1 && (now - this.lastHitTime < 500)) return;
         this.lastHitTime = now;
-        this.laserHitCount++;
+        this.laserHitCount += force;
+        if (this.laserHitCount > 3) this.laserHitCount = 3;
         if (this.electricHurtTimeout) {
             clearTimeout(this.electricHurtTimeout);
         }

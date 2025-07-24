@@ -189,15 +189,17 @@ class World {
             }
             this.laserBeams.forEach(laser => {
                 if (laser.isColliding(enemy)) {
-                    if (laser.isSuperShot) {
-                        if (typeof enemy.triggerElectricHurt === 'function') {
-                            enemy.triggerElectricHurt(true);
-                            enemy.triggerElectricHurt(true);
-                            enemy.triggerElectricHurt(true);
+                    if (enemy instanceof Endboss) {
+                        if (laser.isSuperShot) {
+                            enemy.triggerElectricHurt(5);
+                        } else {
+                            enemy.triggerElectricHurt(1);
                         }
                     } else {
-                        if (typeof enemy.triggerElectricHurt === 'function') {
-                            enemy.triggerElectricHurt();
+                        if (laser.isSuperShot) {
+                            enemy.triggerElectricHurt(3);
+                        } else {
+                            enemy.triggerElectricHurt(1);
                         }
                     }
                 }

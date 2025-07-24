@@ -2,7 +2,51 @@
  * Represents the end boss enemy
  * @extends CollidableObject
  */
+/**
+ * Represents the end boss enemy
+ * @extends CollidableObject
+ */
 class Endboss extends CollidableObject {
+    /**
+     * Reference to the player character
+     */
+    character = null;
+
+    /**
+     * Sets the character reference for distance checking
+     * @param {Character} character
+     */
+    setCharacter(character) {
+        this.character = character;
+    }
+    /** @type {string[]} Array of idle animation image paths */
+    IMAGES_IDLE = [
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_00.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_01.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_02.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_03.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_04.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_05.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_06.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_07.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_08.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_09.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_10.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_11.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_12.png',
+        'img/Enemy Characters/Enemy Character07/Idle/Idle_13.png',
+    ];
+    /**
+     * Counts how many times the endboss was hit by a laser
+     * @type {number}
+     */
+    laserHitCount = 0;
+
+    /**
+     * Indicates if the death animation is currently playing
+     * @type {boolean}
+     */
+    isDeadAnimationPlaying = false;
     /** @type {number} Height of the endboss */
     height = 600;
     /** @type {number} Width of the endboss */
@@ -42,10 +86,71 @@ class Endboss extends CollidableObject {
         'img/Enemy Characters/Enemy Character07/Idle/Idle_13.png',
     ];
 
-    IMAGE_GET_ELECTRIC = [
+    IMAGES_HIT = [
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_00.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_01.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_02.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_03.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_04.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_05.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_06.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_07.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_08.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_09.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_10.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_11.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_12.png',
+        'img/Enemy Characters/Enemy Character07/Hit/Hit_13.png',
+    ];
+
+    IMAGES_GET_ELECTRIC = [
         'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_0.png',
         'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_1.png',
         'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_2.png',
+    ];
+
+    IMAGES_DEATH = [
+        'img/Enemy Characters/Enemy Character07/Death/Death_00.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_01.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_02.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_03.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_04.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_05.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_06.png',    
+        'img/Enemy Characters/Enemy Character07/Death/Death_07.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_08.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_09.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_10.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_11.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_12.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_13.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_14.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_15.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_16.png',        
+        'img/Enemy Characters/Enemy Character07/Death/Death_17.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_18.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_19.png',    
+        'img/Enemy Characters/Enemy Character07/Death/Death_20.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_21.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_22.png',
+        'img/Enemy Characters/Enemy Character07/Death/Death_23.png',
+    ];  
+
+    IMAGES_WALKING = [
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_00.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_01.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_02.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_03.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_04.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_05.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_06.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_07.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_08.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_09.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_10.png',  
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_11.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_12.png',
+        'img/Enemy Characters/Enemy Character07/Walk/Walk_13.png',
     ];
     
     /**
@@ -66,10 +171,14 @@ class Endboss extends CollidableObject {
      * Initializes position and starts animation
      */
     constructor() {
-        super().loadImage('img/Enemy Characters/Enemy Character07/Walk/Walk_00.png');
+        super().loadImage('img/Enemy Characters/Enemy Character07/Idle/Idle_00.png');
+        this.loadImages(this.IMAGES_IDLE);
         this.loadImages(this.IMAGES_WALKING);
         this.x = (1952 * 2 - 900);
-        this.loadImages(this.IMAGE_GET_ELECTRIC);
+        this.loadImages(this.IMAGES_GET_ELECTRIC);
+        this.loadImages(this.IMAGES_DEATH);
+        this.visible = true;
+        this.loadImages(this.IMAGES_HIT);
         this.animate();
     }
 
@@ -77,28 +186,193 @@ class Endboss extends CollidableObject {
      * Starts the endboss idle animation
      * Sets up interval for cycling through idle frames
      */
+    /**
+     * Starts the endboss idle/animation and movement
+     * Sets up intervals for animation and death logic
+     */
     animate() {
-        setInterval(() => {
-            if (this.isElectricHurt) {
-                this.playAnimation(this.IMAGE_GET_ELECTRIC);
-            } else {
-                this.playAnimation(this.IMAGES_WALKING);
+        let deathFrame = 0;
+        let deathDone = false;
+        let animState = 'idle';
+        let animTimer = 0;
+        let hitFrame = 0;
+        let startX = this.x;
+        let leftTargetX = startX - 200;
+        this.animInterval = setInterval(() => {
+            if (this.laserHitCount >= 25 && !this.isElectricHurt) {
+                if (!deathDone) {
+                    this.img = this.imageCache[this.IMAGES_DEATH[deathFrame]];
+                    deathFrame++;
+                    if (deathFrame >= this.IMAGES_DEATH.length) {
+                        deathFrame = this.IMAGES_DEATH.length - 1;
+                        deathDone = true;
+                    }
+                } else {
+                    this.img = this.imageCache[this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1]];
+                }
+                return;
             }
-        }, 100);
+            if (this.isElectricHurt) {
+                this.playAnimation(this.IMAGES_GET_ELECTRIC);
+                pendingMoveRight = true;
+                return;
+            }
+            /**
+             * Animation state machine for Endboss
+             * Handles idle, walking left/right, hit, and transition logic
+             */
+            switch (animState) {
+                case 'idle':
+                    /**
+                     * Idle animation for 2 seconds
+                     */
+                    this.playAnimation(this.IMAGES_IDLE);
+                    animTimer += 50;
+                    if (animTimer >= 2000) {
+                        animState = 'walkingLeft';
+                        animTimer = 0;
+                    }
+                    break;
+                case 'walkingLeft':
+                    /**
+                     * Walking left animation and movement (200px, 4px/step)
+                     */
+                    this.playAnimation(this.IMAGES_WALKING);
+                    if (this.x > leftTargetX) {
+                        this.moveLeft(Math.min(4, this.x - leftTargetX));
+                    }
+                    animTimer += 50;
+                    if (this.x <= leftTargetX || animTimer >= 5000) {
+                        animState = 'hit';
+                        animTimer = 0;
+                        hitFrame = 0;
+                    }
+                    break;
+                case 'hit':
+                    /**
+                     * Hit animation after walking left
+                     */
+                    this.img = this.imageCache[this.IMAGES_HIT[hitFrame % this.IMAGES_HIT.length]];
+                    hitFrame++;
+                    animTimer += 50;
+                    if (hitFrame >= this.IMAGES_HIT.length) {
+                        animState = 'idle2';
+                        animTimer = 0;
+                    }
+                    break;
+                case 'idle2':
+                    /**
+                     * Idle animation after hit
+                     */
+                    this.playAnimation(this.IMAGES_IDLE);
+                    animTimer += 50;
+                    if (animTimer >= 2000) {
+                        animState = 'walkingRight';
+                        animTimer = 0;
+                    }
+                    break;
+                case 'walkingRight':
+                    /**
+                     * Walking right animation and movement (200px, 4px/step)
+                     */
+                    this.playAnimation(this.IMAGES_WALKING);
+                    if (this.x < startX) {
+                        this.moveRight(Math.min(4, startX - this.x));
+                    }
+                    animTimer += 50;
+                    if (this.x >= startX || animTimer >= 5000) {
+                        this.x = startX;
+                        animState = 'idle';
+                        animTimer = 0;
+                    }
+                    break;
+            }
+        }, 50);
     }
     
     /**
      * Triggers the electric hurt animation (e.g. on laser collision)
      * Animation runs for 500ms and then returns to normal state
      */
-    triggerElectricHurt() {
+    /**
+     * Registers an electric laser hit. 'force' is the hit amount (1=normal shot, 5=supershot)
+     * @param {number} [force=1] - Number of hits to apply
+     */
+    triggerElectricHurt(force = 1) {
+        const now = Date.now();
+        if (this.laserHitCount >= 25) return;
+        if (this.isElectricHurt) return;
+        if (force === 5) {
+            if (!this.lastSuperShotTime) this.lastSuperShotTime = 0;
+            if (now - this.lastSuperShotTime < 500) return;
+        }
+        if (force === 1 && (now - this.lastHitTime < 500)) return;
+        if (force === 1) this.lastHitTime = now;
+        this.laserHitCount += force;
+        if (force === 5) this.lastSuperShotTime = now;
+        if (this.laserHitCount > 25) this.laserHitCount = 25;
+        if (this.laserHitCount >= 25) return;
         if (this.electricHurtTimeout) {
             clearTimeout(this.electricHurtTimeout);
         }
         this.isElectricHurt = true;
+        let hurtDuration = (force === 5) ? 1000 : 500;
         this.electricHurtTimeout = setTimeout(() => {
             this.isElectricHurt = false;
             this.electricHurtTimeout = null;
-        }, 500);
+            if (this.laserHitCount === 25) {
+                this.startDeathAnimation();
+            }
+        }, hurtDuration);
+    }
+
+    /**
+     * Starts the death animation for the endboss
+     */
+    startDeathAnimation() {
+        this.isDeadAnimationPlaying = true;
+        this.currentImage = 0;
+        this.collidable = false;
+        if (this.animInterval) {
+            clearInterval(this.animInterval);
+            this.animInterval = null;
+        }
+        let deathFrame = 0;
+        this.deathAnimInterval = setInterval(() => {
+            if (deathFrame < this.IMAGES_DEATH.length) {
+                this.img = this.imageCache[this.IMAGES_DEATH[deathFrame]];
+                deathFrame++;
+            } else {
+                this.img = this.imageCache[this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1]];
+                clearInterval(this.deathAnimInterval);
+            }
+        }, 50);
+
+        setTimeout(() => {
+            this.startBlinking();
+        }, 2500);
+        setTimeout(() => {
+            this.removeEnemy();
+        }, 4000);
+    }
+
+    /**
+     * Starts blinking animation after death
+     */
+    startBlinking() {
+        this.blinkInterval = setInterval(() => {
+            this.visible = !this.visible;
+        }, 200);
+    }
+
+    /**
+     * Removes the endboss from the game
+     */
+    removeEnemy() {
+        this.visible = false;
+        if (this.blinkInterval) {
+            clearInterval(this.blinkInterval);
+            this.blinkInterval = null;
+        }
     }
 }

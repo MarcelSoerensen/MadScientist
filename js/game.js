@@ -49,9 +49,6 @@ window.addEventListener('keydown', (event) => {
         keyboard.S = true;
     }
 
-
-    console.log('key pressed', event);
-
 });
 
 window.addEventListener('keyup', (event) => {
@@ -87,8 +84,5 @@ window.addEventListener('keyup', (event) => {
     if (event.key === 's') {
         keyboard.S = false;
     }
-
-
-    console.log('key released', event);
 
 });
