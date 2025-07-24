@@ -8,6 +8,39 @@
  * @class World
  */
 class World{
+    /**
+     * Checks for supershot creation when S key is pressed.
+     * Fires a large laser, subtracts 3 balls, and counts 3 hits on enemy.
+     */
+    checkSuperShot() {
+        if (
+            this.keyboard.S &&
+            this.energyBallManager.collectedCount === 5 &&
+            this.laserBeams.length === 0
+        ) {
+            let offsetY = 170;
+            let offsetX = this.character.otherDirection ? -80 : 220;
+            let laser = new LaserBeam(
+                this.character.x + offsetX,
+                this.character.y + offsetY,
+                this.character.otherDirection,
+                this.character,
+                offsetX,
+                offsetY
+            );
+            laser.width *= 2;
+            laser.height *= 2;
+            laser.isSuperShot = true;
+            this.laserBeams.push(laser);
+            this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 3);
+            this.laserActive = true;
+            setTimeout(() => {
+                this.laserBeams.forEach(l => l.stopAnimation());
+                this.laserBeams = [];
+                this.laserActive = false;
+            }, 1000);
+        }
+    }
     /** @type {Character} The player character */
     character = new Character();
     /** @type {Level} The current game level */
@@ -77,10 +110,10 @@ class World{
         setInterval(() => {
             this.checkCollisions();
         }, 200);
-        
         setInterval(() => {
             this.checkThrowableObjects();
             this.checkLaserBeams();
+            this.checkSuperShot();
         }, 1000 / 60);
     }
 
@@ -156,8 +189,16 @@ class World{
             }
             this.laserBeams.forEach(laser => {
                 if (laser.isColliding(enemy)) {
-                    if (typeof enemy.triggerElectricHurt === 'function') {
-                        enemy.triggerElectricHurt();
+                    if (laser.isSuperShot) {
+                        if (typeof enemy.triggerElectricHurt === 'function') {
+                            enemy.triggerElectricHurt(true);
+                            enemy.triggerElectricHurt(true);
+                            enemy.triggerElectricHurt(true);
+                        }
+                    } else {
+                        if (typeof enemy.triggerElectricHurt === 'function') {
+                            enemy.triggerElectricHurt();
+                        }
                     }
                 }
             });

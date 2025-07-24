@@ -58,9 +58,14 @@ class LaserBeam extends CollidableObject {
         this.width = 80;
         this.otherDirection = otherDirection;
         this.character = character;
+        
+        if (arguments.length >= 6) {
+            this.offsetX = arguments[4] !== undefined ? arguments[4] : 220;
+            this.offsetY = arguments[5] !== undefined ? arguments[5] : 205;
+        }
         this.animate();
         this.followCharacter();
-        // Kein shoot() - Laser soll nur animiert werden, nicht fliegen
+        
     }
 
     /**
@@ -95,29 +100,25 @@ class LaserBeam extends CollidableObject {
         if (!this.character) return;
         
         this.positionInterval = setInterval(() => {
-            // X-Position abhängig von Charakterrichtung
             if (this.character.otherDirection) {
-                // Nach links: Laser vor dem Charakter (links von ihm)
-                this.x = this.character.x - 0; // Einfachere Positionierung nach links
+                this.x = this.character.x + this.offsetX;
             } else {
-                // Nach rechts: normale Position
                 this.x = this.character.x + this.offsetX;
             }
             
             this.y = this.character.y + this.offsetY;
             
-            // Berücksichtigt Sprung-Offset mit verstärktem Effekt und zusätzlichem Offset
+            
             if (this.character.jumpOffsetY !== undefined && this.character.jumpOffsetY < 0) {
-                // Beim Sprung (jumpOffsetY ist negativ): verstärkter Effekt + zusätzliche 15px nach oben
+                
                 this.y += this.character.jumpOffsetY * 1.2 - 25;
             } else if (this.character.jumpOffsetY !== undefined) {
-                // Normal: nur verstärkter Effekt
+                
                 this.y += this.character.jumpOffsetY * 1.2;
             }
             
-            // Aktualisiert Richtung basierend auf Charakter
             this.otherDirection = this.character.otherDirection;
-        }, 1000 / 120); // Erhöht auf 120 FPS für flüssigere Bewegung
+        }, 1000 / 120);
     }
 
     /**

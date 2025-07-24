@@ -4,7 +4,6 @@
  */
 class EnemyOne extends CollidableObject {
     lastHitTime = 0;
-    // ...existing code...
     /**
      * Counts how many times the enemy was hit by a laser
      * @type {number}
@@ -147,10 +146,14 @@ class EnemyOne extends CollidableObject {
      * Triggers the electric hurt animation (e.g. on laser collision)
      * Animation runs for 500ms and then returns to normal state
      */
-    triggerElectricHurt() {
+    /**
+     * Registers an electric laser hit. If force=true, counts hit regardless of cooldown.
+     * @param {boolean} [force=false] - If true, hit is counted immediately.
+     */
+    triggerElectricHurt(force = false) {
         const now = Date.now();
         if (this.laserHitCount >= 3) return;
-        if (now - this.lastHitTime < 500) return;
+        if (!force && (now - this.lastHitTime < 500)) return;
         this.lastHitTime = now;
         this.laserHitCount++;
         if (this.electricHurtTimeout) {
