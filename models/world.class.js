@@ -1,21 +1,17 @@
 /**
- * Import EnergyBallManager and EnergyBall if using modules:
- * import { EnergyBallManager, EnergyBall } from './energy-balls.class.js';
- * If not using ES6 modules, ensure this file is loaded before world.class.js
- */
-/**
  * Represents the game world. Manages all game objects, rendering, and main game loop.
  * @class World
  */
-class World{
+class World {
     /**
      * Checks for supershot creation when S key is pressed.
-     * Fires a large laser, subtracts 3 balls, and counts 3 hits on enemy.
+     * Fires a large laser, subtracts 5 balls, und zählt 3 Treffer auf den Gegner.
+     * @returns {void}
      */
     checkSuperShot() {
         if (
             this.keyboard.S &&
-            this.energyBallManager.collectedCount === 5 &&
+            this.energyBallManager.collectedCount >= 5 &&
             this.laserBeams.length === 0
         ) {
             let offsetY = 170;
@@ -32,7 +28,7 @@ class World{
             laser.height *= 2;
             laser.isSuperShot = true;
             this.laserBeams.push(laser);
-            this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 3);
+            this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 5);
             this.laserActive = true;
             setTimeout(() => {
                 this.laserBeams.forEach(l => l.stopAnimation());
@@ -49,8 +45,8 @@ class World{
     enemies = level1.enemies;
     /** @type {EnergyBallManager} Manages all energy balls */
     energyBallManager;
-    /** @type {EnergyBallBar} Displays collected energy balls as a bar */
-    energyBallBar;
+    /** @type {SuperShotBar} Displays collected energy balls as a bar */
+    superShotBar;
     /** @type {Array<DrawableObject>} Array of background objects */
     backgroundObjects = level1.backgroundObjects;
 
@@ -88,8 +84,8 @@ class World{
         this.setWorld();
         /** Initialize EnergyBallManager with character */
         this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
-        /** Initialize EnergyBallBar */
-        this.energyBallBar = new EnergyBallBar();
+        /** Initialize SuperShotBar */
+        this.superShotBar = new SuperShotBar();
         this.draw();
         this.run();
     }
@@ -151,11 +147,15 @@ class World{
                     laser.stopAnimation();
                 });
                 this.laserBeams = [];
+                let offsetY = 205;
+                let offsetX = this.character.otherDirection ? -0 : 220;
                 let laser = new LaserBeam(
-                    this.character.x + 220,
-                    this.character.y + 205,
+                    this.character.x + offsetX,
+                    this.character.y + offsetY,
                     this.character.otherDirection,
-                    this.character
+                    this.character,
+                    offsetX,
+                    offsetY
                 );
                 this.laserBeams.push(laser);
                 this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 1);
@@ -210,19 +210,34 @@ class World{
      * @returns {void}
      */
     draw() {
-
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
         this.ctx.translate(this.camera_x, 0);
-
         this.drawMainBackground();
         this.drawGameObjects();
         this.drawParallaxTop();
         this.drawParallaxBottom();
-
         this.ctx.translate(-this.camera_x, 0);
-
         this.drawStatusBar();
+
+        if (this.energyBallManager && this.superShotBar) {
+            const superShots = Math.floor(this.energyBallManager.collectedCount / 5);
+            if (superShots > 0) {
+                this.ctx.save();
+                this.ctx.font = 'bold 18px "Comic Sans MS", "Comic Sans", cursive, sans-serif';
+                this.ctx.textAlign = 'left';
+                const barX = this.superShotBar.x || 0;
+                const barY = this.superShotBar.y || 0;
+                const barWidth = this.superShotBar.width || 120;
+                const textX = barX + barWidth - 21;
+                const textY = barY + (this.superShotBar.height ? this.superShotBar.height / 2 + 5 : 35);
+                this.ctx.lineWidth = 4;
+                this.ctx.strokeStyle = 'black';
+                this.ctx.strokeText(superShots, textX, textY);
+                this.ctx.fillStyle = 'white';
+                this.ctx.fillText(superShots, textX, textY);
+                this.ctx.restore();
+            }
+        }
 
         let self = this;
         requestAnimationFrame(function() {
@@ -240,7 +255,7 @@ class World{
     }
 
     /**
-     * Draws the status bar on the map. Renders the status bar image and overlays a custom HP bar with trapezoid shape.
+     * Draws the status bar on the map. Renders the status bar image und überlagert eine benutzerdefinierte HP-Bar mit Trapezform.
      * @returns {void}
      */
     drawStatusBar() {
@@ -275,8 +290,8 @@ class World{
             this.ctx.restore();
         }
         
-        if (this.energyBallBar) {
-            this.energyBallBar.draw(this.ctx);
+        if (this.superShotBar) {
+            this.superShotBar.draw(this.ctx);
         }
     }
 
@@ -292,8 +307,8 @@ class World{
         if (this.energyBallManager) {
             this.energyBallManager.update(this.character);
             this.energyBallManager.draw(this.ctx);
-            if (this.energyBallBar) {
-                this.energyBallBar.setBalls(this.energyBallManager.collectedCount);
+            if (this.superShotBar) {
+                this.superShotBar.setBalls(this.energyBallManager.collectedCount);
             }
         }
     }

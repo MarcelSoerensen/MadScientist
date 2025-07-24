@@ -1,8 +1,10 @@
 /**
  * Displays the collected energy balls as a filling bar using a graphic.
  * Only the bar is shown, the count is tracked internally.
+ * @class SuperShotBar
+ * @extends DrawableObject
  */
-class EnergyBallBar extends DrawableObject {
+class SuperShotBar extends DrawableObject {
     /** @type {string} Path to the bar image */
     imgPath = 'img/Projectile/Laser/skeleton-animation_2.png';
     /** @type {number} Number of collected balls (tracked internally) */
@@ -14,10 +16,12 @@ class EnergyBallBar extends DrawableObject {
     /** @type {number} Calculated width for current state */
     currentBallWidth = 0;
 
+    /**
+     * Creates a SuperShotBar instance and initializes its properties.
+     */
     constructor() {
         super();
         this.loadImage(this.imgPath);
-        // Position and size match the HP bar in StatusBar
         this.x = 52;
         this.y = 16.9;
         this.width = 147;
@@ -30,8 +34,11 @@ class EnergyBallBar extends DrawableObject {
      * Sets the number of collected balls and updates the bar width.
      * @param {number} count - Number of collected balls
      */
+    /**
+     * Sets the number of collected balls and updates the bar width.
+     * @param {number} count - Number of collected balls
+     */
     setBalls(count) {
-        // Clamp count between 0 and maxBalls
         this.collectedCount = Math.max(0, Math.min(count, this.maxBalls));
         this.currentBallWidth = (this.maxWidth * this.collectedCount) / this.maxBalls;
     }
@@ -40,8 +47,11 @@ class EnergyBallBar extends DrawableObject {
      * Draws the energy ball bar.
      * @param {CanvasRenderingContext2D} ctx
      */
+    /**
+     * Draws the energy ball bar.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
-        // Clip the bar from the right according to collected balls
         const visibleWidth = (this.maxWidth * this.collectedCount) / this.maxBalls;
         ctx.save();
         ctx.beginPath();

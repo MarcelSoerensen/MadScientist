@@ -78,6 +78,10 @@ class EnergyBall extends CollidableObject {
     }
 }
 
+/**
+ * Manages all energy balls in the game world. Handles placement, collection, and rendering.
+ * @class EnergyBallManager
+ */
 class EnergyBallManager {
     /**
      * Creates an EnergyBallManager instance.
@@ -86,11 +90,17 @@ class EnergyBallManager {
      * @param {object} character - The main character object.
      * @param {Array} enemies - Array of enemy objects.
      */
+    /**
+     * Initializes energy balls in the world at random positions, avoiding overlap and enemies.
+     * @param {number} worldWidth - The width of the game world.
+     * @param {number} worldHeight - The height of the game world.
+     * @param {object} character - The main character object.
+     * @param {Array} enemies - Array of enemy objects.
+     */
     constructor(worldWidth, worldHeight, character, enemies = []) {
-        console.log('[EnergyBallManager] Character-Objekt:', character);
         this.balls = [];
         this.collectedCount = 0;
-        this.maxBalls = 5;
+        this.maxBalls = 20;
         const minDist = 60;
         let tries = 0;
 
@@ -104,15 +114,6 @@ class EnergyBallManager {
             : 50;
 
         while (this.balls.length < ballsToPlace && tries < 1000) {
-            if (this.balls.length === 0 && character) {
-                console.log('[EnergyBallManager] Character-Koordinaten:', {
-                    x: character.x,
-                    y: character.y,
-                    width: character.width,
-                    height: character.height,
-                    offset: character.offset
-                });
-            }
             let x;
             if (this.balls.length === 0) {
                 if (
@@ -153,6 +154,10 @@ class EnergyBallManager {
      * Updates all energy balls and handles collection by the character.
      * @param {object} character - The main character object.
      */
+    /**
+     * Updates all energy balls and handles collection by the character.
+     * @param {object} character - The main character object.
+     */
     update(character) {
         for (let i = this.balls.length - 1; i >= 0; i--) {
             const ball = this.balls[i];
@@ -161,12 +166,15 @@ class EnergyBallManager {
                 if (this.collectedCount < this.maxBalls) {
                     this.balls.splice(i, 1);
                     this.collectedCount++;
-                    console.log('[EnergyBallManager] Ball collected, total:', this.collectedCount);
                 }
             }
         }
     }
 
+    /**
+     * Draws all energy balls managed by this manager.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     /**
      * Draws all energy balls managed by this manager.
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
