@@ -111,6 +111,39 @@ class World {
             this.checkLaserBeams();
             this.checkSuperShot();
         }, 1000 / 60);
+
+        // Stick-Kollision für Endboss mit höherer Frequenz
+        setInterval(() => {
+            this.checkStickCollision();
+        }, 50);
+    }
+
+    /**
+     * Prüft nur die Stick-Kollision des Endboss mit dem Character
+     */
+    checkStickCollision() {
+        this.level.enemies.forEach(enemy => {
+            if (enemy instanceof Endboss && enemy.animState === 'hit') {
+                const stickRect = enemy.getStickCollisionRect && enemy.getStickCollisionRect();
+                if (stickRect) {
+                    const charRect = {
+                        x: this.character.x + (this.character.offset?.left || 0),
+                        y: this.character.y + (this.character.offset?.top || 0),
+                        width: this.character.width - ((this.character.offset?.left || 0) + (this.character.offset?.right || 0)),
+                        height: this.character.height - ((this.character.offset?.top || 0) + (this.character.offset?.bottom || 0))
+                    };
+                    const stickCollision =
+                        charRect.x < stickRect.x + stickRect.width &&
+                        charRect.x + charRect.width > stickRect.x &&
+                        charRect.y < stickRect.y + stickRect.height &&
+                        charRect.y + charRect.height > stickRect.y;
+                    if (stickCollision) {
+                        this.character.hit();
+                        this.statusBar.setPercentage(this.character.energy);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -182,8 +215,34 @@ class World {
      * @returns {void}
      */
     checkCollisions() {
+        /**
+         * Checks collision between character and all enemies, including Endboss stick hit detection.
+         * Triggers character hit and updates status bar if collision occurs.
+         */
         this.level.enemies.forEach(enemy => {
-            if (this.character.isColliding(enemy)) {
+            let collided = this.character.isColliding(enemy);
+
+            if (enemy instanceof Endboss && enemy.animState === 'hit') {
+                const stickRect = enemy.getStickCollisionRect && enemy.getStickCollisionRect();
+                if (stickRect) {
+                    const charRect = {
+                        x: this.character.x + (this.character.offset?.left || 0),
+                        y: this.character.y + (this.character.offset?.top || 0),
+                        width: this.character.width - ((this.character.offset?.left || 0) + (this.character.offset?.right || 0)),
+                        height: this.character.height - ((this.character.offset?.top || 0) + (this.character.offset?.bottom || 0))
+                    };
+                    const stickCollision =
+                        charRect.x < stickRect.x + stickRect.width &&
+                        charRect.x + charRect.width > stickRect.x &&
+                        charRect.y < stickRect.y + stickRect.height &&
+                        charRect.y + charRect.height > stickRect.y;
+                    if (stickCollision) {
+                        collided = true;
+                    }
+                }
+            }
+
+            if (collided) {
                 this.character.hit();
                 this.statusBar.setPercentage(this.character.energy);
             }
@@ -235,7 +294,7 @@ class World {
                 this.ctx.lineWidth = 4;
                 this.ctx.strokeStyle = 'black';
                 this.ctx.strokeText(superShots, textX, textY);
-                this.ctx.fillStyle = 'white';
+                this.ctx.fillStyle = 'rgba(255,255,255,1)';
                 this.ctx.fillText(superShots, textX, textY);
                 this.ctx.restore();
             }

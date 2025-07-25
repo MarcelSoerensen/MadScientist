@@ -8,18 +8,78 @@
  */
 class Endboss extends CollidableObject {
     /**
-     * Reference to the player character
+     * Returns the current stick collision rectangle during hit animation.
+     * The rectangle matches the visible blue stick frame.
+     * @returns {{x: number, y: number, width: number, height: number}|null}
+     */
+    getStickCollisionRect() {
+        if (this.animState !== 'hit') return null;
+        const hitFrame = this.hitFrame || 0;
+        let stickX = this.x + this.width - 60 - 350;
+        let stickY = this.y + this.height / 2;
+        let growFrame = Math.max(0, hitFrame - 4);
+        let stickWidth = 2 + growFrame * 10;
+        let stickHeight = 100;
+        let left = stickX - (stickWidth - 2 - 60);
+        return {
+            x: left,
+            y: stickY,
+            width: stickWidth,
+            height: stickHeight
+        };
+    }
+    /**
+     * Draws the collision frame for the Endboss.
+     * Draws a red rectangle for the main body and a blue rectangle for the stick during hit animation.
+     * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+     */
+    drawCollisionFrame(ctx) {
+        let leftOffset = this.offset.left;
+        const isHitAnim = this.animState === 'hit';
+        if (!this.collidable) return;
+        ctx.save();
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        let yPos = this.y + this.offset.top;
+        if (this.jumpOffsetY !== undefined) {
+            yPos += this.jumpOffsetY * 1.5;
+        }
+        ctx.strokeRect(
+            this.x + leftOffset,
+            yPos,
+            this.width - leftOffset - this.offset.right,
+            this.height - this.offset.top - this.offset.bottom
+        );
+        if (isHitAnim) {
+            const hitFrame = this.hitFrame || 0;
+            let stickX = this.x + this.width - 60 - 350;
+            let stickY = this.y + this.height / 2;
+            let growFrame = Math.max(0, hitFrame - 4);
+            let stickWidth = 2 + growFrame * 10;
+            let stickHeight = 100;
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(stickX - (stickWidth - 2 - 60), stickY, stickWidth, stickHeight);
+        }
+        ctx.restore();
+    }
+    /**
+     * Reference to the character instance.
+     * @type {Character|null}
      */
     character = null;
 
     /**
-     * Sets the character reference for distance checking
-     * @param {Character} character
+     * Sets the character reference for the Endboss.
+     * @param {Character} character - The character instance
      */
     setCharacter(character) {
         this.character = character;
     }
-    /** @type {string[]} Array of idle animation image paths */
+    /**
+     * Array of idle animation image paths.
+     * @type {string[]}
+     */
     IMAGES_IDLE = [
         'img/Enemy Characters/Enemy Character07/Idle/Idle_00.png',
         'img/Enemy Characters/Enemy Character07/Idle/Idle_01.png',
@@ -37,29 +97,35 @@ class Endboss extends CollidableObject {
         'img/Enemy Characters/Enemy Character07/Idle/Idle_13.png',
     ];
     /**
-     * Counts how many times the endboss was hit by a laser
+     * Number of times the Endboss was hit by a laser.
      * @type {number}
      */
     laserHitCount = 0;
 
     /**
-     * Indicates if the death animation is currently playing
+     * Indicates if the death animation is currently playing.
      * @type {boolean}
      */
     isDeadAnimationPlaying = false;
-    /** @type {number} Height of the endboss */
+    /**
+     * Height of the Endboss.
+     * @type {number}
+     */
     height = 600;
-    /** @type {number} Width of the endboss */
+    /**
+     * Width of the Endboss.
+     * @type {number}
+     */
     width = 600;
-    /** @type {number} Y position of the endboss */
+    /**
+     * Y position of the Endboss.
+     * @type {number}
+     */
     y = -60;
 
     /**
-     * @type {Object} Collision offset values for precise hit detection
-     * @property {number} top - Top offset in pixels
-     * @property {number} left - Left offset in pixels
-     * @property {number} right - Right offset in pixels
-     * @property {number} bottom - Bottom offset in pixels
+     * Collision offset values for precise hit detection.
+     * @type {{top: number, left: number, right: number, bottom: number}}
      */
     offset = {
         top: 280,
@@ -68,7 +134,10 @@ class Endboss extends CollidableObject {
         bottom: 160
     };
 
-    /** @type {string[]} Array of idle animation image paths */
+    /**
+     * Array of walking animation image paths.
+     * @type {string[]}
+     */
     IMAGES_WALKING = [
         'img/Enemy Characters/Enemy Character07/Idle/Idle_00.png',
         'img/Enemy Characters/Enemy Character07/Idle/Idle_01.png',
@@ -86,6 +155,10 @@ class Endboss extends CollidableObject {
         'img/Enemy Characters/Enemy Character07/Idle/Idle_13.png',
     ];
 
+    /**
+     * Array of hit animation image paths.
+     * @type {string[]}
+     */
     IMAGES_HIT = [
         'img/Enemy Characters/Enemy Character07/Hit/Hit_00.png',
         'img/Enemy Characters/Enemy Character07/Hit/Hit_01.png',
@@ -103,12 +176,20 @@ class Endboss extends CollidableObject {
         'img/Enemy Characters/Enemy Character07/Hit/Hit_13.png',
     ];
 
+    /**
+     * Array of electric hurt animation image paths.
+     * @type {string[]}
+     */
     IMAGES_GET_ELECTRIC = [
         'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_0.png',
         'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_1.png',
         'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_2.png',
     ];
 
+    /**
+     * Array of death animation image paths.
+     * @type {string[]}
+     */
     IMAGES_DEATH = [
         'img/Enemy Characters/Enemy Character07/Death/Death_00.png',
         'img/Enemy Characters/Enemy Character07/Death/Death_01.png',
@@ -136,6 +217,10 @@ class Endboss extends CollidableObject {
         'img/Enemy Characters/Enemy Character07/Death/Death_23.png',
     ];  
 
+    /**
+     * Array of walking animation image paths.
+     * @type {string[]}
+     */
     IMAGES_WALKING = [
         'img/Enemy Characters/Enemy Character07/Walk/Walk_00.png',
         'img/Enemy Characters/Enemy Character07/Walk/Walk_01.png',
@@ -154,21 +239,21 @@ class Endboss extends CollidableObject {
     ];
     
     /**
-     * Indicates if the endboss is currently hit by a laser
+     * Indicates if the Endboss is currently hit by a laser.
      * @type {boolean}
      */
     isElectricHurt = false;
     
     /**
-     * Timeout handler for electric hurt animation
+     * Timeout handler for electric hurt animation.
      * @type {number|null}
      */
     electricHurtTimeout = null;
 
 
     /**
-     * Creates a new Endboss instance
-     * Initializes position and starts animation
+     * Creates a new Endboss instance.
+     * Initializes position and starts animation.
      */
     constructor() {
         super().loadImage('img/Enemy Characters/Enemy Character07/Idle/Idle_00.png');
@@ -183,19 +268,15 @@ class Endboss extends CollidableObject {
     }
 
     /**
-     * Starts the endboss idle animation
-     * Sets up interval for cycling through idle frames
-     */
-    /**
-     * Starts the endboss idle/animation and movement
-     * Sets up intervals for animation and death logic
+     * Starts the Endboss idle animation and movement.
+     * Sets up intervals for animation and death logic.
      */
     animate() {
         let deathFrame = 0;
         let deathDone = false;
-        let animState = 'idle';
+        this.animState = 'idle'; // Track animation state on instance
         let animTimer = 0;
-        let hitFrame = 0;
+        this.hitFrame = 0;
         let startX = this.x;
         let leftTargetX = startX - 200;
         this.animInterval = setInterval(() => {
@@ -220,7 +301,7 @@ class Endboss extends CollidableObject {
              * Animation state machine for Endboss
              * Handles idle, walking left/right, hit, and transition logic
              */
-            switch (animState) {
+            switch (this.animState) {
                 case 'idle':
                     /**
                      * Idle animation for 2 seconds
@@ -228,7 +309,7 @@ class Endboss extends CollidableObject {
                     this.playAnimation(this.IMAGES_IDLE);
                     animTimer += 50;
                     if (animTimer >= 2000) {
-                        animState = 'walkingLeft';
+                        this.animState = 'walkingLeft';
                         animTimer = 0;
                     }
                     break;
@@ -242,20 +323,21 @@ class Endboss extends CollidableObject {
                     }
                     animTimer += 50;
                     if (this.x <= leftTargetX || animTimer >= 5000) {
-                        animState = 'hit';
+                        this.animState = 'hit';
                         animTimer = 0;
-                        hitFrame = 0;
+                        this.hitFrame = 0;
                     }
                     break;
                 case 'hit':
                     /**
                      * Hit animation after walking left
+                     * Set image and update hitFrame for collision frame rendering
                      */
-                    this.img = this.imageCache[this.IMAGES_HIT[hitFrame % this.IMAGES_HIT.length]];
-                    hitFrame++;
+                    this.img = this.imageCache[this.IMAGES_HIT[this.hitFrame % this.IMAGES_HIT.length]];
+                    this.hitFrame++;
                     animTimer += 50;
-                    if (hitFrame >= this.IMAGES_HIT.length) {
-                        animState = 'idle2';
+                    if (this.hitFrame >= this.IMAGES_HIT.length) {
+                        this.animState = 'idle2';
                         animTimer = 0;
                     }
                     break;
@@ -266,7 +348,7 @@ class Endboss extends CollidableObject {
                     this.playAnimation(this.IMAGES_IDLE);
                     animTimer += 50;
                     if (animTimer >= 2000) {
-                        animState = 'walkingRight';
+                        this.animState = 'walkingRight';
                         animTimer = 0;
                     }
                     break;
@@ -281,7 +363,7 @@ class Endboss extends CollidableObject {
                     animTimer += 50;
                     if (this.x >= startX || animTimer >= 5000) {
                         this.x = startX;
-                        animState = 'idle';
+                        this.animState = 'idle';
                         animTimer = 0;
                     }
                     break;
@@ -290,12 +372,9 @@ class Endboss extends CollidableObject {
     }
     
     /**
-     * Triggers the electric hurt animation (e.g. on laser collision)
-     * Animation runs for 500ms and then returns to normal state
-     */
-    /**
-     * Registers an electric laser hit. 'force' is the hit amount (1=normal shot, 5=supershot)
-     * @param {number} [force=1] - Number of hits to apply
+     * Registers an electric laser hit and triggers the electric hurt animation.
+     * Animation runs for 500ms (normal) or 1000ms (supershot) and then returns to normal state.
+     * @param {number} [force=1] - Number of hits to apply (1=normal shot, 5=supershot)
      */
     triggerElectricHurt(force = 1) {
         const now = Date.now();
@@ -326,7 +405,7 @@ class Endboss extends CollidableObject {
     }
 
     /**
-     * Starts the death animation for the endboss
+     * Starts the death animation for the Endboss.
      */
     startDeathAnimation() {
         this.isDeadAnimationPlaying = true;
@@ -356,7 +435,7 @@ class Endboss extends CollidableObject {
     }
 
     /**
-     * Starts blinking animation after death
+     * Starts blinking animation after death.
      */
     startBlinking() {
         this.blinkInterval = setInterval(() => {
@@ -365,7 +444,7 @@ class Endboss extends CollidableObject {
     }
 
     /**
-     * Removes the endboss from the game
+     * Removes the Endboss from the game.
      */
     removeEnemy() {
         this.visible = false;

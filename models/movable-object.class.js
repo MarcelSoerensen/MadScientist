@@ -61,7 +61,6 @@ class MovableObject extends DrawableObject {
      * @returns {boolean} True if objects are colliding
      */
     isColliding(movableObject){
-        // Prüfe, ob beide Objekte collidable sind
         if (this.collidable === false || movableObject.collidable === false) {
             return false;
         }
@@ -78,21 +77,31 @@ class MovableObject extends DrawableObject {
             if (movableObject.jumpOffsetY !== undefined) {
                 otherYPos += movableObject.jumpOffsetY * 1.5;
             }
-            const leftA = this.x + this.offset.left;
-            const rightA = this.x + this.width - this.offset.right;
+            let leftOffsetA = this.offset.left;
+            let rightOffsetA = this.offset.right;
+            if (this instanceof Character && this.otherDirection) {
+                leftOffsetA = this.offset.right;
+                rightOffsetA = this.offset.left;
+            }
+            let leftOffsetB = movableObject.offset.left;
+            let rightOffsetB = movableObject.offset.right;
+            if (movableObject instanceof Character && movableObject.otherDirection) {
+                leftOffsetB = movableObject.offset.right;
+                rightOffsetB = movableObject.offset.left;
+            }
+            const leftA = this.x + leftOffsetA;
+            const rightA = this.x + this.width - rightOffsetA;
             const topA = thisYPos + this.offset.top;
             const bottomA = thisYPos + this.height - this.offset.bottom;
-            const leftB = movableObject.x + movableObject.offset.left;
-            const rightB = movableObject.x + movableObject.width - movableObject.offset.right;
+            const leftB = movableObject.x + leftOffsetB;
+            const rightB = movableObject.x + movableObject.width - rightOffsetB;
             const topB = otherYPos + movableObject.offset.top;
             const bottomB = otherYPos + movableObject.height - movableObject.offset.bottom;
-            // Standard collision: bounding boxes overlap
             const collision =
                 leftA < rightB &&
                 rightA > leftB &&
                 topA < bottomB &&
                 bottomA > topB;
-            // Containment: A is fully inside B
             const contained =
                 leftA >= leftB &&
                 rightA <= rightB &&
