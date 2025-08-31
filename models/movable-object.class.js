@@ -16,10 +16,25 @@ class MovableObject extends DrawableObject {
     /** @type {number} Timestamp of last hit */
     lastHit = 0;
 
+    /**
+     * Applies gravity to the object, updating its vertical position and speed.
+     * For ThrowableObjects, triggers explosion on ground contact.
+     */
     applyGravity() {
-        setInterval(() => {
+        this.gravityInterval = setInterval(() => {
+            if (this instanceof ThrowableObjects && this.hasExploded) {
+                clearInterval(this.gravityInterval);
+                return;
+            }
+
             this.y -= this.speedY;
             this.speedY -= this.acceleration;
+
+            const GROUND_Y = 400;
+            if (this instanceof ThrowableObjects && !this.hasExploded && this.y + this.height >= GROUND_Y) {
+                this.y = GROUND_Y - this.height;
+                this.explode();
+            }
         }, 1000 / 60);
     }
 

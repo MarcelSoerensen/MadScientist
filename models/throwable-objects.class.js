@@ -4,6 +4,22 @@
  */
 class ThrowableObjects extends MovableObject {
 
+    IMAGES_EXPLOSION = [
+        'img/Collision_Fx/Fx02/skeleton-Fx2_0.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_1.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_2.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_3.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_4.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_5.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_6.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_7.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_8.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_9.png'
+    ];
+
+    hasExploded = false;
+    isExploding = false;
+
     /**
      * Creates a new ThrowableObjects instance
      * @param {number} x - The initial x position
@@ -17,7 +33,7 @@ class ThrowableObjects extends MovableObject {
         this.height = 40;
         this.width = 40;
         this.otherDirection = otherDirection;
-        this.throw()
+        this.throw();
     }
 
     /**
@@ -27,12 +43,54 @@ class ThrowableObjects extends MovableObject {
      */
     throw() {
         this.speedY = 15;
-        this.speedX = this.otherDirection ? -8 : 8;
+        this.speedX = this.otherDirection ? -4 : 4;
         this.acceleration = 0.5;
         this.applyGravity();
-        
-        setInterval(() => {
+
+        this.moveInterval = setInterval(() => {
             this.x += this.speedX;
         }, 1000 / 60);
+    }
+
+    /**
+     * Handles the explosion of the throwable object
+     * Stops the object movement, plays explosion animation and marks the object as exploded
+     */
+    explode() {
+        if (this.hasExploded) return;
+        this.hasExploded = true;
+        clearInterval(this.moveInterval);
+        this.speedX = 0;
+        this.speedY = 0;
+        this.loadImages(this.IMAGES_EXPLOSION);
+
+        const centerX = this.x + this.width / 2;
+        const centerY = this.y + this.height / 2;
+        this.width = 150;
+        this.height = 150;
+        this.x = centerX - this.width / 2;
+        this.y = centerY - this.height / 2 - 30; 
+
+        this.isExploding = true;
+        this.currentImage = 0;
+        this.images = this.IMAGES_EXPLOSION;
+        this.img = this.imageCache[this.IMAGES_EXPLOSION[0]];
+
+        this.explosionInterval = setInterval(() => {
+            this.currentImage++;
+            if (this.currentImage < this.IMAGES_EXPLOSION.length) {
+                this.img = this.imageCache[this.IMAGES_EXPLOSION[this.currentImage]];
+            } else {
+                clearInterval(this.explosionInterval);
+                this.isExploding = false;
+                this.visible = false;
+            }
+        }, 50);
+    }
+
+    /**
+     * Called regularly in the game loop to animate the object if needed
+     */
+    animate() {
     }
 }
