@@ -2,6 +2,10 @@
  * Represents the game world. Manages all game objects, rendering, and main game loop.
  * @class World
  */
+// @ts-ignore
+// eslint-disable-next-line no-undef
+// If using modules, use: import EnemyTwo from './enemy-2.class.js';
+// Otherwise, ensure EnemyTwo is loaded globally
 class World {
     /**
      * Starts the first enemy only if the character is at least 800px away
@@ -55,7 +59,7 @@ class World {
     character = new Character();
     /** @type {Level} The current game level */
     level = level1;
-    /** @type {Array<EnemyOne>} Array of enemy objects */
+    /** @type {Array<EnemyOne|EnemyTwo>} Array of enemy objects */
     enemies = level1.enemies;
     /** @type {EnergyBallManager} Manages all energy balls */
     energyBallManager;
@@ -252,9 +256,6 @@ class World {
          */
         this.level.enemies.forEach(enemy => {
             if (!enemy.collidable) {
-                if (enemy instanceof Endboss) {
-                    console.log('Endboss collision check: collidable false, isDead:', enemy.isDeadAnimationPlaying);
-                }
                 return;
             }
 

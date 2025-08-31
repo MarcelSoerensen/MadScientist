@@ -38,7 +38,6 @@ class Endboss extends CollidableObject {
      * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
      */
     drawCollisionFrame(ctx) {
-    console.log('Endboss drawCollisionFrame collidable:', this.collidable, 'isDead:', this.isDeadAnimationPlaying);
     if (!this.collidable) return;
         let leftOffset = this.offset.left;
         const isHitAnim = this.animState === 'hit';
