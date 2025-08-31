@@ -3,7 +3,47 @@
  * @extends MovableObject
  */
 class ThrowableObjects extends MovableObject {
+    /**
+     * Explosion image sequence for the bomb
+     * @type {string[]}
+     */
+    IMAGES_EXPLOSION = [
+        'img/Collision_Fx/Fx02/skeleton-Fx2_0.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_1.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_2.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_3.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_4.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_5.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_6.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_7.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_8.png',
+        'img/Collision_Fx/Fx02/skeleton-Fx2_9.png'
+    ];
 
+    /**
+     * Indicates if the bomb has already exploded
+     * @type {boolean}
+     */
+    hasExploded = false;
+    /**
+     * Indicates if the bomb is currently exploding
+     * @type {boolean}
+     */
+    isExploding = false;
+
+    /**
+     * Returns the current rectangle of the explosion
+     * @returns {{x: number, y: number, width: number, height: number}|null}
+     */
+    getExplosionRect() {
+        if (!this.isExploding) return null;
+        return {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height
+        };
+    }
     IMAGES_EXPLOSION = [
         'img/Collision_Fx/Fx02/skeleton-Fx2_0.png',
         'img/Collision_Fx/Fx02/skeleton-Fx2_1.png',
@@ -92,5 +132,21 @@ class ThrowableObjects extends MovableObject {
      * Called regularly in the game loop to animate the object if needed
      */
     animate() {
+    }
+
+    /**
+     * Draws the bomb including explosion and blue border
+     * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+     */
+    draw(ctx) {
+        if (this.visible === false) return;
+        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        if (this.isExploding) {
+            ctx.save();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+            ctx.restore();
+        }
     }
 }

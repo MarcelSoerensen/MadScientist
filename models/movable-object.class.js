@@ -123,10 +123,19 @@ class MovableObject extends DrawableObject {
                 topA >= topB &&
                 bottomA <= bottomB;
             if (collision || contained) {
-                console.log('isColliding detected:', {
-                    objectA: {leftA, rightA, topA, bottomA, x: this.x, y: this.y, w: this.width, h: this.height, offset: this.offset},
-                    objectB: {leftB, rightB, topB, bottomB, x: movableObject.x, y: movableObject.y, w: movableObject.width, h: movableObject.height, offset: movableObject.offset}
-                });
+                if (this.constructor.name === 'ThrowableObjects' || movableObject.constructor.name === 'ThrowableObjects') {
+                    console.log('Bomb Kollision:', {
+                        bomb: this.constructor.name === 'ThrowableObjects' ? this : movableObject,
+                        other: this.constructor.name === 'ThrowableObjects' ? movableObject : this,
+                        collision,
+                        contained
+                    });
+                } else {
+                    console.log('isColliding detected:', {
+                        objectA: {leftA, rightA, topA, bottomA, x: this.x, y: this.y, w: this.width, h: this.height, offset: this.offset},
+                        objectB: {leftB, rightB, topB, bottomB, x: movableObject.x, y: movableObject.y, w: movableObject.width, h: movableObject.height, offset: movableObject.offset}
+                    });
+                }
             }
             return collision || contained;
         } else {

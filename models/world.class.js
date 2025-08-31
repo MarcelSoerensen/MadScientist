@@ -5,7 +5,7 @@
 class World {
     /**
      * Checks for supershot creation when S key is pressed.
-     * Fires a large laser, subtracts 5 balls, und zählt 3 Treffer auf den Gegner.
+     * Fires a large laser, subtracts 5 balls, and counts 3 hits on the enemy.
      * @returns {void}
      */
     checkSuperShot() {
@@ -74,6 +74,7 @@ class World {
 
     /**
      * Creates a new World instance.
+     * Initializes all game objects and starts the main loop.
      * @param {HTMLCanvasElement} canvas - The game canvas
      * @param {Keyboard} keyboard - The keyboard input handler
      */
@@ -112,14 +113,14 @@ class World {
             this.checkSuperShot();
         }, 1000 / 60);
 
-        // Stick-Kollision für Endboss mit höherer Frequenz
+        
         setInterval(() => {
             this.checkStickCollision();
         }, 50);
     }
 
     /**
-     * Prüft nur die Stick-Kollision des Endboss mit dem Character
+     * Checks only the stick collision of the Endboss with the character
      */
     checkStickCollision() {
         this.level.enemies.forEach(enemy => {
@@ -222,6 +223,7 @@ class World {
         this.level.enemies.forEach(enemy => {
             let collided = this.character.isColliding(enemy);
 
+            
             if (enemy instanceof Endboss && enemy.animState === 'hit') {
                 const stickRect = enemy.getStickCollisionRect && enemy.getStickCollisionRect();
                 if (stickRect) {
@@ -241,6 +243,37 @@ class World {
                     }
                 }
             }
+
+            
+            this.throwableObjects.forEach(bomb => {
+                if (bomb.isExploding) {
+                    const bombRect = bomb.getExplosionRect();
+                    const enemyRect = {
+                        x: enemy.x + (enemy.offset?.left || 0),
+                        y: enemy.y + (enemy.offset?.top || 0),
+                        width: enemy.width - ((enemy.offset?.left || 0) + (enemy.offset?.right || 0)),
+                        height: enemy.height - ((enemy.offset?.top || 0) + (enemy.offset?.bottom || 0))
+                    };
+                    
+                    const overlap =
+                        enemyRect.x < bombRect.x + bombRect.width &&
+                        enemyRect.x + enemyRect.width > bombRect.x &&
+                        enemyRect.y < bombRect.y + bombRect.height &&
+                        enemyRect.y + enemyRect.height > bombRect.y;
+                    
+                    const contained =
+                        enemyRect.x >= bombRect.x &&
+                        enemyRect.y >= bombRect.y &&
+                        enemyRect.x + enemyRect.width <= bombRect.x + bombRect.width &&
+                        enemyRect.y + enemyRect.height <= bombRect.y + bombRect.height;
+                    if (overlap || contained) {
+                        console.log('Bomb Kollision:', { bomb, enemy, overlap, contained });
+                        if (typeof enemy.startDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
+                            enemy.startDeathAnimation();
+                        }
+                    }
+                }
+            });
 
             if (collided) {
                 this.character.hit();
@@ -316,7 +349,7 @@ class World {
     }
 
     /**
-     * Draws the status bar on the map. Renders the status bar image und überlagert eine benutzerdefinierte HP-Bar mit Trapezform.
+     * Draws the status bar on the map. Renders the status bar image and overlays a custom HP bar with trapezoid shape.
      * @returns {void}
      */
     drawStatusBar() {
