@@ -76,9 +76,21 @@ class BombManager extends DrawableObject {
      * @param {object} character - The main character object.
      */
     update(character) {
+        // Zielkoordinaten der BombsBar (müssen ggf. angepasst werden)
+        const barY = 50;
         for (let i = this.bombs.length - 1; i >= 0; i--) {
             const bomb = this.bombs[i];
-            if (character && bomb.isColliding(character)) {
+            if (typeof bomb.update === 'function') {
+                bomb.update();
+            }
+            if (
+                typeof bomb.startCollecting === 'function' &&
+                !bomb.isCollecting && character && bomb.isColliding(character)
+            ) {
+                // Ziel-x = Start-x - 100, Ziel-y = 50 (nach links und oben)
+                bomb.startCollecting(bomb.originX - 100, barY);
+            }
+            if (bomb.isCollecting && bomb.collectProgress >= 1) {
                 this.bombs.splice(i, 1);
                 this.collectedCount++;
             }
@@ -107,13 +119,79 @@ class CollectibleBomb extends CollidableObject {
      */
     constructor(x, y) {
         super();
-        this.x = x;
-        this.y = y;
-        this.width = 40;
-        this.height = 40;
-        this.img = new Image();
-        this.img.src = 'img/Projectile/Other/1.png';
-        this.offset = { top: 0, left: 0, right: 0, bottom: 0 };
+    this.x = x;
+    this.y = y;
+    this.width = 40;
+    this.height = 40;
+    this.img = new Image();
+    this.img.src = 'img/Projectile/Other/1.png';
+    this.offset = { top: 0, left: 0, right: 0, bottom: 0 };
+    this.originX = x;
+    this.originY = y;
+    this.isCollecting = false;
+    this.collectProgress = 0;
+    this.startX = x;
+    this.startY = y;
+    this.targetX = x;
+    this.targetY = y;
+    this.startWidth = this.width;
+    this.startHeight = this.height;
+    }
+
+    /**
+     * Starts the collect animation to the bombs bar
+     */
+    startCollecting(targetX, targetY) {
+        if (this.isCollecting) return;
+        this.isCollecting = true;
+        this.collectProgress = 0;
+        this.startX = this.originX;
+        this.startY = this.originY;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.startWidth = 40;
+        this.startHeight = 40;
+        const dx = this.targetX - this.startX;
+        const dy = this.targetY - this.startY;
+        this.distance = Math.sqrt(dx*dx + dy*dy);
+        this.speed = 10;
+        this.duration = this.distance / this.speed;
+        if (this.duration < 1) this.duration = 1;
+    }
+
+    /**
+     * Updates the animation if the bomb is being collected
+     */
+    update() {
+        if (this.isCollecting) {
+            if (!this.duration) this.duration = 1;
+            this.collectProgress += 1 / this.duration;
+            if (this.collectProgress >= 1) {
+                this.x = this.targetX;
+                this.y = this.targetY;
+                this.width = this.startWidth * 0.4;
+                this.height = this.startHeight * 0.4;
+                if (!this._animationDone) {
+                    this._animationDone = true;
+                }
+            } else {
+                this.x = this.startX + (this.targetX - this.startX) * this.collectProgress;
+                this.y = this.startY + (this.targetY - this.startY) * this.collectProgress;
+                const shrink = 1 - 0.6 * this.collectProgress;
+                this.width = this.startWidth * shrink;
+                this.height = this.startHeight * shrink;
+            }
+        }
+    }
+
+    /**
+     * Draws the bomb (including animation)
+     */
+    draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = 1;
+        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        ctx.restore();
     }
 
 }
