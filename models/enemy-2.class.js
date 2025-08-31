@@ -68,30 +68,36 @@ class EnemyTwo extends MovableObject {
      * Starts enemy animation and vertical movement
      */
     animate() {
-        this.moveInterval = setInterval(() => {
+        let lastAnimTime = 0;
+        const animFrameDuration = 120; // ms pro Frame (langsamer = höherer Wert)
+        const animateStep = (timestamp) => {
             this.moveVertically();
-        }, 1000 / 60);
-
-        let deathFrame = 0;
-        let deathDone = false;
-        this.animInterval = setInterval(() => {
             if (this.laserHitCount >= 3 && !this.isElectricHurt) {
-                if (!deathDone) {
-                    this.img = this.imageCache[this.IMAGES_DEATH[deathFrame]];
-                    deathFrame++;
-                    if (deathFrame >= this.IMAGES_DEATH.length) {
-                        deathFrame = this.IMAGES_DEATH.length - 1;
-                        deathDone = true;
+                if (!this.deathDone) {
+                    if (typeof this.deathFrame === 'undefined') this.deathFrame = 0;
+                    this.img = this.imageCache[this.IMAGES_DEATH[this.deathFrame]];
+                    this.deathFrame++;
+                    if (this.deathFrame >= this.IMAGES_DEATH.length) {
+                        this.deathFrame = this.IMAGES_DEATH.length - 1;
+                        this.deathDone = true;
                     }
                 } else {
                     this.img = this.imageCache[this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1]];
                 }
             } else if (this.isElectricHurt) {
-                this.playAnimation(this.IMAGES_GET_ELECTRIC);
+                if (!this.lastElectricAnimTime || timestamp - this.lastElectricAnimTime > animFrameDuration) {
+                    this.playAnimation(this.IMAGES_GET_ELECTRIC);
+                    this.lastElectricAnimTime = timestamp;
+                }
             } else {
-                this.playAnimation(this.IMAGES_WALKING);
+                if (!lastAnimTime || timestamp - lastAnimTime > animFrameDuration) {
+                    this.playAnimation(this.IMAGES_WALKING);
+                    lastAnimTime = timestamp;
+                }
             }
-        }, 50);
+            this.animationFrame = requestAnimationFrame(animateStep);
+        };
+        this.animationFrame = requestAnimationFrame(animateStep);
     }
 
     /**
@@ -140,13 +146,9 @@ class EnemyTwo extends MovableObject {
         this.isDeadAnimationPlaying = true;
         this.currentImage = 0;
         this.collidable = false;
-        if (this.moveInterval) {
-            clearInterval(this.moveInterval);
-            this.moveInterval = null;
-        }
-        if (this.animInterval) {
-            clearInterval(this.animInterval);
-            this.animInterval = null;
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+            this.animationFrame = null;
         }
 
         let deathFrame = 0;
