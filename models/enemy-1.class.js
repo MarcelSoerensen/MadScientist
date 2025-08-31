@@ -97,14 +97,16 @@ class EnemyOne extends CollidableObject {
      * Creates a new EnemyOne instance
      * Initializes position, speed, and starts animation
      */
-    constructor() {
+    constructor(isFirstEnemy = false, levelStartX = -400) {
         super().loadImage('img/Enemy Characters/Enemy Character01/Walk/Walk_00.png');
         this.loadImages(this.IMAGES_WALKING);
-        this.x = 400 + Math.random() * 720;
+        if (isFirstEnemy) {
+            this.x = levelStartX + 1200;
+        } else {
+            this.x = 400 + Math.random() * 720;
+        }
         this.y = 160 + Math.random() * 10;
-
         this.speed = 0.15 + Math.random() * 0.25;
-
         this.loadImages(this.IMAGES_GET_ELECTRIC);
         this.loadImages(this.IMAGES_DEATH);
         this.visible = true;

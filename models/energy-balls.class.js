@@ -116,17 +116,11 @@ class EnergyBallManager {
         while (this.balls.length < ballsToPlace && tries < 1000) {
             let x;
             if (this.balls.length === 0) {
-                if (
-                    character &&
-                    typeof character.x === 'number' &&
-                    typeof character.width === 'number' &&
-                    character.offset &&
-                    typeof character.offset.right === 'number'
-                ) {
-                    x = character.x + character.width - character.offset.right + 100;
-                } else {
-                    x = 200;
-                }
+                x = 300 + Math.random() * 30;
+            } else if (this.balls.length === 1) {
+                x = 350 + Math.random() * 150;
+            } else if (this.balls.length === 2) {
+                x = 520 + Math.random() * 80;
             } else {
                 x = minX + Math.random() * Math.max(0, worldWidth - minX - 1000);
             }

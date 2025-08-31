@@ -1,12 +1,16 @@
 /**
- * Represents the end boss enemy
- * @extends CollidableObject
- */
-/**
- * Represents the end boss enemy
+ * Represents the end boss enemy in the game. Handles all logic, animation, and collision for the boss.
+ * Extends CollidableObject.
+ *
+ * @class Endboss
  * @extends CollidableObject
  */
 class Endboss extends CollidableObject {
+    /**
+     * Indicates if the Endboss is collidable (for collision detection)
+     * @type {boolean}
+     */
+    collidable = true;
     /**
      * Returns the current stick collision rectangle during hit animation.
      * The rectangle matches the visible blue stick frame.
@@ -34,9 +38,10 @@ class Endboss extends CollidableObject {
      * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
      */
     drawCollisionFrame(ctx) {
+    console.log('Endboss drawCollisionFrame collidable:', this.collidable, 'isDead:', this.isDeadAnimationPlaying);
+    if (!this.collidable) return;
         let leftOffset = this.offset.left;
         const isHitAnim = this.animState === 'hit';
-        if (!this.collidable) return;
         ctx.save();
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
@@ -274,7 +279,7 @@ class Endboss extends CollidableObject {
     animate() {
         let deathFrame = 0;
         let deathDone = false;
-        this.animState = 'idle'; // Track animation state on instance
+        this.animState = 'idle'; 
         let animTimer = 0;
         this.hitFrame = 0;
         let startX = this.x;
@@ -388,8 +393,7 @@ class Endboss extends CollidableObject {
         if (force === 1) this.lastHitTime = now;
         this.laserHitCount += force;
         if (force === 5) this.lastSuperShotTime = now;
-        if (this.laserHitCount > 25) this.laserHitCount = 25;
-        if (this.laserHitCount >= 25) return;
+    if (this.laserHitCount > 25) this.laserHitCount = 25;
         if (this.electricHurtTimeout) {
             clearTimeout(this.electricHurtTimeout);
         }
@@ -408,9 +412,9 @@ class Endboss extends CollidableObject {
      * Starts the death animation for the Endboss.
      */
     startDeathAnimation() {
-        this.isDeadAnimationPlaying = true;
-        this.currentImage = 0;
-        this.collidable = false;
+    this.collidable = false;
+    this.isDeadAnimationPlaying = true;
+    this.currentImage = 0;
         if (this.animInterval) {
             clearInterval(this.animInterval);
             this.animInterval = null;
@@ -448,6 +452,7 @@ class Endboss extends CollidableObject {
      */
     removeEnemy() {
         this.visible = false;
+        this.collidable = false;
         if (this.blinkInterval) {
             clearInterval(this.blinkInterval);
             this.blinkInterval = null;

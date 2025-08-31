@@ -1,6 +1,7 @@
+const levelStartX = -400;
 const level1 = new Level(
     [
-        new EnemyOne(),
+        new EnemyOne(true, levelStartX),
         new EnemyOne(),
         new EnemyOne(),
         new Endboss(),

@@ -4,6 +4,20 @@
  */
 class World {
     /**
+     * Starts the first enemy only if the character is at least 800px away
+     */
+    checkFirstEnemyDistance() {
+        if (this.level && this.level.enemies && this.level.enemies.length > 0) {
+            const firstEnemy = this.level.enemies[0];
+            if (firstEnemy._delayedStart && Math.abs(this.character.x - firstEnemy.x) >= 800) {
+                firstEnemy._delayedStart = false;
+                if (!firstEnemy.moveInterval && !firstEnemy.animInterval) {
+                    firstEnemy.animate();
+                }
+            }
+        }
+    }
+    /**
      * Checks for supershot creation when S key is pressed.
      * Fires a large laser, subtracts 5 balls, and counts 3 hits on the enemy.
      * @returns {void}
@@ -119,6 +133,7 @@ class World {
             this.checkThrowableObjects();
             this.checkLaserBeams();
             this.checkSuperShot();
+            this.checkFirstEnemyDistance();
         }, 1000 / 60);
 
         
@@ -132,7 +147,12 @@ class World {
      */
     checkStickCollision() {
         this.level.enemies.forEach(enemy => {
-            if (enemy instanceof Endboss && enemy.animState === 'hit') {
+            if (
+                enemy instanceof Endboss &&
+                enemy.animState === 'hit' &&
+                !enemy.isDeadAnimationPlaying &&
+                enemy.collidable !== false
+            ) {
                 const stickRect = enemy.getStickCollisionRect && enemy.getStickCollisionRect();
                 if (stickRect) {
                     const charRect = {
@@ -231,10 +251,16 @@ class World {
          * Triggers character hit and updates status bar if collision occurs.
          */
         this.level.enemies.forEach(enemy => {
+            if (!enemy.collidable) {
+                if (enemy instanceof Endboss) {
+                    console.log('Endboss collision check: collidable false, isDead:', enemy.isDeadAnimationPlaying);
+                }
+                return;
+            }
+
             let collided = this.character.isColliding(enemy);
 
-            
-            if (enemy instanceof Endboss && enemy.animState === 'hit') {
+            if (enemy instanceof Endboss && enemy.animState === 'hit' && enemy.collidable) {
                 const stickRect = enemy.getStickCollisionRect && enemy.getStickCollisionRect();
                 if (stickRect) {
                     const charRect = {
@@ -481,7 +507,7 @@ class World {
             movableObject.draw(this.ctx);
             movableObject.drawFrame(this.ctx); 
 
-            if (movableObject.drawCollisionFrame) {
+            if (movableObject.drawCollisionFrame && movableObject.collidable !== false) {
                 movableObject.drawCollisionFrame(this.ctx);
             }
 
