@@ -3,7 +3,19 @@
  * @extends MovableObject
  * @classdesc Vertical-moving enemy using EnemyOne's animation, placed in the center of the level.
  */
-class EnemyTwo extends MovableObject {
+class EnemyTwo extends CollidableObject {
+    lastHitTime = 0;
+    laserHitCount = 0;
+    isDeadAnimationPlaying = false;
+    /**
+     * Collision offset values for EnemyTwo (wie EnemyOne)
+     */
+    offset = {
+        top: 140,
+        left: 103,
+        right: 115,
+        bottom: 80
+    };
     IMAGES_WALKING = [
         'img/Enemy Characters/Enemy Character10/Moving and Idle/Moving and Idle_0.png',
         'img/Enemy Characters/Enemy Character10/Moving and Idle/Moving and Idle_1.png',
@@ -15,36 +27,26 @@ class EnemyTwo extends MovableObject {
     ];
 
     IMAGES_GET_ELECTRIC = [
-        'img/Enemy Characters/Enemy Character01/Get Electric/Get Electric_0.png',
-        'img/Enemy Characters/Enemy Character01/Get Electric/Get Electric_1.png',
-        'img/Enemy Characters/Enemy Character01/Get Electric/Get Electric_2.png',
+        'img/Enemy Characters/Enemy Character10/Get Electric/Get Electric_0.png',
+        'img/Enemy Characters/Enemy Character10/Get Electric/Get Electric_1.png',
+        'img/Enemy Characters/Enemy Character10/Get Electric/Get Electric_2.png',
     ];
 
     IMAGES_DEATH = [
-        'img/Enemy Characters/Enemy Character01/Death/Death_00.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_01.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_02.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_03.png',    
-        'img/Enemy Characters/Enemy Character01/Death/Death_04.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_05.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_06.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_07.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_08.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_09.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_10.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_11.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_12.png',            
-        'img/Enemy Characters/Enemy Character01/Death/Death_13.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_14.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_15.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_16.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_17.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_18.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_19.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_20.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_21.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_22.png',
-        'img/Enemy Characters/Enemy Character01/Death/Death_23.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_00.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_01.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_02.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_03.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_04.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_05.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_06.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_07.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_08.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_09.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_10.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_11.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_12.png',
+        'img/Enemy Characters/Enemy Character10/Destroy/Destroy_13.png'
     ];
 
     /**
@@ -69,9 +71,11 @@ class EnemyTwo extends MovableObject {
      */
     animate() {
         let lastAnimTime = 0;
-        const animFrameDuration = 120; // ms pro Frame (langsamer = höherer Wert)
+        const animFrameDuration = 120;
         const animateStep = (timestamp) => {
-            this.moveVertically();
+            if (!this.isDeadAnimationPlaying) {
+                this.moveVertically();
+            }
             if (this.laserHitCount >= 3 && !this.isElectricHurt) {
                 if (!this.deathDone) {
                     if (typeof this.deathFrame === 'undefined') this.deathFrame = 0;
@@ -89,7 +93,7 @@ class EnemyTwo extends MovableObject {
                     this.playAnimation(this.IMAGES_GET_ELECTRIC);
                     this.lastElectricAnimTime = timestamp;
                 }
-            } else {
+            } else if (!this.isDeadAnimationPlaying) {
                 if (!lastAnimTime || timestamp - lastAnimTime > animFrameDuration) {
                     this.playAnimation(this.IMAGES_WALKING);
                     lastAnimTime = timestamp;
@@ -150,6 +154,7 @@ class EnemyTwo extends MovableObject {
             cancelAnimationFrame(this.animationFrame);
             this.animationFrame = null;
         }
+        this.moveVertically = function(){};
 
         let deathFrame = 0;
         this.deathAnimInterval = setInterval(() => {
@@ -159,15 +164,9 @@ class EnemyTwo extends MovableObject {
             } else {
                 this.img = this.imageCache[this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1]];
                 clearInterval(this.deathAnimInterval);
+                this.removeEnemy(); 
             }
         }, 50);
-
-        setTimeout(() => {
-            this.startBlinking();
-        }, 2500);
-        setTimeout(() => {
-            this.removeEnemy();
-        }, 4000);
     }
 
     /**

@@ -436,6 +436,16 @@ class World {
      */
     drawGameObjects() {
         this.addObjectsToMap(this.enemies);
+        // Roter Rahmen um EnemyTwo
+        this.enemies.forEach(enemy => {
+            if (enemy instanceof EnemyTwo && enemy.visible) {
+                this.ctx.save();
+                this.ctx.strokeStyle = 'red';
+                this.ctx.lineWidth = 3;
+                this.ctx.strokeRect(enemy.x + (enemy.offset?.left || 0), enemy.y + (enemy.offset?.top || 0), enemy.width - ((enemy.offset?.left || 0) + (enemy.offset?.right || 0)), enemy.height - ((enemy.offset?.top || 0) + (enemy.offset?.bottom || 0)));
+                this.ctx.restore();
+            }
+        });
         this.addToMap(this.character);
         this.addObjectsToMap(this.throwableObjects);
         this.addObjectsToMap(this.laserBeams);
