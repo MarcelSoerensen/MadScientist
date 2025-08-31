@@ -47,6 +47,10 @@ class World {
     energyBallManager;
     /** @type {SuperShotBar} Displays collected energy balls as a bar */
     superShotBar;
+    /** @type {BombsBar} Displays collected bombs as a bar */
+    bombsBar;
+    /** @type {BombManager} Manages all collectible bombs */
+    bombManager;
     /** @type {Array<DrawableObject>} Array of background objects */
     backgroundObjects = level1.backgroundObjects;
 
@@ -85,10 +89,14 @@ class World {
         this.setWorld();
         /** Initialize EnergyBallManager with character */
         this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
-        /** Initialize SuperShotBar */
-        this.superShotBar = new SuperShotBar();
-        this.draw();
-        this.run();
+    /** Initialize SuperShotBar */
+    this.superShotBar = new SuperShotBar();
+    /** Initialize BombsBar */
+    this.bombsBar = new BombsBar(65, 50, 5);
+    /** Initialize BombManager with character */
+    this.bombManager = new BombManager(4000, 600, this.character);
+    this.draw();
+    this.run();
     }
     
     /**
@@ -153,7 +161,8 @@ class World {
      * @returns {void}
      */
     checkThrowableObjects() {
-        if (this.keyboard.D && !this.lastDKeyState && !this.character.throwAnimationPlaying) {
+        
+        if (this.keyboard.D && !this.lastDKeyState && !this.character.throwAnimationPlaying && this.bombManager.collectedCount > 0) {
             this.character.playThrowBombAnimation();
             setTimeout(() => {
                 let bombX = this.character.otherDirection ? this.character.x + 100 : this.character.x + 160;
@@ -163,6 +172,7 @@ class World {
                     this.character.otherDirection
                 );
                 this.throwableObjects.push(bomb);
+                this.bombManager.collectedCount = Math.max(0, this.bombManager.collectedCount - 1);
             }, 500);
         }
         this.lastDKeyState = this.keyboard.D;
@@ -254,13 +264,11 @@ class World {
                         width: enemy.width - ((enemy.offset?.left || 0) + (enemy.offset?.right || 0)),
                         height: enemy.height - ((enemy.offset?.top || 0) + (enemy.offset?.bottom || 0))
                     };
-                    
                     const overlap =
                         enemyRect.x < bombRect.x + bombRect.width &&
                         enemyRect.x + enemyRect.width > bombRect.x &&
                         enemyRect.y < bombRect.y + bombRect.height &&
                         enemyRect.y + enemyRect.height > bombRect.y;
-                    
                     const contained =
                         enemyRect.x >= bombRect.x &&
                         enemyRect.y >= bombRect.y &&
@@ -268,7 +276,9 @@ class World {
                         enemyRect.y + enemyRect.height <= bombRect.y + bombRect.height;
                     if (overlap || contained) {
                         console.log('Bomb Kollision:', { bomb, enemy, overlap, contained });
-                        if (typeof enemy.startDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
+                        if (enemy instanceof Endboss) {
+                            enemy.triggerElectricHurt(5);
+                        } else if (typeof enemy.startDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
                             enemy.startDeathAnimation();
                         }
                     }
@@ -331,6 +341,10 @@ class World {
                 this.ctx.fillText(superShots, textX, textY);
                 this.ctx.restore();
             }
+        }
+        if (this.bombsBar && this.bombManager) {
+            this.bombsBar.setBombs(this.bombManager.collectedCount);
+            this.bombsBar.draw(this.ctx);
         }
 
         let self = this;
@@ -404,6 +418,13 @@ class World {
             if (this.superShotBar) {
                 this.superShotBar.setBalls(this.energyBallManager.collectedCount);
             }
+        }
+        if (this.bombManager) {
+            this.bombManager.update(this.character);
+            this.bombManager.draw(this.ctx);
+        }
+        if (this.bombsBar && this.bombManager) {
+            this.bombsBar.setBombs(this.bombManager.collectedCount);
         }
     }
 
