@@ -11,13 +11,13 @@ class BombManager extends DrawableObject {
      * @param {number} levelHeight - The height of the level
      * @param {Character} character - The main character
      */
-    constructor(levelWidth, levelHeight, character) {
+    constructor(levelWidth, levelHeight, character, energyBalls = []) {
         super();
         this.bombs = [];
         this.collectedCount = 0;
         this.maxBombs = 5;
         this.character = character;
-        this.placeBombs(levelWidth, levelHeight);
+        this.placeBombs(levelWidth, levelHeight, energyBalls);
     }
 
     /**
@@ -25,7 +25,7 @@ class BombManager extends DrawableObject {
      * @param {number} levelWidth - The width of the level
      * @param {number} levelHeight - The height of the level
      */
-    placeBombs(levelWidth, levelHeight) {
+    placeBombs(levelWidth, levelHeight, energyBalls = []) {
         let tries = 0;
         let bombsToPlace = this.maxBombs;
         let lowerCount = Math.floor(bombsToPlace / 2);
@@ -34,37 +34,24 @@ class BombManager extends DrawableObject {
         let minX = this.character && typeof this.character.x === 'number' && typeof this.character.width === 'number'
             ? Math.max(this.character.x + this.character.width + 100, 50)
             : 50;
-
+        const minDist = 100;
         while (this.bombs.length < bombsToPlace && tries < 1000) {
-            let x;
-            if (this.bombs.length === 0) {
-                if (
-                    this.character &&
-                    typeof this.character.x === 'number' &&
-                    typeof this.character.width === 'number' &&
-                    this.character.offset &&
-                    typeof this.character.offset.right === 'number'
-                ) {
-                    x = this.character.x + this.character.width - this.character.offset.right + 100;
-                } else {
-                    x = 200;
-                }
-            } else {
-                x = minX + Math.random() * Math.max(0, levelWidth - minX - 1000);
-            }
-            let y;
-            if (this.bombs.length < lowerCount) {
-                y = lowerY + Math.random() * 10 - 5;
-            } else {
-                y = upperY + Math.random() * 10 - 5;
-            }
-            let tooClose = this.bombs.some(b => {
+            let x = minX + Math.random() * Math.max(0, levelWidth - minX - 1000);
+            let y = (this.bombs.length < lowerCount)
+                ? lowerY + Math.random() * 10 - 5
+                : upperY + Math.random() * 10 - 5;
+            let tooCloseBombs = this.bombs.some(b => {
                 let dx = b.x - x;
                 let dy = b.y - y;
-                return Math.sqrt(dx*dx + dy*dy) < 80;
+                return Math.sqrt(dx*dx + dy*dy) < minDist;
+            });
+            let tooCloseEnergy = energyBalls.some(e => {
+                let dx = e.x - x;
+                let dy = e.y - y;
+                return Math.sqrt(dx*dx + dy*dy) < minDist;
             });
             let bomb = new CollectibleBomb(x, y);
-            if (!tooClose) {
+            if (!tooCloseBombs && !tooCloseEnergy) {
                 this.bombs.push(bomb);
             }
             tries++;
@@ -86,7 +73,7 @@ class BombManager extends DrawableObject {
                 typeof bomb.startCollecting === 'function' &&
                 !bomb.isCollecting && character && bomb.isColliding(character)
             ) {
-                // Ziel-x = Start-x - 100, Ziel-y = 50 (nach links und oben)
+                
                 bomb.startCollecting(bomb.originX - 100, barY);
             }
             if (bomb.isCollecting && bomb.collectProgress >= 1) {
@@ -208,10 +195,25 @@ class CollectibleBomb extends CollidableObject {
      * Draws the bomb (including animation).
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
+    /**
+     * Draws the bomb with animation (rotating movement and pulsating transparency).
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         ctx.save();
-        ctx.globalAlpha = 1;
-        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        if (!this.isCollecting) {
+            let t = performance.now() * 0.003;
+            let angle = t % (2 * Math.PI);
+            let radius = (this.width + this.height) / 32;
+            let xOffset = Math.cos(angle) * radius;
+            let yOffset = Math.sin(angle) * radius;
+            let flash = Math.abs(Math.sin(performance.now() * 0.012));
+            ctx.globalAlpha = 1;
+            ctx.drawImage(this.img, this.x + xOffset, this.y + yOffset, this.width, this.height);
+        } else {
+            ctx.globalAlpha = 1;
+            ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        }
         ctx.restore();
     }
 

@@ -114,7 +114,7 @@ class EnergyBallManager {
         this.balls = [];
         this.collectedCount = 0;
         this.maxBalls = 20;
-        const minDist = 60;
+    const minDist = 100;
         let tries = 0;
 
         let jumpHeight = character && typeof character.jumpHeight === 'number' ? character.jumpHeight : 100;
@@ -127,22 +127,10 @@ class EnergyBallManager {
             : 50;
 
         while (this.balls.length < ballsToPlace && tries < 1000) {
-            let x;
-            if (this.balls.length === 0) {
-                x = 300 + Math.random() * 30;
-            } else if (this.balls.length === 1) {
-                x = 350 + Math.random() * 150;
-            } else if (this.balls.length === 2) {
-                x = 520 + Math.random() * 80;
-            } else {
-                x = minX + Math.random() * Math.max(0, worldWidth - minX - 1000);
-            }
-            let y;
-            if (this.balls.length < lowerCount) {
-                y = lowerY + Math.random() * 10 - 5;
-            } else {
-                y = upperY + Math.random() * 10 - 5;
-            }
+            let x = minX + Math.random() * Math.max(0, worldWidth - minX - 1000);
+            let y = (this.balls.length < lowerCount)
+                ? lowerY + Math.random() * 10 - 5
+                : upperY + Math.random() * 10 - 5;
             let tooClose = this.balls.some(b => {
                 let dx = b.x - x;
                 let dy = b.y - y;

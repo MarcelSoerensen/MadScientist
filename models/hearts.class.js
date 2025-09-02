@@ -59,11 +59,35 @@ class CollectibleHeart extends CollidableObject {
      * Draws the heart on the canvas.
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
+    /**
+     * Draws the heart with animation (pulsing and diagonal movement).
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         if (this.collected && !this.isCollecting) return;
         ctx.save();
-        ctx.globalAlpha = 1;
-        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        if (!this.isCollecting) {
+            let t = performance.now() * 0.004;
+            let move = Math.sin(t);
+            ctx.translate(this.x + move + this.width / 2, this.y + move + this.height / 2);
+            ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
+        } else {
+
+            if (this.collectProgress === undefined) this.collectProgress = 0;
+            this.collectProgress += 0.04;
+            let pulse = 1;
+            let alpha = 1;
+            if (this.collectProgress < 2) {
+                pulse = 1 + 12 / this.width * Math.abs(Math.sin(this.collectProgress * Math.PI * 2));
+            } else {
+                pulse = 2.0;
+                alpha = Math.max(0, 1 - (this.collectProgress - 2) * 3);
+            }
+            ctx.globalAlpha = alpha;
+            ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+            ctx.scale(pulse, pulse);
+            ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
+        }
         ctx.restore();
     }
     /**
@@ -92,12 +116,12 @@ class HeartsManager extends DrawableObject {
      * @param {Character} character - The main character
      * @param {Array} enemies - Array of enemy objects
      */
-    constructor(worldWidth, worldHeight, character, enemies = []) {
+    constructor(worldWidth, worldHeight, character, enemies = [], energyBalls = [], bombs = []) {
         super();
         this.hearts = [];
         this.collectedCount = 0;
         this.maxHearts = 5;
-        const minDist = 80;
+        const minDist = 100;
         let tries = 0;
         let jumpHeight = character && typeof character.jumpHeight === 'number' ? character.jumpHeight : 100;
         let heartsToPlace = 5;
@@ -108,36 +132,28 @@ class HeartsManager extends DrawableObject {
             ? Math.max(character.x + character.width + 100, 50)
             : 50;
         while (this.hearts.length < heartsToPlace && tries < 1000) {
-            let x;
-            if (this.hearts.length === 0) {
-                if (
-                    character &&
-                    typeof character.x === 'number' &&
-                    typeof character.width === 'number' &&
-                    character.offset &&
-                    typeof character.offset.right === 'number'
-                ) {
-                    x = character.x + character.width - character.offset.right + 100;
-                } else {
-                    x = 200;
-                }
-            } else {
-                x = minX + Math.random() * Math.max(0, worldWidth - minX - 1000);
-            }
-            let y;
-            if (this.hearts.length < lowerCount) {
-                y = lowerY + Math.random() * 10 - 5;
-            } else {
-                y = upperY + Math.random() * 10 - 5;
-            }
-            let tooClose = this.hearts.some(h => {
+            let x = minX + Math.random() * Math.max(0, worldWidth - minX - 1000);
+            let y = (this.hearts.length < lowerCount)
+                ? lowerY + Math.random() * 10 - 5
+                : upperY + Math.random() * 10 - 5;
+            let tooCloseHearts = this.hearts.some(h => {
                 let dx = h.x - x;
                 let dy = h.y - y;
                 return Math.sqrt(dx*dx + dy*dy) < minDist;
             });
+            let tooCloseEnergy = energyBalls.some(e => {
+                let dx = e.x - x;
+                let dy = e.y - y;
+                return Math.sqrt(dx*dx + dy*dy) < minDist;
+            });
+            let tooCloseBombs = bombs.some(b => {
+                let dx = b.x - x;
+                let dy = b.y - y;
+                return Math.sqrt(dx*dx + dy*dy) < minDist;
+            });
             let heart = new CollectibleHeart(x, y);
             let collidesWithEnemy = enemies.some(enemy => heart.isColliding(enemy));
-            if (!tooClose && !collidesWithEnemy) {
+            if (!tooCloseHearts && !tooCloseEnergy && !tooCloseBombs && !collidesWithEnemy) {
                 this.hearts.push(heart);
             }
             tries++;
@@ -151,7 +167,7 @@ class HeartsManager extends DrawableObject {
     update(character) {
         for (let i = this.hearts.length - 1; i >= 0; i--) {
             const heart = this.hearts[i];
-            heart.updatePulse();
+            if (typeof heart.update === 'function') heart.update();
             if (!heart.isCollecting && character && heart.isColliding(character)) {
                 if (this.collectedCount < this.maxHearts) {
                     heart.collected = true;
@@ -159,9 +175,13 @@ class HeartsManager extends DrawableObject {
                     if (character.world && character.world.statusBar) {
                         character.world.statusBar.setPercentage(character.energy);
                     }
-                    this.hearts.splice(i, 1);
-                    this.collectedCount++;
+
+                    heart.startCollecting(heart.x, heart.y - 50);
                 }
+            }
+            if (heart.isCollecting && heart.collectProgress >= 1) {
+                this.hearts.splice(i, 1);
+                this.collectedCount++;
             }
         }
     }

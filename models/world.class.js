@@ -2,10 +2,6 @@
  * Represents the game world. Manages all game objects, rendering, and main game loop.
  * @class World
  */
-// @ts-ignore
-// eslint-disable-next-line no-undef
-// If using modules, use: import EnemyTwo from './enemy-2.class.js';
-// Otherwise, ensure EnemyTwo is loaded globally
 class World {
     /**
      * Starts the first enemy only if the character is at least 800px away
@@ -107,16 +103,14 @@ class World {
         this.canvas = canvas;
         this.keyboard = keyboard;
         this.setWorld();
-        /** Initialize EnergyBallManager with character */
-        this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
-    /** Initialize SuperShotBar */
+    /**
+     * Place energy balls first, then bombs and hearts with distance checks.
+     */
+    this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
+    this.bombManager = new BombManager(4000, 600, this.character, this.energyBallManager.balls);
+    this.heartsManager = new HeartsManager(4000, 600, this.character, [], this.energyBallManager.balls, this.bombManager.bombs);
     this.superShotBar = new SuperShotBar();
-    /** Initialize BombsBar */
     this.bombsBar = new BombsBar(65, 50, 5);
-    /** Initialize BombManager with character */
-    this.bombManager = new BombManager(4000, 600, this.character);
-    /** Initialize HeartsManager with character */
-    this.heartsManager = new HeartsManager(4000, 600, this.character);
     this.draw();
     this.run();
     }
