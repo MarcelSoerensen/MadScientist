@@ -20,13 +20,26 @@ class EnergyBall extends CollidableObject {
         this.pulseUp = true;
         this.img = new Image();
         this.img.src = 'img/Projectile/Other/7.png';
-
-        this.offset = {
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0
-        };
+    }
+    /**
+     * Checks collision with the character using the character's collision rectangle.
+     * @param {Character} character - The main character
+     * @returns {boolean} True if colliding, else false
+     */
+    isColliding(character) {
+        const charLeft = character.x + (character.offset?.left || 0);
+        const charRight = character.x + character.width - (character.offset?.right || 0);
+        let charTop = character.y + (character.offset?.top || 0);
+        if (character.jumpOffsetY !== undefined) {
+            charTop += character.jumpOffsetY * 1.5;
+        }
+        const charBottom = charTop + character.height - (character.offset?.top || 0) - (character.offset?.bottom || 0);
+        return (
+            this.x < charRight &&
+            this.x + this.width > charLeft &&
+            this.y < charBottom &&
+            this.y + this.height > charTop
+        );
     }
 
     /**

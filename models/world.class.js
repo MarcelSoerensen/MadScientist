@@ -63,6 +63,8 @@ class World {
     enemies = level1.enemies;
     /** @type {EnergyBallManager} Manages all energy balls */
     energyBallManager;
+    /** @type {HeartsManager} Manages all collectible hearts */
+    heartsManager;
     /** @type {SuperShotBar} Displays collected energy balls as a bar */
     superShotBar;
     /** @type {BombsBar} Displays collected bombs as a bar */
@@ -113,6 +115,8 @@ class World {
     this.bombsBar = new BombsBar(65, 50, 5);
     /** Initialize BombManager with character */
     this.bombManager = new BombManager(4000, 600, this.character);
+    /** Initialize HeartsManager with character */
+    this.heartsManager = new HeartsManager(4000, 600, this.character);
     this.draw();
     this.run();
     }
@@ -459,6 +463,10 @@ class World {
         if (this.bombManager) {
             this.bombManager.update(this.character);
             this.bombManager.draw(this.ctx);
+        }
+        if (this.heartsManager) {
+            this.heartsManager.update(this.character);
+            this.heartsManager.draw(this.ctx);
         }
         if (this.bombsBar && this.bombManager) {
             this.bombsBar.setBombs(this.bombManager.collectedCount);

@@ -22,8 +22,8 @@ class BombManager extends DrawableObject {
 
     /**
      * Places bombs randomly in the level.
-     * @param {number} levelWidth
-     * @param {number} levelHeight
+     * @param {number} levelWidth - The width of the level
+     * @param {number} levelHeight - The height of the level
      */
     placeBombs(levelWidth, levelHeight) {
         let tries = 0;
@@ -76,7 +76,6 @@ class BombManager extends DrawableObject {
      * @param {object} character - The main character object.
      */
     update(character) {
-        // Zielkoordinaten der BombsBar (müssen ggf. angepasst werden)
         const barY = 50;
         for (let i = this.bombs.length - 1; i >= 0; i--) {
             const bomb = this.bombs[i];
@@ -99,7 +98,7 @@ class BombManager extends DrawableObject {
 
     /**
      * Draws all bombs on the canvas.
-     * @param {CanvasRenderingContext2D} ctx
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
         this.bombs.forEach(bomb => bomb.draw(ctx));
@@ -113,6 +112,26 @@ class BombManager extends DrawableObject {
  */
 class CollectibleBomb extends CollidableObject {
     /**
+     * Checks collision with the character using the character's collision rectangle.
+     * @param {Character} character - The main character
+     * @returns {boolean} True if colliding, else false
+     */
+    isColliding(character) {
+        const charLeft = character.x + (character.offset?.left || 0);
+        const charRight = character.x + character.width - (character.offset?.right || 0);
+        let charTop = character.y + (character.offset?.top || 0);
+        if (character.jumpOffsetY !== undefined) {
+            charTop += character.jumpOffsetY * 1.5;
+        }
+        const charBottom = charTop + character.height - (character.offset?.top || 0) - (character.offset?.bottom || 0);
+        return (
+            this.x < charRight &&
+            this.x + this.width > charLeft &&
+            this.y < charBottom &&
+            this.y + this.height > charTop
+        );
+    }
+    /**
      * Creates a CollectibleBomb instance.
      * @param {number} x - The x position
      * @param {number} y - The y position
@@ -125,7 +144,6 @@ class CollectibleBomb extends CollidableObject {
     this.height = 40;
     this.img = new Image();
     this.img.src = 'img/Projectile/Other/1.png';
-    this.offset = { top: 0, left: 0, right: 0, bottom: 0 };
     this.originX = x;
     this.originY = y;
     this.isCollecting = false;
@@ -139,7 +157,9 @@ class CollectibleBomb extends CollidableObject {
     }
 
     /**
-     * Starts the collect animation to the bombs bar
+     * Starts the collect animation to the bombs bar.
+     * @param {number} targetX - Target x position for animation
+     * @param {number} targetY - Target y position for animation
      */
     startCollecting(targetX, targetY) {
         if (this.isCollecting) return;
@@ -160,7 +180,7 @@ class CollectibleBomb extends CollidableObject {
     }
 
     /**
-     * Updates the animation if the bomb is being collected
+     * Updates the animation if the bomb is being collected.
      */
     update() {
         if (this.isCollecting) {
@@ -185,7 +205,8 @@ class CollectibleBomb extends CollidableObject {
     }
 
     /**
-     * Draws the bomb (including animation)
+     * Draws the bomb (including animation).
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
         ctx.save();
