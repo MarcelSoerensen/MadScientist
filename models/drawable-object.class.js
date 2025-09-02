@@ -27,6 +27,16 @@ class DrawableObject {
      */
     draw(ctx) {
         if (this.visible === false) return;
+        if (this.img && this.img.src) {
+            if (this.img.src.includes('1.png')) {
+                ctx.drawImage(this.img, 0, 0, this.img.width - 1, this.img.height, this.x, this.y, this.width - 1, this.height);
+                return;
+            }
+            if (this.img.src.includes('2.png')) {
+                ctx.drawImage(this.img, 1, 0, this.img.width - 1, this.img.height, this.x, this.y, this.width - 1, this.height);
+                return;
+            }
+        }
         ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
     }
 
