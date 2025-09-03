@@ -56,7 +56,7 @@ class EnemyTwo extends CollidableObject {
     constructor(levelHeight = 480) {
         super().loadImage('img/Enemy Characters/Enemy Character01/Walk/Walk_00.png');
         this.loadImages(this.IMAGES_WALKING);
-    this.x = 1600;
+    this.x = 1800;
     this.y = Math.random() * 100 - 100;
     this.speed = 2.0 + Math.random() * 1.0;
     this.verticalDirection = Math.random() < 0.5 ? 1 : -1;

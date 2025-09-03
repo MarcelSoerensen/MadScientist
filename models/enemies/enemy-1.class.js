@@ -97,14 +97,21 @@ class EnemyOne extends CollidableObject {
      * Creates a new EnemyOne instance
      * Initializes position, speed, and starts animation
      */
-    constructor(isFirstEnemy = false, levelStartX = -400) {
-    super().loadImage('img/Enemy Characters/Enemy Character01/Walk/Walk_00.png');
-    this.loadImages(this.IMAGES_WALKING);
+    constructor(isFirstEnemy = false, levelStartX = -400, activateAt = 300) {
+        super().loadImage('img/Enemy Characters/Enemy Character01/Walk/Walk_00.png');
+        this.loadImages(this.IMAGES_WALKING);
         if (!window.enemySpawnPositions) {
             window.enemySpawnPositions = [];
         }
-        let minX = 1200;
-        let maxX = 2000;
+        let minX, maxX;
+        const canvasWidth = window?.gameCanvas?.width || 800;
+        if (activateAt === 1800) {
+            minX = activateAt + canvasWidth / 2;
+            maxX = 3000;
+        } else {
+            minX = 800;
+            maxX = 2000;
+        }
         let x;
         let tries = 0;
         do {
@@ -118,12 +125,13 @@ class EnemyOne extends CollidableObject {
         );
         window.enemySpawnPositions.push(x);
         this.x = x;
-    this.y = 160 + Math.random() * 10;
-    this.speed = 0.15 + Math.random() * 0.25;
-    this.loadImages(this.IMAGES_GET_ELECTRIC);
-    this.loadImages(this.IMAGES_DEATH);
-    this.visible = false;
-    this._waitingForCharacter = true;
+        this.y = 160 + Math.random() * 10;
+        this.speed = 0.15 + Math.random() * 0.25;
+        this.loadImages(this.IMAGES_GET_ELECTRIC);
+        this.loadImages(this.IMAGES_DEATH);
+        this.visible = false;
+        this._waitingForCharacter = true;
+        this._activateAt = activateAt;
     }
 
     /**

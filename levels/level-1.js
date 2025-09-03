@@ -11,6 +11,8 @@ const level1 = new Level(
         new EnemyOne(true, levelStartX),
         new EnemyOne(),
         new EnemyOne(),
+    new EnemyOne(false, 2500 + Math.random() * 1500, 1800),
+    new EnemyOne(false, 2500 + Math.random() * 1500, 1800),
         new EnemyTwo(),
         new Endboss(),
     ],

@@ -1,10 +1,10 @@
 /**
- * Bomben-Wurfobjekt mit Explosion und Animation
- * Erbt von ThrowableObjects
+ * Bomb throwing object with explosion and animation
+ * Inherits from ThrowableObjects
  */
 class ThrowBomb extends ThrowableObjects {
     /**
-     * Explosion-Bildsequenz
+     * Explosion image sequence
      * @type {string[]}
      */
     IMAGES_EXPLOSION = [
@@ -24,7 +24,7 @@ class ThrowBomb extends ThrowableObjects {
     isExploding = false;
 
     /**
-     * Erstellt eine neue Bombeninstanz
+     * Creates a new bomb instance
      * @param {number} x
      * @param {number} y
      * @param {boolean} otherDirection
@@ -34,7 +34,7 @@ class ThrowBomb extends ThrowableObjects {
     }
 
     /**
-     * Gibt das aktuelle Explosionsrechteck zurück
+     * Returns the current explosion rectangle
      * @returns {{x: number, y: number, width: number, height: number}|null}
      */
     getExplosionRect() {
@@ -48,7 +48,7 @@ class ThrowBomb extends ThrowableObjects {
     }
 
     /**
-     * Führt die Explosion aus
+     * Executes the explosion
      */
     explode() {
         if (this.hasExploded) return;
@@ -83,14 +83,13 @@ class ThrowBomb extends ThrowableObjects {
     }
 
     /**
-     * Animation der Bombe (optional)
+     * Animation of the bomb (optional)
      */
     animate() {
-        // Animation kann hier erweitert werden
     }
 
     /**
-     * Zeichnet die Bombe inkl. Explosion und blauer Umrandung
+     * Draws the bomb including explosion and blue border
      * @param {CanvasRenderingContext2D} ctx
      */
     draw(ctx) {
@@ -98,7 +97,7 @@ class ThrowBomb extends ThrowableObjects {
         ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
         if (this.isExploding) {
             ctx.save();
-            ctx.strokeStyle = 'blue';
+            ctx.strokeStyle = 'rgba(0,0,0,0)';
             ctx.lineWidth = 4;
             ctx.strokeRect(this.x, this.y, this.width, this.height);
             ctx.restore();

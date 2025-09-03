@@ -143,17 +143,17 @@ class HeartsManager extends DrawableObject {
         super();
         this.hearts = [];
         this.collectedCount = 0;
-        this.maxHearts = 5;
+        this.maxHearts = 3;
         const minDist = 100;
         let tries = 0;
         let jumpHeight = character && typeof character.jumpHeight === 'number' ? character.jumpHeight : 100;
-        let heartsToPlace = 5;
+        let heartsToPlace = 3;
         let lowerCount = Math.floor(heartsToPlace / 2);
         let lowerY = 330;
         let upperY = 170 + jumpHeight / 2;
-        let minX = character && typeof character.x === 'number' && typeof character.width === 'number'
-            ? Math.max(character.x + character.width + 100, 50)
-            : 50;
+        let minX = Math.max(1200, character && typeof character.x === 'number' && typeof character.width === 'number'
+            ? character.x + character.width + 100
+            : 50);
         while (this.hearts.length < heartsToPlace && tries < 1000) {
             let x = minX + Math.random() * Math.max(0, worldWidth - minX - 1000);
             let y = (this.hearts.length < lowerCount)
@@ -194,7 +194,7 @@ class HeartsManager extends DrawableObject {
             if (!heart.isCollecting && character && heart.isColliding(character)) {
                 if (this.collectedCount < this.maxHearts && character.energy < 100) {
                     heart.collected = true;
-                    character.energy = Math.min(character.energy + 20, 100);
+                    character.energy = Math.min(character.energy + 33, 100);
                     if (character.world && character.world.statusBar) {
                         character.world.statusBar.setPercentage(character.energy);
                     }

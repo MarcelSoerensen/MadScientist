@@ -9,7 +9,8 @@ class World {
     checkFirstEnemyDistance() {
         if (this.level && this.level.enemies && this.level.enemies.length > 0) {
             this.level.enemies.forEach(enemy => {
-                if (enemy._waitingForCharacter && this.character.x >= 500) {
+                let activateAt = enemy._activateAt || 500;
+                if (enemy._waitingForCharacter && this.character.x >= activateAt) {
                     enemy.visible = true;
                     enemy._waitingForCharacter = false;
                     if (!enemy.moveInterval && !enemy.animInterval) {
@@ -436,7 +437,7 @@ class World {
      * @returns {void}
      */
     drawGameObjects() {
-        this.addObjectsToMap(this.enemies);
+    this.addObjectsToMap(this.enemies);
         this.enemies.forEach(enemy => {
             if (enemy instanceof EnemyTwo && enemy.visible) {
                 this.ctx.save();
