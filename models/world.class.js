@@ -188,8 +188,9 @@ class World {
             this.character.playThrowBombAnimation();
             setTimeout(() => {
                 let bombX = this.character.otherDirection ? this.character.x + 100 : this.character.x + 160;
-                let bomb = new ThrowableObjects(
-                    bombX, 
+                let bomb = ThrowableObjects.createThrowableObject(
+                    'bomb',
+                    bombX,
                     this.character.y + 180,
                     this.character.otherDirection
                 );
