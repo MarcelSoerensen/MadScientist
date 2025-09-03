@@ -5,6 +5,13 @@
  */
 class CollectibleHeart extends CollidableObject {
     /**
+     * Triggers a bounce animation when the heart cannot be collected.
+     */
+    triggerBounce() {
+        this.bounceActive = true;
+        this.bounceProgress = 0;
+    }
+    /**
      * Creates a CollectibleHeart instance.
      * @param {number} x - The x position
      * @param {number} y - The y position
@@ -66,22 +73,38 @@ class CollectibleHeart extends CollidableObject {
     draw(ctx) {
         if (this.collected && !this.isCollecting) return;
         ctx.save();
-        if (!this.isCollecting) {
+        if (this.bounceActive) {
+            this.bounceProgress = (this.bounceProgress || 0) + 0.08;
+            let scale = 1 - 0.7 * Math.sin(Math.PI * Math.min(this.bounceProgress, 1));
+            let alpha = 0.5 + 0.5 * Math.abs(Math.sin(Math.PI * Math.min(this.bounceProgress, 1)));
+            ctx.globalAlpha = alpha;
+            ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+            ctx.scale(scale, scale);
+            ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
+            ctx.globalAlpha = 1;
+            if (this.bounceProgress >= 1) {
+                this.bounceActive = false;
+                this.bounceProgress = 0;
+            }
+        } else if (!this.isCollecting) {
             let t = performance.now() * 0.004;
             let move = Math.sin(t);
             ctx.translate(this.x + move + this.width / 2, this.y + move + this.height / 2);
             ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
         } else {
-
             if (this.collectProgress === undefined) this.collectProgress = 0;
             this.collectProgress += 0.04;
             let pulse = 1;
             let alpha = 1;
-            if (this.collectProgress < 2) {
-                pulse = 1 + 12 / this.width * Math.abs(Math.sin(this.collectProgress * Math.PI * 2));
+            if (this.collectProgress < 1) {
+                pulse = 1 + 22 / this.width * Math.abs(Math.sin(this.collectProgress * Math.PI * 2));
+                alpha = 1;
+            } else if (this.collectProgress < 2) {
+                pulse = 1 + 22 / this.width * Math.abs(Math.sin((this.collectProgress - 1) * Math.PI * 2));
+                alpha = Math.max(0, 1 - (this.collectProgress - 1));
             } else {
-                pulse = 2.0;
-                alpha = Math.max(0, 1 - (this.collectProgress - 2) * 3);
+                pulse = 2.3;
+                alpha = 0;
             }
             ctx.globalAlpha = alpha;
             ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
@@ -169,14 +192,15 @@ class HeartsManager extends DrawableObject {
             const heart = this.hearts[i];
             if (typeof heart.update === 'function') heart.update();
             if (!heart.isCollecting && character && heart.isColliding(character)) {
-                if (this.collectedCount < this.maxHearts) {
+                if (this.collectedCount < this.maxHearts && character.energy < 100) {
                     heart.collected = true;
                     character.energy = Math.min(character.energy + 20, 100);
                     if (character.world && character.world.statusBar) {
                         character.world.statusBar.setPercentage(character.energy);
                     }
-
                     heart.startCollecting(heart.x, heart.y - 50);
+                } else if (character.energy >= 100) {
+                    if (!heart.bounceActive) heart.triggerBounce();
                 }
             }
             if (heart.isCollecting && heart.collectProgress >= 1) {
