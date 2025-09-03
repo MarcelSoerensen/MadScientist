@@ -30,7 +30,7 @@ class CollidableObject extends MovableObject {
      */
     drawCollisionFrame(ctx) {
         if (!this.collidable) return;
-        ctx.strokeStyle = 'red';
+    ctx.strokeStyle = 'rgba(0,0,0,0)';
         ctx.lineWidth = 2;
 
         let yPos = this.y + this.offset.top;

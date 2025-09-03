@@ -38,11 +38,11 @@ class Endboss extends CollidableObject {
      * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
      */
     drawCollisionFrame(ctx) {
-    if (!this.collidable) return;
+        if (!this.collidable) return;
         let leftOffset = this.offset.left;
         const isHitAnim = this.animState === 'hit';
         ctx.save();
-        ctx.strokeStyle = 'red';
+    ctx.strokeStyle = 'rgba(0,0,0,0)';
         ctx.lineWidth = 2;
         let yPos = this.y + this.offset.top;
         if (this.jumpOffsetY !== undefined) {
@@ -61,7 +61,7 @@ class Endboss extends CollidableObject {
             let growFrame = Math.max(0, hitFrame - 4);
             let stickWidth = 2 + growFrame * 10;
             let stickHeight = 100;
-            ctx.strokeStyle = 'blue';
+            ctx.strokeStyle = 'rgba(0,0,0,0)';
             ctx.lineWidth = 2;
             ctx.strokeRect(stickX - (stickWidth - 2 - 60), stickY, stickWidth, stickHeight);
         }

@@ -8,13 +8,15 @@ class World {
      */
     checkFirstEnemyDistance() {
         if (this.level && this.level.enemies && this.level.enemies.length > 0) {
-            const firstEnemy = this.level.enemies[0];
-            if (firstEnemy._delayedStart && Math.abs(this.character.x - firstEnemy.x) >= 800) {
-                firstEnemy._delayedStart = false;
-                if (!firstEnemy.moveInterval && !firstEnemy.animInterval) {
-                    firstEnemy.animate();
+            this.level.enemies.forEach(enemy => {
+                if (enemy._waitingForCharacter && this.character.x >= 500) {
+                    enemy.visible = true;
+                    enemy._waitingForCharacter = false;
+                    if (!enemy.moveInterval && !enemy.animInterval) {
+                        enemy.animate();
+                    }
                 }
-            }
+            });
         }
     }
     /**
@@ -435,13 +437,10 @@ class World {
      */
     drawGameObjects() {
         this.addObjectsToMap(this.enemies);
-        // Roter Rahmen um EnemyTwo
         this.enemies.forEach(enemy => {
             if (enemy instanceof EnemyTwo && enemy.visible) {
                 this.ctx.save();
-                this.ctx.strokeStyle = 'red';
-                this.ctx.lineWidth = 3;
-                this.ctx.strokeRect(enemy.x + (enemy.offset?.left || 0), enemy.y + (enemy.offset?.top || 0), enemy.width - ((enemy.offset?.left || 0) + (enemy.offset?.right || 0)), enemy.height - ((enemy.offset?.top || 0) + (enemy.offset?.bottom || 0)));
+                    // Rahmen werden nicht mehr gezeichnet
                 this.ctx.restore();
             }
         });
