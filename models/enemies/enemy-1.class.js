@@ -176,6 +176,16 @@ class EnemyOne extends CollidableObject {
         this.lastHitTime = now;
         this.laserHitCount += force;
         if (this.laserHitCount > 3) this.laserHitCount = 3;
+        // Play laser hit sound effect
+        if (typeof window !== 'undefined') {
+            if (!window.enemy1CollidedSound) {
+                window.enemy1CollidedSound = new Audio('sounds/enemy1-collided.wav');
+                window.enemy1CollidedSound.volume = 1.0;
+            }
+            window.enemy1CollidedSound.currentTime = 0;
+            window.enemy1CollidedSound.volume = 1.0;
+            window.enemy1CollidedSound.play();
+        }
         if (this.electricHurtTimeout) {
             clearTimeout(this.electricHurtTimeout);
         }
@@ -196,6 +206,16 @@ class EnemyOne extends CollidableObject {
         this.isDeadAnimationPlaying = true;
         this.currentImage = 0;
         this.collidable = false;
+        // Play death sound effect
+        if (typeof window !== 'undefined') {
+            if (!window.enemy1DeathSound) {
+                window.enemy1DeathSound = new Audio('sounds/enemy1-death.wav');
+                window.enemy1DeathSound.volume = 1.0;
+            }
+            window.enemy1DeathSound.currentTime = 0;
+            window.enemy1DeathSound.volume = 1.0;
+            window.enemy1DeathSound.play();
+        }
         if (this.moveInterval) {
             clearInterval(this.moveInterval);
             this.moveInterval = null;

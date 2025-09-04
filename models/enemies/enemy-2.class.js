@@ -4,6 +4,10 @@
  * @classdesc Vertical-moving enemy using EnemyOne's animation, placed in the center of the level.
  */
 class EnemyTwo extends CollidableObject {
+    // ...existing code...
+    // ...existing code...
+    _proximitySoundPlaying = false;
+    _proximitySoundAudio = null;
     lastHitTime = 0;
     laserHitCount = 0;
     isDeadAnimationPlaying = false;
@@ -58,12 +62,16 @@ class EnemyTwo extends CollidableObject {
         this.loadImages(this.IMAGES_WALKING);
     this.x = 1800;
     this.y = Math.random() * 100 - 100;
-    this.speed = 2.0 + Math.random() * 1.0;
+    this.speed = 1.99 + Math.random() * 1.0;
     this.verticalDirection = Math.random() < 0.5 ? 1 : -1;
         this.loadImages(this.IMAGES_GET_ELECTRIC);
         this.loadImages(this.IMAGES_DEATH);
         this.visible = true;
         this.animate();
+        // world-Referenz setzen, falls vorhanden
+        if (typeof window !== 'undefined' && window.world) {
+            this.world = window.world;
+        }
     }
 
     /**
@@ -73,6 +81,73 @@ class EnemyTwo extends CollidableObject {
         let lastAnimTime = 0;
         const animFrameDuration = 120;
         const animateStep = (timestamp) => {
+            // Proximity Sound: Fade-In/Fade-Out Bereich
+            if (this.world && this.world.character) {
+                const charX = this.world.character.x;
+                const enemyX = this.x;
+                const fadeRange = 350;
+                const fadeOutStop = 350;
+                const fadeOutStart = 250;
+                const dist = Math.abs(charX - enemyX);
+                if (dist <= fadeRange) {
+                    if (!this._proximitySoundPlaying) {
+                        this._proximitySoundAudio = new Audio('sounds/enemy2.wav');
+                        this._proximitySoundAudio.loop = true;
+                        this._proximitySoundAudio.volume = 0.0;
+                        this._proximitySoundAudio.playbackRate = 0.90;
+                        this._proximitySoundAudio.play();
+                        this._proximitySoundPlaying = true;
+                        // Einfaches Fade-In
+                        let fadeStep = 0.01;
+                        let fadeInterval = setInterval(() => {
+                            if (!this._proximitySoundAudio) return;
+                            if (this._proximitySoundAudio.volume >= 0.5) {
+                                this._proximitySoundAudio.volume = 0.5;
+                                clearInterval(fadeInterval);
+                            } else {
+                                this._proximitySoundAudio.volume += fadeStep;
+                            }
+                        }, 40);
+                    }
+                    // Fade-Out ab 250px Entfernung
+                    if (this._proximitySoundPlaying && this._proximitySoundAudio && dist > fadeOutStart) {
+                        let targetVolume = 0.5 * (1 - (dist - fadeOutStart) / (fadeRange - fadeOutStart));
+                        targetVolume = Math.max(0, Math.min(0.5, targetVolume));
+                        let fadeOutInterval = setInterval(() => {
+                            if (!this._proximitySoundAudio) return;
+                            if (this._proximitySoundAudio.volume <= targetVolume + 0.01) {
+                                this._proximitySoundAudio.volume = targetVolume;
+                                clearInterval(fadeOutInterval);
+                            } else {
+                                this._proximitySoundAudio.volume -= 0.01;
+                            }
+                        }, 40);
+                    }
+                } else if (dist > fadeRange && dist <= fadeOutStop) {
+                    // Fade-Out bis 350px
+                    if (this._proximitySoundPlaying && this._proximitySoundAudio) {
+                        let targetVolume = 0.5 * (1 - (dist - fadeRange) / (fadeOutStop - fadeRange));
+                        targetVolume = Math.max(0, Math.min(0.5, targetVolume));
+                        let fadeOutInterval = setInterval(() => {
+                            if (!this._proximitySoundAudio) return;
+                            if (this._proximitySoundAudio.volume <= targetVolume + 0.01) {
+                                this._proximitySoundAudio.volume = targetVolume;
+                                clearInterval(fadeOutInterval);
+                            } else {
+                                this._proximitySoundAudio.volume -= 0.01;
+                            }
+                        }, 40);
+                    }
+                } else if (dist > fadeOutStop) {
+                    // Sound komplett stoppen
+                    if (this._proximitySoundPlaying && this._proximitySoundAudio) {
+                        this._proximitySoundAudio.volume = 0;
+                        this._proximitySoundAudio.pause();
+                        this._proximitySoundAudio.currentTime = 0;
+                        this._proximitySoundPlaying = false;
+                    }
+                }
+            }
             if (!this.isDeadAnimationPlaying) {
                 this.moveVertically();
             }

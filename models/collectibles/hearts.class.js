@@ -1,3 +1,4 @@
+    _lastNoHeartSoundTime = 0;
 /**
  * Represents a collectible heart in the game.
  * @class CollectibleHeart
@@ -142,6 +143,7 @@ class CollectibleHeart extends CollidableObject {
  * @extends DrawableObject
  */
 class HeartsManager extends DrawableObject {
+    _lastFullEnergy = false;
     /**
      * Creates a HeartsManager instance and places hearts randomly in the level.
      * @param {number} worldWidth - The width of the world
@@ -204,13 +206,55 @@ class HeartsManager extends DrawableObject {
             if (!heart.isCollecting && character && heart.isColliding(character)) {
                 if (this.collectedCount < this.maxHearts && character.energy < 100) {
                     heart.collected = true;
+                    const beforeEnergy = character.energy;
                     character.energy = Math.min(character.energy + 33, 100);
                     if (character.world && character.world.statusBar) {
                         character.world.statusBar.setPercentage(character.energy);
                     }
                     heart.startCollecting(heart.x, heart.y - 50);
+                    if (beforeEnergy < 100 && character.energy === 100 && character.world && typeof character.world._superlaserText !== 'undefined') {
+                        character.world._superlaserText = {
+                            text: 'Full Energy',
+                            font: 'bold 50px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
+                            x: character.world.canvas.width / 2,
+                            y: character.world.canvas.height / 2,
+                            scale: 1,
+                            alpha: 1,
+                            duration: 1500,
+                            start: Date.now()
+                        };
+                        try {
+                            const fullEnergySound = new Audio('sounds/full-energy.flac');
+                            fullEnergySound.volume = 0.5;
+                            fullEnergySound.play();
+                        } catch (e) {}
+                        if (character.world._superlaserTextAnim) {
+                            clearInterval(character.world._superlaserTextAnim);
+                        }
+                        character.world._superlaserTextAnim = setInterval(() => {
+                            if (character.world._superlaserText) {
+                                const elapsed = Date.now() - character.world._superlaserText.start;
+                                character.world._superlaserText.scale = 1 + elapsed / 700;
+                                character.world._superlaserText.alpha = Math.max(0, 1 - elapsed / character.world._superlaserText.duration);
+                                if (elapsed > character.world._superlaserText.duration) {
+                                    character.world._superlaserText = null;
+                                    clearInterval(character.world._superlaserTextAnim);
+                                    character.world._superlaserTextAnim = null;
+                                }
+                            }
+                        }, 30);
+                    }
                 } else if (character.energy >= 100) {
                     if (!heart.bounceActive) heart.triggerBounce();
+                    const now = Date.now();
+                    if (!this._lastNoHeartSoundTime || now - this._lastNoHeartSoundTime > 2000) {
+                        try {
+                            const noHeartSound = new Audio('sounds/no-heart.wav');
+                            noHeartSound.volume = 0.2;
+                            noHeartSound.play();
+                            this._lastNoHeartSoundTime = now;
+                        } catch (e) {}
+                    }
                 }
             }
             if (heart.isCollecting && heart.collectProgress >= 1) {

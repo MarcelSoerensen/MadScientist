@@ -4,6 +4,16 @@
  */
 class World {
     /**
+     * Setzt die world-Referenz für alle Enemies nach dem Laden des Levels
+     */
+    setWorldReferenceForEnemies() {
+        if (this.enemies) {
+            this.enemies.forEach(enemy => {
+                enemy.world = this;
+            });
+        }
+    }
+    /**
      * Animation for the Superlaser text
      */
     _superlaserText = null;

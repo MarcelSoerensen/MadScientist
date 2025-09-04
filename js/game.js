@@ -5,12 +5,25 @@ let keyboard = new Keyboard();
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
+    world.setWorldReferenceForEnemies();
 
+    // Hintergrundmusik nach erstem Klick auf das Canvas starten
+    if (typeof window !== 'undefined') {
+        if (!window.backgroundMusic) {
+            window.backgroundMusic = new Audio('sounds/background-sound.flac');
+            window.backgroundMusic.loop = true;
+            window.backgroundMusic.volume = 0.08;
+        }
+        window.backgroundMusic.currentTime = 0;
+        const playMusic = () => {
+            window.backgroundMusic.play();
+            canvas.removeEventListener('click', playMusic);
+        };
+        canvas.addEventListener('click', playMusic);
+    }
 
     console.log('my character is', world.character);
     console.log('my enemies are', world.enemies);
-    
-    
 }
 
 window.addEventListener('keydown', (event) => {
