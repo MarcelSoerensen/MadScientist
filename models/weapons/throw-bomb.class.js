@@ -69,6 +69,11 @@ class ThrowBomb extends ThrowableObjects {
         this.currentImage = 0;
         this.images = this.IMAGES_EXPLOSION;
         this.img = this.imageCache[this.IMAGES_EXPLOSION[0]];
+            try {
+                const explosionSound = new Audio('sounds/explosion.flac');
+                explosionSound.play();
+            } catch (e) {
+            }
 
         this.explosionInterval = setInterval(() => {
             this.currentImage++;

@@ -6,6 +6,7 @@
  * @extends CollidableObject
  */
 class Endboss extends CollidableObject {
+    _lastHitSoundTime = 0;
     /**
      * Indicates if the Endboss is collidable (for collision detection)
      * @type {boolean}
@@ -383,7 +384,23 @@ class Endboss extends CollidableObject {
      * @param {number} [force=1] - Number of hits to apply (1=normal shot, 5=supershot)
      */
     triggerElectricHurt(force = 1) {
-        const now = Date.now();
+    /**
+     * Registers an electric laser hit and triggers the electric hurt animation and sound.
+     * Plays hit sound only every 1 second. Triggers death animation at 25 hits.
+     * @param {number} [force=1] - Number of hits to apply (1=normal shot, 5=supershot)
+     * @returns {void}
+     */
+    let now = Date.now();
+    if (!this._lastHitSoundTime || now - this._lastHitSoundTime > 1000) {
+        try {
+            const hitSound = new Audio('sounds/endboss-collided.wav');
+            hitSound.volume = 0.7;
+            hitSound.play();
+            this._lastHitSoundTime = now;
+        } catch (e) {
+    
+        }
+    }
         if (this.laserHitCount >= 25) return;
         if (this.isElectricHurt) return;
         if (force === 5) {
@@ -413,10 +430,32 @@ class Endboss extends CollidableObject {
      * Starts the death animation for the Endboss.
      */
     startDeathAnimation() {
+    /**
+     * Starts the death animation for the Endboss and plays the death sound with fade-out.
+     * Sets collidable to false and marks the boss as defeated.
+     * @returns {void}
+     */
+    try {
+        const deathSound = new Audio('sounds/endboss-death.wav');
+        deathSound.volume = 0.4;
+        deathSound.play();
+        let fadeSteps = 10;
+        let fadeInterval = 100;
+        let currentStep = 0;
+        let fade = setInterval(() => {
+            currentStep++;
+            deathSound.volume = Math.max(0, 0.4 * (1 - currentStep / fadeSteps));
+            if (currentStep >= fadeSteps) {
+                clearInterval(fade);
+            }
+        }, fadeInterval);
+    } catch (e) {
+    
+    }
     this.collidable = false;
     this.isDeadAnimationPlaying = true;
     this.currentImage = 0;
-    window.endbossDefeated = true; // Flag für Spielende
+    window.endbossDefeated = true;
         if (this.animInterval) {
             clearInterval(this.animInterval);
             this.animInterval = null;

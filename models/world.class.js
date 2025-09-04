@@ -4,6 +4,12 @@
  */
 class World {
     /**
+     * Animation for the Superlaser text
+     */
+    _superlaserText = null;
+    _superlaserTextAnim = null;
+    _lastCollisionSoundTime = 0;
+    /**
      * Starts the first enemy only if the character is at least 800px away
      */
     checkFirstEnemyDistance() {
@@ -44,6 +50,14 @@ class World {
             laser.width *= 2;
             laser.height *= 2;
             laser.isSuperShot = true;
+            try {
+                const superlaserSound = new Audio('sounds/superlaser-shot.wav');
+                superlaserSound.volume = 0.5;
+                superlaserSound.play();
+            } catch (e) {
+            }
+            
+            // Schriftzug beim Schießen des Superlasers nicht anzeigen
             this.laserBeams.push(laser);
             this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 5);
             this.laserActive = true;
@@ -172,6 +186,16 @@ class World {
                         charRect.y < stickRect.y + stickRect.height &&
                         charRect.y + charRect.height > stickRect.y;
                     if (stickCollision) {
+                        const now = Date.now();
+                        if (!this._lastCollisionSoundTime || now - this._lastCollisionSoundTime > 500) {
+                            try {
+                                const collisionSound = new Audio('sounds/character-collided.wav');
+                                collisionSound.volume = 0.5;
+                                collisionSound.play();
+                                this._lastCollisionSoundTime = now;
+                            } catch (e) {
+                            }
+                        }
                         this.character.hit();
                         this.statusBar.setPercentage(this.character.energy);
                     }
@@ -227,6 +251,7 @@ class World {
                     offsetX,
                     offsetY
                 );
+                laser.shoot();
                 this.laserBeams.push(laser);
                 this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 1);
                 setTimeout(() => {
@@ -252,6 +277,9 @@ class World {
      * @returns {void}
      */
     checkCollisions() {
+        if (this.character.isDead && this.character.isDead()) {
+            return;
+        }
         /**
          * Checks collision between character and all enemies, including Endboss stick hit detection.
          * Triggers character hit and updates status bar if collision occurs.
@@ -315,6 +343,16 @@ class World {
             });
 
             if (collided) {
+                const now = Date.now();
+                if (!this._lastCollisionSoundTime || now - this._lastCollisionSoundTime > 500) {
+                    try {
+                        const collisionSound = new Audio('sounds/character-collided.wav');
+                        collisionSound.volume = 0.5;
+                        collisionSound.play();
+                        this._lastCollisionSoundTime = now;
+                    } catch (e) {
+                    }
+                }
                 this.character.hit();
                 this.statusBar.setPercentage(this.character.energy);
             }
@@ -355,6 +393,40 @@ class World {
         if (this.energyBallManager && this.superShotBar) {
             const superShots = Math.floor(this.energyBallManager.collectedCount / 5);
             if (superShots > 0) {
+                if (!this._lastSuperShots || superShots > this._lastSuperShots) {
+                    try {
+                        const availableSound = new Audio('sounds/available-superlaser.wav');
+                        availableSound.volume = 0.3;
+                        availableSound.play();
+                    } catch (e) {}
+                    
+                    this._superlaserText = {
+                        text: `Superlaser ${superShots}`,
+                        font: 'bold 50px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
+                        x: this.canvas.width / 2,
+                        y: this.canvas.height / 2,
+                        scale: 1,
+                        alpha: 1,
+                        duration: 1500,
+                        start: Date.now()
+                    };
+                    if (this._superlaserTextAnim) {
+                        clearInterval(this._superlaserTextAnim);
+                    }
+                    this._superlaserTextAnim = setInterval(() => {
+                        if (this._superlaserText) {
+                            const elapsed = Date.now() - this._superlaserText.start;
+                            this._superlaserText.scale = 1 + elapsed / 700;
+                            this._superlaserText.alpha = Math.max(0, 1 - elapsed / this._superlaserText.duration);
+                            if (elapsed > this._superlaserText.duration) {
+                                this._superlaserText = null;
+                                clearInterval(this._superlaserTextAnim);
+                                this._superlaserTextAnim = null;
+                            }
+                        }
+                    }, 30);
+                }
+                this._lastSuperShots = superShots;
                 this.ctx.save();
                 this.ctx.font = 'bold 18px "Comic Sans MS", "Comic Sans", cursive, sans-serif';
                 this.ctx.textAlign = 'left';
@@ -370,6 +442,22 @@ class World {
                 this.ctx.fillText(superShots, textX, textY);
                 this.ctx.restore();
             }
+        }
+        // Superlaser Schriftzug in der Mitte anzeigen
+        if (this._superlaserText) {
+            this.ctx.save();
+            this.ctx.font = this._superlaserText.font;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.globalAlpha = this._superlaserText.alpha;
+            this.ctx.translate(this._superlaserText.x, this._superlaserText.y);
+            this.ctx.scale(this._superlaserText.scale, this._superlaserText.scale);
+            this.ctx.lineWidth = 6;
+            this.ctx.strokeStyle = 'black';
+            this.ctx.strokeText(this._superlaserText.text, 0, 0);
+            this.ctx.fillStyle = 'rgba(255,255,255,1)';
+            this.ctx.fillText(this._superlaserText.text, 0, 0);
+            this.ctx.restore();
         }
         if (this.bombsBar && this.bombManager) {
             this.bombsBar.setBombs(this.bombManager.collectedCount);

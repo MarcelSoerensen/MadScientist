@@ -3,6 +3,10 @@
  * @extends CollidableObject
  */
 class Character extends CollidableObject {
+    _jumpSoundPlayed = false;
+    _stepSoundEndHandler = null;
+    _stepSoundAudio = null;
+    _isStepSoundPlaying = false;
     /**
      * Moves the character to the right by the given speed
      * @param {number} speed - Movement speed
@@ -291,7 +295,7 @@ class Character extends CollidableObject {
                 return;
             }
 
-            // Blockiere Bewegung und Kamera, vergrößere Charakter bei Endboss-Tod
+            
             if (window.endbossDefeated) {
                 if (!this._isDoubled && !this._isDoublingAnimRunning) {
                     this._isDoublingAnimRunning = true;
@@ -371,6 +375,43 @@ class Character extends CollidableObject {
                     this.playAnimation(this.IMAGES_IDLE);
                     this.lastAnimation = 'idle';
                 }
+            }
+            
+            const isWalking = this.world.keyboard.RIGHT || this.world.keyboard.LEFT;
+            const isJumping = this.world.keyboard.UP;
+
+            
+            if (isJumping && !this._jumpSoundPlayed) {
+                try {
+                    const jumpSound = new Audio('sounds/character-jump.wav');
+                    jumpSound.volume = 0.2;
+                    jumpSound.play();
+                } catch (e) {}
+                this._jumpSoundPlayed = true;
+            }
+            if (!isJumping) {
+                this._jumpSoundPlayed = false;
+            }
+            if (isWalking && !isJumping && !this._isStepSoundPlaying) {
+                try {
+                    this._stepSoundAudio = new Audio('sounds/character-steps.wav');
+                    this._stepSoundAudio.loop = true;
+                    this._stepSoundAudio.volume = 0.3;
+                    this._stepSoundAudio.playbackRate = 2.3;
+                    this._stepSoundAudio.currentTime = 0;
+                    this._stepSoundAudio.play();
+                    this._isStepSoundPlaying = true;
+                } catch (e) {
+                    
+                }
+            }
+            if ((!isWalking || isJumping) && this._isStepSoundPlaying && this._stepSoundAudio) {
+                try {
+                    this._stepSoundAudio.pause();
+                    this._stepSoundAudio.currentTime = 0;
+                } catch (e) {}
+                this._isStepSoundPlaying = false;
+                this._stepSoundAudio = null;
             }
         }, 60);
 
@@ -464,6 +505,15 @@ class Character extends CollidableObject {
         let frame = 0;
         const self = this;
         const delays = new Array(this.IMAGES_DEAD.length).fill(30);
+
+            
+        try {
+            const deathSound = new Audio('sounds/character-death.mp3');
+            deathSound.volume = 0.7;
+            deathSound.play();
+    } catch (e) {
+            
+        }
 
         /**
          * Animates the character's death sequence frame by frame

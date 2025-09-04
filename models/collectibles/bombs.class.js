@@ -158,6 +158,11 @@ class CollectibleBomb extends CollidableObject {
         this.targetY = targetY;
         this.startWidth = 40;
         this.startHeight = 40;
+            try {
+                const collectedSound = new Audio('sounds/collected-bomb.wav');
+                collectedSound.play();
+            } catch (e) {
+            }
         const dx = this.targetX - this.startX;
         const dy = this.targetY - this.startY;
         this.distance = Math.sqrt(dx*dx + dy*dy);

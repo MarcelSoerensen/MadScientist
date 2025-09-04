@@ -97,7 +97,7 @@ class EnergyBall extends CollidableObject {
     let alpha = 1;
     if (this.isCollecting) {
         scale = 1 - 0.6 * this.collectProgress;
-        alpha = 1 - 0.8 * this.collectProgress;
+        alpha = 1;
         offsetX = (this.baseSize - this.baseSize * scale) / 2;
         offsetY = (this.baseSize - this.baseSize * scale) / 2;
     }
@@ -111,7 +111,7 @@ class EnergyBall extends CollidableObject {
     ctx.translate(this.x + this.baseSize / 2 + xOffset - 3, this.y + this.baseSize / 2 + yOffset - 3);
     ctx.rotate(randomRotation);
     let flash = Math.abs(Math.sin(performance.now() * 0.12));
-    ctx.globalAlpha = alpha * (0.2 + 0.8 * flash);
+    ctx.globalAlpha = alpha; 
     ctx.beginPath();
     ctx.ellipse(0, 0, this.baseSize * scale * 0.7, this.baseSize * 0.13 * scale * 0.7, 0, 0, 2 * Math.PI);
     ctx.fillStyle = 'white';
@@ -145,6 +145,12 @@ class EnergyBall extends CollidableObject {
         this.speed = 10;
         this.duration = this.distance / this.speed;
         if (this.duration < 1) this.duration = 1;
+
+            try {
+                const collectedSound = new Audio('sounds/collected-energyball.wav');
+                collectedSound.play();
+            } catch (e) {
+            }
     }
 }
 

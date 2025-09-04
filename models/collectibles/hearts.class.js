@@ -123,6 +123,16 @@ class CollectibleHeart extends CollidableObject {
         this.pulseCount = 0;
         this.fadeAlpha = 1;
         this.collectProgress = 0;
+        try {
+            const heartSound = new Audio('sounds/heartbeat.wav');
+            heartSound.volume = 0.7;
+            heartSound.play();
+            setTimeout(() => {
+                heartSound.pause();
+                heartSound.currentTime = 0;
+            }, 500);
+        } catch (e) {
+        }
     }
 }
 
