@@ -38,6 +38,11 @@ class Character extends CollidableObject {
      */
     height = 380;
     /**
+     * Width of the character
+     * @type {number}
+     */
+    width = 250;
+    /**
      * Movement speed of the character
      * @type {number}
      */
@@ -48,10 +53,10 @@ class Character extends CollidableObject {
      * @type {{top: number, left: number, right: number, bottom: number}}
      */
     offset = {
-        top: 185,
-        left: 100,
-        right: 130,
-        bottom: 110
+    top: 185,
+    left: 80,
+    right: 110,
+    bottom: 110
     };
 
     /**
@@ -282,17 +287,52 @@ class Character extends CollidableObject {
      */
     animate() {
         setInterval(() => {
-
             if (this.isDead()) {
                 return;
             }
 
-            let moveSpeed = this.speed;
+            // Blockiere Bewegung und Kamera, vergrößere Charakter bei Endboss-Tod
+            if (window.endbossDefeated) {
+                if (!this._isDoubled && !this._isDoublingAnimRunning) {
+                    this._isDoublingAnimRunning = true;
+                    const startHeight = this.height;
+                    const startWidth = this.width;
+                    const startY = this.y;
+                    const startX = this.x;
+                    const targetHeight = startHeight * 2;
+                    const targetWidth = startWidth * 2;
+                    const targetY = startY - 280;
+                    const targetX = startX - 100;
+                    const steps = 40;
+                    let step = 0;
+                    const heightStep = (targetHeight - startHeight) / steps;
+                    const widthStep = (targetWidth - startWidth) / steps;
+                    const yStep = (targetY - startY) / steps;
+                    const xStep = (targetX - startX) / steps;
+                    this._doubleAnimInterval = setInterval(() => {
+                        if (step < steps) {
+                            this.height += heightStep;
+                            this.width += widthStep;
+                            this.y += yStep;
+                            this.x += xStep;
+                            step++;
+                        } else {
+                            this.height = targetHeight;
+                            this.width = targetWidth;
+                            this.y = targetY;
+                            this.x = targetX;
+                            clearInterval(this._doubleAnimInterval);
+                            this._isDoubled = true;
+                        }
+                    }, 40);
+                }
+                return;
+            }
 
+            let moveSpeed = this.speed;
             if (this.isAboveGround() && this.world.keyboard.UP) {
                 moveSpeed = this.speed * 1.5; 
             }
-
             if (this.world.keyboard.RIGHT && this.x < 3250) {
                 this.moveRight(moveSpeed);
                 this.otherDirection = false;
@@ -301,7 +341,6 @@ class Character extends CollidableObject {
                 this.moveLeft(moveSpeed);
                 this.otherDirection = true;
             }
-
             let targetCameraX;
             if (this.otherDirection) {
                 targetCameraX = -this.x + 400;
@@ -316,7 +355,6 @@ class Character extends CollidableObject {
             }
             const cameraSpeed = 0.02;
             this.world.camera_x += (targetCameraX - this.world.camera_x) * cameraSpeed;
-
             if (this.world.keyboard.UP && !this.isAboveGround()) {
                 this.isAboveGroundActive = true;
                 this.currentImage = 0;

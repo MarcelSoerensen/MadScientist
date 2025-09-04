@@ -32,7 +32,7 @@ class World {
             this.laserBeams.length === 0
         ) {
             let offsetY = 170;
-            let offsetX = this.character.otherDirection ? -80 : 220;
+            let offsetX = this.character.otherDirection ? -94 : 187;
             let laser = new LaserBeam(
                 this.character.x + offsetX,
                 this.character.y + offsetY,
@@ -218,7 +218,7 @@ class World {
                 });
                 this.laserBeams = [];
                 let offsetY = 205;
-                let offsetX = this.character.otherDirection ? -0 : 220;
+                let offsetX = this.character.otherDirection ? -20 : 190;
                 let laser = new LaserBeam(
                     this.character.x + offsetX,
                     this.character.y + offsetY,
@@ -441,7 +441,6 @@ class World {
         this.enemies.forEach(enemy => {
             if (enemy instanceof EnemyTwo && enemy.visible) {
                 this.ctx.save();
-                    // Rahmen werden nicht mehr gezeichnet
                 this.ctx.restore();
             }
         });

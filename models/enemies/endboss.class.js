@@ -32,17 +32,19 @@ class Endboss extends CollidableObject {
             height: stickHeight
         };
     }
+
     /**
      * Draws the collision frame for the Endboss.
      * Draws a red rectangle for the main body and a blue rectangle for the stick during hit animation.
      * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+     * @returns {void}
      */
     drawCollisionFrame(ctx) {
         if (!this.collidable) return;
         let leftOffset = this.offset.left;
         const isHitAnim = this.animState === 'hit';
         ctx.save();
-    ctx.strokeStyle = 'rgba(0,0,0,0)';
+        ctx.strokeStyle = 'rgba(0,0,0,0)';
         ctx.lineWidth = 2;
         let yPos = this.y + this.offset.top;
         if (this.jumpOffsetY !== undefined) {
@@ -414,6 +416,7 @@ class Endboss extends CollidableObject {
     this.collidable = false;
     this.isDeadAnimationPlaying = true;
     this.currentImage = 0;
+    window.endbossDefeated = true; // Flag für Spielende
         if (this.animInterval) {
             clearInterval(this.animInterval);
             this.animInterval = null;

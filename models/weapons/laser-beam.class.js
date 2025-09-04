@@ -38,7 +38,7 @@ class LaserBeam extends CollidableObject {
     /** @type {Character} Reference to the character to follow */
     character = null;
     /** @type {number} X offset from character position */
-    offsetX = 220;
+    offsetX = 190;
     /** @type {number} Y offset from character position */
     offsetY = 205;
 
@@ -58,19 +58,18 @@ class LaserBeam extends CollidableObject {
         this.width = 80;
         this.otherDirection = otherDirection;
         this.character = character;
-        
         if (arguments.length >= 6) {
             this.offsetX = arguments[4] !== undefined ? arguments[4] : 220;
             this.offsetY = arguments[5] !== undefined ? arguments[5] : 205;
         }
         this.animate();
         this.followCharacter();
-        
     }
 
     /**
      * Starts the laser beam animation
      * Continuously cycles through animation frames
+     * @returns {void}
      */
     animate() {
         this.animationInterval = setInterval(() => {
@@ -80,6 +79,7 @@ class LaserBeam extends CollidableObject {
 
     /**
      * Stops the laser beam animation
+     * @returns {void}
      */
     stopAnimation() {
         if (this.animationInterval) {
@@ -95,28 +95,22 @@ class LaserBeam extends CollidableObject {
     /**
      * Makes the laser follow the character's position
      * Updates position including jump offset
+     * @returns {void}
      */
     followCharacter() {
         if (!this.character) return;
-        
         this.positionInterval = setInterval(() => {
             if (this.character.otherDirection) {
                 this.x = this.character.x + this.offsetX;
             } else {
                 this.x = this.character.x + this.offsetX;
             }
-            
             this.y = this.character.y + this.offsetY;
-            
-            
             if (this.character.jumpOffsetY !== undefined && this.character.jumpOffsetY < 0) {
-                
                 this.y += this.character.jumpOffsetY * 1.2 - 25;
             } else if (this.character.jumpOffsetY !== undefined) {
-                
                 this.y += this.character.jumpOffsetY * 1.2;
             }
-            
             this.otherDirection = this.character.otherDirection;
         }, 1000 / 120);
     }
@@ -124,6 +118,7 @@ class LaserBeam extends CollidableObject {
     /**
      * Initiates the shooting movement for the laser beam
      * Moves horizontally based on character direction
+     * @returns {void}
      */
     shoot() {
         setInterval(() => {

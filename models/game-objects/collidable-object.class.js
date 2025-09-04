@@ -18,26 +18,25 @@ class CollidableObject extends MovableObject {
      * @property {number} bottom - Bottom offset in pixels
      */
     offset = {
-        top: 80,
-        left: 50,
-        right: 50,
-        bottom: 20   
+    top: 80,
+    left: 30,
+    right: 30,
+    bottom: 20   
     };
 
     /**
      * Draws a red frame around the actual collision area
      * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+     * @returns {void}
      */
     drawCollisionFrame(ctx) {
         if (!this.collidable) return;
     ctx.strokeStyle = 'rgba(0,0,0,0)';
         ctx.lineWidth = 2;
-
         let yPos = this.y + this.offset.top;
         if (this.jumpOffsetY !== undefined) {
             yPos += this.jumpOffsetY * 1.5;
         }
-
         ctx.strokeRect(
             this.x + this.offset.left,
             yPos,
