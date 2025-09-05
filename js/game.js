@@ -7,7 +7,6 @@ function init() {
     world = new World(canvas, keyboard);
     world.setWorldReferenceForEnemies();
 
-    // Hintergrundmusik nach erstem Klick auf das Canvas starten
     if (typeof window !== 'undefined') {
         if (!window.backgroundMusic) {
             window.backgroundMusic = new Audio('sounds/background-sound.flac');
@@ -27,37 +26,30 @@ function init() {
 }
 
 window.addEventListener('keydown', (event) => {
+    if (world && world.gameOver) {
+        if (['d', 'y', 's'].includes(event.key)) return;
+    }
     if (event.key === 'ArrowLeft') {
         keyboard.LEFT = true;
-       
     }
-
     if (event.key === 'ArrowRight') {
         keyboard.RIGHT = true;
-        
     }
-
     if (event.key === 'ArrowUp') {
         keyboard.UP = true;
-        
     }
-
     if (event.key === 'ArrowDown') {
         keyboard.DOWN = true;
     }
-
     if (event.key === ' ') {
         keyboard.SPACE = true;
     }
-
     if (event.key === 'd') {
         keyboard.D = true;
     }
-
     if (event.key === 'y') {
         keyboard.Y = true;
     }
-
     if (event.key === 's') {
         keyboard.S = true;
     }

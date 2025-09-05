@@ -4,7 +4,13 @@
  */
 class World {
     /**
-     * Setzt die world-Referenz für alle Enemies nach dem Laden des Levels
+     * Indicates if the game is over
+     * @type {boolean}
+     */
+    gameOver = false;
+    /**
+     * Sets the world reference for all enemies after loading the level
+     * @returns {void}
      */
     setWorldReferenceForEnemies() {
         if (this.enemies) {
@@ -21,6 +27,7 @@ class World {
     _lastCollisionSoundTime = 0;
     /**
      * Starts the first enemy only if the character is at least 800px away
+     * @returns {void}
      */
     checkFirstEnemyDistance() {
         if (this.level && this.level.enemies && this.level.enemies.length > 0) {
@@ -37,8 +44,7 @@ class World {
         }
     }
     /**
-     * Checks for supershot creation when S key is pressed.
-     * Fires a large laser, subtracts 5 balls, and counts 3 hits on the enemy.
+     * Checks for supershot creation when S key is pressed. Fires a large laser, subtracts 5 balls, and counts 3 hits on the enemy.
      * @returns {void}
      */
     checkSuperShot() {
@@ -67,7 +73,7 @@ class World {
             } catch (e) {
             }
             
-            // Schriftzug beim Schießen des Superlasers nicht anzeigen
+            /* Superlaser text is not displayed when shooting */
             this.laserBeams.push(laser);
             this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 5);
             this.laserActive = true;
@@ -287,7 +293,26 @@ class World {
      * @returns {void}
      */
     checkCollisions() {
-        if (this.character.isDead && this.character.isDead()) {
+        if (this.gameOver || (this.character.isDead && this.character.isDead())) {
+            if (!this.gameOver) {
+                this.gameOver = true;
+                if (this.keyboard) {
+                    this.keyboard.S = false;
+                    this.keyboard.D = false;
+                    this.keyboard.Y = false;
+                }
+            }
+            return;
+        }
+        if (window.endbossDefeated) {
+            if (!this.gameOver) {
+                this.gameOver = true;
+                if (this.keyboard) {
+                    this.keyboard.S = false;
+                    this.keyboard.D = false;
+                    this.keyboard.Y = false;
+                }
+            }
             return;
         }
         /**
@@ -453,7 +478,6 @@ class World {
                 this.ctx.restore();
             }
         }
-        // Superlaser Schriftzug in der Mitte anzeigen
         if (this._superlaserText) {
             this.ctx.save();
             this.ctx.font = this._superlaserText.font;
