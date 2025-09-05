@@ -19,12 +19,9 @@ class World {
             });
         }
     }
-    /**
-     * Animation for the Superlaser text
-     */
-    _superlaserText = null;
-    _superlaserTextAnim = null;
+
     _lastCollisionSoundTime = 0;
+
     /**
      * Starts the first enemy only if the character is at least 800px away
      * @returns {void}
@@ -136,16 +133,14 @@ class World {
         this.canvas = canvas;
         this.keyboard = keyboard;
         this.setWorld();
-    /**
-     * Place energy balls first, then bombs and hearts with distance checks.
-     */
-    this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
-    this.bombManager = new BombManager(4000, 600, this.character, this.energyBallManager.balls);
-    this.heartsManager = new HeartsManager(4000, 600, this.character, [], this.energyBallManager.balls, this.bombManager.bombs);
-    this.superShotBar = new SuperShotBar();
-    this.bombsBar = new BombsBar(65, 50, 5);
-    this.draw();
-    this.run();
+        this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
+        this.bombManager = new BombManager(4000, 600, this.character, this.energyBallManager.balls);
+        this.heartsManager = new HeartsManager(4000, 600, this.character, [], this.energyBallManager.balls, this.bombManager.bombs);
+        this.superShotBar = new SuperShotBar();
+        this.bombsBar = new BombsBar(65, 50, 5);
+        this.gameAlerts = new window.GameAlerts(this.canvas);
+        this.draw();
+        this.run();
     }
     
     /**
@@ -312,6 +307,7 @@ class World {
                     this.keyboard.D = false;
                     this.keyboard.Y = false;
                 }
+                this.gameAlerts.showAlert('levelComplete', 'Level Complete');
             }
             return;
         }
@@ -426,77 +422,16 @@ class World {
         this.drawStatusBar();
 
         if (this.energyBallManager && this.superShotBar) {
-            const superShots = Math.floor(this.energyBallManager.collectedCount / 5);
-            if (superShots > 0) {
-                if (!this._lastSuperShots || superShots > this._lastSuperShots) {
-                    try {
-                        const availableSound = new Audio('sounds/available-superlaser.wav');
-                        availableSound.volume = 0.3;
-                        availableSound.play();
-                    } catch (e) {}
-                    
-                    this._superlaserText = {
-                        text: `Superlaser ${superShots}`,
-                        font: 'bold 50px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
-                        x: this.canvas.width / 2,
-                        y: this.canvas.height / 2,
-                        scale: 1,
-                        alpha: 1,
-                        duration: 1500,
-                        start: Date.now()
-                    };
-                    if (this._superlaserTextAnim) {
-                        clearInterval(this._superlaserTextAnim);
-                    }
-                    this._superlaserTextAnim = setInterval(() => {
-                        if (this._superlaserText) {
-                            const elapsed = Date.now() - this._superlaserText.start;
-                            this._superlaserText.scale = 1 + elapsed / 700;
-                            this._superlaserText.alpha = Math.max(0, 1 - elapsed / this._superlaserText.duration);
-                            if (elapsed > this._superlaserText.duration) {
-                                this._superlaserText = null;
-                                clearInterval(this._superlaserTextAnim);
-                                this._superlaserTextAnim = null;
-                            }
-                        }
-                    }, 30);
-                }
-                this._lastSuperShots = superShots;
-                this.ctx.save();
-                this.ctx.font = 'bold 18px "Comic Sans MS", "Comic Sans", cursive, sans-serif';
-                this.ctx.textAlign = 'left';
-                const barX = this.superShotBar.x || 0;
-                const barY = this.superShotBar.y || 0;
-                const barWidth = this.superShotBar.width || 120;
-                const textX = barX + barWidth - 21;
-                const textY = barY + (this.superShotBar.height ? this.superShotBar.height / 2 + 6 : 37);
-                this.ctx.lineWidth = 4;
-                this.ctx.strokeStyle = 'black';
-                this.ctx.strokeText(superShots, textX, textY);
-                this.ctx.fillStyle = 'rgba(255,255,255,1)';
-                this.ctx.fillText(superShots, textX, textY);
-                this.ctx.restore();
-            }
-        }
-        if (this._superlaserText) {
-            this.ctx.save();
-            this.ctx.font = this._superlaserText.font;
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.globalAlpha = this._superlaserText.alpha;
-            this.ctx.translate(this._superlaserText.x, this._superlaserText.y);
-            this.ctx.scale(this._superlaserText.scale, this._superlaserText.scale);
-            this.ctx.lineWidth = 6;
-            this.ctx.strokeStyle = 'black';
-            this.ctx.strokeText(this._superlaserText.text, 0, 0);
-            this.ctx.fillStyle = 'rgba(255,255,255,1)';
-            this.ctx.fillText(this._superlaserText.text, 0, 0);
-            this.ctx.restore();
+            this.superShotBar.setBalls(this.energyBallManager.collectedCount);
+            this.superShotBar.draw(this.ctx);
         }
         if (this.bombsBar && this.bombManager) {
             this.bombsBar.setBombs(this.bombManager.collectedCount);
             this.bombsBar.draw(this.ctx);
         }
+
+        // Textanimationen (Superlaser, Level Complete, Game Over)
+        this.gameAlerts.draw(this.ctx);
 
         let self = this;
         requestAnimationFrame(function() {
@@ -518,40 +453,8 @@ class World {
      * @returns {void}
      */
     drawStatusBar() {
-        this.addToMap(this.statusBar);
-        
-        if (this.character.energy > 0) {
-            const currentHPWidth = this.statusBar.currentHPWidth;
-            this.ctx.save();
-            const clipStartX = this.statusBar.x + 47;
-            const clipWidth = currentHPWidth;
-            const widthRatio = clipWidth / 148;
-            this.ctx.beginPath();
-            this.ctx.moveTo(clipStartX, this.statusBar.y + 4);
-            this.ctx.lineTo(clipStartX + clipWidth, this.statusBar.y + 4);
-            this.ctx.lineTo(clipStartX + clipWidth - (3 * widthRatio), this.statusBar.y + 22);
-            this.ctx.lineTo(clipStartX, this.statusBar.y + 28);
-            this.ctx.closePath();
-            this.ctx.clip();
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.statusBar.x + 46, this.statusBar.y + 6.9);
-            this.ctx.lineTo(this.statusBar.x + 195, this.statusBar.y + 4);
-            this.ctx.lineTo(this.statusBar.x + 192, this.statusBar.y + 22);
-            this.ctx.lineTo(this.statusBar.x + 49, this.statusBar.y + 22);
-            this.ctx.closePath();
-            const gradient = this.ctx.createLinearGradient(0, this.statusBar.y + 6, 0, this.statusBar.y + 22);
-            gradient.addColorStop(0, 'rgb(117, 197, 27)');
-            gradient.addColorStop(0.4, 'rgb(117, 197, 27)');
-            gradient.addColorStop(0.6, 'rgb(103, 178, 27)');
-            gradient.addColorStop(1, 'rgb(103, 178, 27)');
-            this.ctx.fillStyle = gradient;
-            this.ctx.fill();
-            this.ctx.restore();
-        }
-        
-        if (this.superShotBar) {
-            this.superShotBar.draw(this.ctx);
-        }
+    this.addToMap(this.statusBar);
+    this.statusBar.drawHPBar(this.ctx);
     }
 
     /**
@@ -572,9 +475,6 @@ class World {
         if (this.energyBallManager) {
             this.energyBallManager.update(this.character);
             this.energyBallManager.draw(this.ctx);
-            if (this.superShotBar) {
-                this.superShotBar.setBalls(this.energyBallManager.collectedCount);
-            }
         }
         if (this.bombManager) {
             this.bombManager.update(this.character);

@@ -539,7 +539,15 @@ class Character extends CollidableObject {
      */
     playThrowBombAnimation() {
         if (this.throwAnimationPlaying) return;
-        
+
+        setTimeout(() => {
+            try {
+                const bombSound = new Audio('sounds/hit-bomb.wav');
+                bombSound.volume = 0.25;
+                bombSound.play();
+            } catch (e) {}
+        }, 500);
+
         this.throwAnimationPlaying = true;
         let frame = 0;
         const self = this;
