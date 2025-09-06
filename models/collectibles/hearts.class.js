@@ -1,22 +1,10 @@
-    _lastNoHeartSoundTime = 0;
 /**
- * Represents a collectible heart in the game.
- * @class CollectibleHeart
- * @extends CollidableObject
+ * Represents a collectible heart object.
  */
 class CollectibleHeart extends CollidableObject {
-    /**
-     * Triggers a bounce animation when the heart cannot be collected.
-     */
-    triggerBounce() {
-        this.bounceActive = true;
-        this.bounceProgress = 0;
-    }
-    /**
-     * Creates a CollectibleHeart instance.
-     * @param {number} x - The x position
-     * @param {number} y - The y position
-     */
+        /**
+         * Creates a CollectibleHeart instance.
+         */
     constructor(x, y) {
         super();
         this.x = x;
@@ -35,88 +23,23 @@ class CollectibleHeart extends CollidableObject {
         this.fadeAlpha = 1;
     }
 
-    /**
-     * Checks collision with the character using the character's collision rectangle.
-     * @param {Character} character - The main character
-     * @returns {boolean} True if colliding, else false
-     */
+        /**
+         * Checks collision with the character.
+         */
     isColliding(character) {
-        const charLeft = character.x + (character.offset?.left || 0);
-        const charRight = character.x + character.width - (character.offset?.right || 0);
-        let charTop = character.y + (character.offset?.top || 0);
-        if (character.jumpOffsetY !== undefined) {
-            charTop += character.jumpOffsetY * 1.5;
-        }
-        const charBottom = charTop + character.height - (character.offset?.top || 0) - (character.offset?.bottom || 0);
-        return (
-            this.x < charRight &&
-            this.x + this.width > charLeft &&
-            this.y < charBottom &&
-            this.y + this.height > charTop
-        );
+        const charRect = character.getCollisionRect();
+        const heartRect = {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height
+        };
+        return window.collisionManager.isCollision(charRect, heartRect);
     }
 
-    /**
-     * Updates the pulse animation for the heart (static, no animation).
-     */
-    updatePulse() {
-        this.fadeScale = 1;
-    }
-
-    /**
-     * Draws the heart on the canvas.
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     */
-    /**
-     * Draws the heart with animation (pulsing and diagonal movement).
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     */
-    draw(ctx) {
-        if (this.collected && !this.isCollecting) return;
-        ctx.save();
-        if (this.bounceActive) {
-            this.bounceProgress = (this.bounceProgress || 0) + 0.08;
-            let scale = 1 - 0.7 * Math.sin(Math.PI * Math.min(this.bounceProgress, 1));
-            let alpha = 0.5 + 0.5 * Math.abs(Math.sin(Math.PI * Math.min(this.bounceProgress, 1)));
-            ctx.globalAlpha = alpha;
-            ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-            ctx.scale(scale, scale);
-            ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
-            ctx.globalAlpha = 1;
-            if (this.bounceProgress >= 1) {
-                this.bounceActive = false;
-                this.bounceProgress = 0;
-            }
-        } else if (!this.isCollecting) {
-            let t = performance.now() * 0.004;
-            let move = Math.sin(t);
-            ctx.translate(this.x + move + this.width / 2, this.y + move + this.height / 2);
-            ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
-        } else {
-            if (this.collectProgress === undefined) this.collectProgress = 0;
-            this.collectProgress += 0.04;
-            let pulse = 1;
-            let alpha = 1;
-            if (this.collectProgress < 1) {
-                pulse = 1 + 22 / this.width * Math.abs(Math.sin(this.collectProgress * Math.PI * 2));
-                alpha = 1;
-            } else if (this.collectProgress < 2) {
-                pulse = 1 + 22 / this.width * Math.abs(Math.sin((this.collectProgress - 1) * Math.PI * 2));
-                alpha = Math.max(0, 1 - (this.collectProgress - 1));
-            } else {
-                pulse = 2.3;
-                alpha = 0;
-            }
-            ctx.globalAlpha = alpha;
-            ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-            ctx.scale(pulse, pulse);
-            ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
-        }
-        ctx.restore();
-    }
-    /**
-     * Starts the collect animation for the heart.
-     */
+        /**
+         * Starts the collecting animation for the heart.
+         */
     startCollecting() {
         if (this.isCollecting) return;
         this.isCollecting = true;
@@ -132,116 +55,112 @@ class CollectibleHeart extends CollidableObject {
                 heartSound.pause();
                 heartSound.currentTime = 0;
             }, 500);
-        } catch (e) {
-        }
+        } catch (e) {}
     }
-}
 
-/**
- * Manages all hearts in the game. Handles placement, collection, and drawing.
- * @class HeartsManager
- * @extends DrawableObject
- */
-class HeartsManager extends DrawableObject {
-    _lastFullEnergy = false;
-    /**
-     * Creates a HeartsManager instance and places hearts randomly in the level.
-     * @param {number} worldWidth - The width of the world
-     * @param {number} worldHeight - The height of the world
-     * @param {Character} character - The main character
-     * @param {Array} enemies - Array of enemy objects
-     */
-    constructor(worldWidth, worldHeight, character, enemies = [], energyBalls = [], bombs = []) {
-        super();
-        this.hearts = [];
-        this.collectedCount = 0;
-        this.maxHearts = 3;
-        const minDist = 100;
-        let tries = 0;
-        let jumpHeight = character && typeof character.jumpHeight === 'number' ? character.jumpHeight : 100;
-        let heartsToPlace = 3;
-        let lowerCount = Math.floor(heartsToPlace / 2);
-        let lowerY = 330;
-        let upperY = 170 + jumpHeight / 2;
-        let minX = Math.max(1200, character && typeof character.x === 'number' && typeof character.width === 'number'
-            ? character.x + character.width + 100
-            : 50);
-        while (this.hearts.length < heartsToPlace && tries < 1000) {
-            let x = minX + Math.random() * Math.max(0, worldWidth - minX - 1000);
-            let y = (this.hearts.length < lowerCount)
-                ? lowerY + Math.random() * 10 - 5
-                : upperY + Math.random() * 10 - 5;
-            let tooCloseHearts = this.hearts.some(h => {
-                let dx = h.x - x;
-                let dy = h.y - y;
-                return Math.sqrt(dx*dx + dy*dy) < minDist;
-            });
-            let tooCloseEnergy = energyBalls.some(e => {
-                let dx = e.x - x;
-                let dy = e.y - y;
-                return Math.sqrt(dx*dx + dy*dy) < minDist;
-            });
-            let tooCloseBombs = bombs.some(b => {
-                let dx = b.x - x;
-                let dy = b.y - y;
-                return Math.sqrt(dx*dx + dy*dy) < minDist;
-            });
-            let heart = new CollectibleHeart(x, y);
-            let collidesWithEnemy = enemies.some(enemy => heart.isColliding(enemy));
-            if (!tooCloseHearts && !tooCloseEnergy && !tooCloseBombs && !collidesWithEnemy) {
-                this.hearts.push(heart);
-            }
-            tries++;
+        /**
+         * Updates pulse and collecting animation.
+         */
+    updatePulse() {
+        this.updatePulseAnimation();
+        this.updateCollectingAnimation();
+    }
+
+        /**
+         * Updates pulse animation.
+         */
+    updatePulseAnimation() {
+        this.fadeScale = 1;
+    }
+
+        /**
+         * Updates collecting animation.
+         */
+    updateCollectingAnimation() {
+        if (this.isCollecting) {
+            if (this.collectProgress === undefined) this.collectProgress = 0;
+            this.collectProgress += 0.04;
         }
     }
 
-    /**
-     * Updates all hearts and handles collection by the character.
-     * @param {Character} character - The main character
-     */
-    update(character) {
-        for (let i = this.hearts.length - 1; i >= 0; i--) {
-            const heart = this.hearts[i];
-            if (typeof heart.update === 'function') heart.update();
-            if (!heart.isCollecting && character && heart.isColliding(character)) {
-                if (this.collectedCount < this.maxHearts && character.energy < 100) {
-                    heart.collected = true;
-                    const beforeEnergy = character.energy;
-                    character.energy = Math.min(character.energy + 33, 100);
-                    if (character.world && character.world.statusBar) {
-                        character.world.statusBar.setPercentage(character.energy);
-                    }
-                    heart.startCollecting(heart.x, heart.y - 50);
-                    if (beforeEnergy < 100 && character.energy === 100 && character.world && character.world.gameAlerts) {
-                        character.world.gameAlerts.triggerFullEnergy();
-                    }
-                } else if (character.energy >= 100) {
-                    if (!heart.bounceActive) heart.triggerBounce();
-                    const now = Date.now();
-                    if (!this._lastNoHeartSoundTime || now - this._lastNoHeartSoundTime > 2000) {
-                        try {
-                            const noHeartSound = new Audio('sounds/no-heart.wav');
-                            noHeartSound.volume = 0.2;
-                            noHeartSound.play();
-                            this._lastNoHeartSoundTime = now;
-                        } catch (e) {}
-                    }
-                }
-            }
-            if (heart.isCollecting && heart.collectProgress >= 1) {
-                this.hearts.splice(i, 1);
-                this.collectedCount++;
-            }
-        }
-    }
-
-    /**
-     * Draws all hearts on the canvas.
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     */
+        /**
+         * Draws the heart on the canvas.
+         */
     draw(ctx) {
-        this.hearts.forEach(heart => heart.draw(ctx));
+        if (this.collected && !this.isCollecting) return;
+        if (this.bounceActive) {
+            this.drawBounce(ctx);
+        } else if (!this.isCollecting) {
+            this.drawImage(ctx);
+        } else {
+            this.drawCollectingAnimation(ctx);
+        }
+    }
+
+        /**
+         * Draws the bounce animation.
+         */
+    drawBounce(ctx) {
+        ctx.save();
+        this.bounceProgress = (this.bounceProgress || 0) + 0.08;
+        let scale = 1 - 0.7 * Math.sin(Math.PI * Math.min(this.bounceProgress, 1));
+        let alpha = 0.5 + 0.5 * Math.abs(Math.sin(Math.PI * Math.min(this.bounceProgress, 1)));
+        ctx.globalAlpha = alpha;
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+        ctx.scale(scale, scale);
+        ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.globalAlpha = 1;
+        if (this.bounceProgress >= 1) {
+            this.bounceActive = false;
+            this.bounceProgress = 0;
+        }
+        ctx.restore();
+    }
+
+        /**
+         * Draws the heart image.
+         */
+    drawImage(ctx) {
+        ctx.save();
+        let t = performance.now() * 0.004;
+        let move = Math.sin(t);
+        ctx.translate(this.x + move + this.width / 2, this.y + move + this.height / 2);
+        ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.restore();
+    }
+
+        /**
+         * Draws the collecting animation.
+         */
+    drawCollectingAnimation(ctx) {
+        ctx.save();
+        if (this.collectProgress === undefined) this.collectProgress = 0;
+        this.collectProgress += 0.04;
+        let pulse = 1;
+        let alpha = 1;
+        if (this.collectProgress < 1) {
+            pulse = 1 + 22 / this.width * Math.abs(Math.sin(this.collectProgress * Math.PI * 2));
+            alpha = 1;
+        } else if (this.collectProgress < 2) {
+            pulse = 1 + 22 / this.width * Math.abs(Math.sin((this.collectProgress - 1) * Math.PI * 2));
+            alpha = Math.max(0, 1 - (this.collectProgress - 1));
+        } else {
+            pulse = 2.3;
+            alpha = 0;
+        }
+        ctx.globalAlpha = alpha;
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+        ctx.scale(pulse, pulse);
+        ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.restore();
     }
 }
+    
+    
+    
+    
+    
+    
+
 
 

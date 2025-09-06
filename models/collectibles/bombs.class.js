@@ -1,149 +1,54 @@
 /**
- * Manages collectible bombs in the level, similar to energy balls.
- * Handles bomb placement, collection, and inventory logic.
- * @class BombManager
- * @extends DrawableObject
- */
-class BombManager extends DrawableObject {
-    /**
-     * Creates a BombManager instance and places bombs randomly in the level.
-     * @param {number} levelWidth - The width of the level
-     * @param {number} levelHeight - The height of the level
-     * @param {Character} character - The main character
-     */
-    constructor(levelWidth, levelHeight, character, energyBalls = []) {
-        super();
-        this.bombs = [];
-        this.collectedCount = 0;
-        this.maxBombs = 5;
-        this.character = character;
-        this.placeBombs(levelWidth, levelHeight, energyBalls);
-    }
-
-    /**
-     * Places bombs randomly in the level.
-     * @param {number} levelWidth - The width of the level
-     * @param {number} levelHeight - The height of the level
-     */
-    placeBombs(levelWidth, levelHeight, energyBalls = []) {
-        let tries = 0;
-        let bombsToPlace = this.maxBombs;
-        let lowerCount = Math.floor(bombsToPlace / 2);
-        let lowerY = 330;
-        let upperY = 170 + (this.character && typeof this.character.jumpHeight === 'number' ? this.character.jumpHeight / 2 : 50);
-        let minX = this.character && typeof this.character.x === 'number' && typeof this.character.width === 'number'
-            ? Math.max(this.character.x + this.character.width + 100, 50)
-            : 50;
-        const minDist = 100;
-        while (this.bombs.length < bombsToPlace && tries < 1000) {
-            let x = minX + Math.random() * Math.max(0, levelWidth - minX - 1000);
-            let y = (this.bombs.length < lowerCount)
-                ? lowerY + Math.random() * 10 - 5
-                : upperY + Math.random() * 10 - 5;
-            let tooCloseBombs = this.bombs.some(b => {
-                let dx = b.x - x;
-                let dy = b.y - y;
-                return Math.sqrt(dx*dx + dy*dy) < minDist;
-            });
-            let tooCloseEnergy = energyBalls.some(e => {
-                let dx = e.x - x;
-                let dy = e.y - y;
-                return Math.sqrt(dx*dx + dy*dy) < minDist;
-            });
-            let bomb = new CollectibleBomb(x, y);
-            if (!tooCloseBombs && !tooCloseEnergy) {
-                this.bombs.push(bomb);
-            }
-            tries++;
-        }
-    }
-
-    /**
-     * Updates all bombs and handles collection by the character.
-     * @param {object} character - The main character object.
-     */
-    update(character) {
-        const barY = 50;
-        for (let i = this.bombs.length - 1; i >= 0; i--) {
-            const bomb = this.bombs[i];
-            if (typeof bomb.update === 'function') {
-                bomb.update();
-            }
-            if (
-                typeof bomb.startCollecting === 'function' &&
-                !bomb.isCollecting && character && bomb.isColliding(character)
-            ) {
-                
-                bomb.startCollecting(bomb.originX - 100, barY);
-            }
-            if (bomb.isCollecting && bomb.collectProgress >= 1) {
-                this.bombs.splice(i, 1);
-                this.collectedCount++;
-            }
-        }
-    }
-
-    /**
-     * Draws all bombs on the canvas.
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     */
-    draw(ctx) {
-        this.bombs.forEach(bomb => bomb.draw(ctx));
-    }
-}
-
-/**
- * Represents a collectible bomb in the level.
- * @class CollectibleBomb
- * @extends DrawableObject
+ * Represents a collectible bomb object.
  */
 class CollectibleBomb extends CollidableObject {
-    /**
-     * Checks collision with the character using the character's collision rectangle.
-     * @param {Character} character - The main character
-     * @returns {boolean} True if colliding, else false
-     */
+        /**
+         * Creates a CollectibleBomb instance.
+         */
+    constructor(x, y) {
+        super();
+        this.x = x;
+        this.y = y;
+        this.width = 40;
+        this.height = 40;
+        this.img = new Image();
+        this.img.src = 'img/Projectile/Other/1.png';
+        this.originX = x;
+        this.originY = y;
+        this.isCollecting = false;
+        this.collectProgress = 0;
+        this.startX = x;
+        this.startY = y;
+        this.targetX = x;
+        this.targetY = y;
+        this.startWidth = this.width;
+        this.startHeight = this.height;
+    }
+
+        /**
+         * Checks collision with the character.
+         */
     isColliding(character) {
-        const charRect = this.getCharacterRect(character);
+        const charRect = character.getCollisionRect();
         const bombRect = this.getBombRect();
-        return this.isRectCollision(charRect, bombRect);
+        return window.collisionManager.isCollision(charRect, bombRect);
     }
 
-    /**
-     * Returns the rectangle of the character for collision detection.
-     * @param {Character} character
-     * @returns {{left:number, right:number, top:number, bottom:number}}
-     */
-    getCharacterRect(character) {
-        const left = character.x + (character.offset?.left || 0);
-        const right = character.x + character.width - (character.offset?.right || 0);
-        let top = character.y + (character.offset?.top || 0);
-        if (character.jumpOffsetY !== undefined) {
-            top += character.jumpOffsetY * 1.5;
-        }
-        const bottom = top + character.height - (character.offset?.top || 0) - (character.offset?.bottom || 0);
-        return { left, right, top, bottom };
-    }
-
-    /**
-     * Returns the rectangle of the bomb for collision detection.
-     * @returns {{left:number, right:number, top:number, bottom:number}}
-     */
+        /**
+         * Returns the bomb's rectangle for collision.
+         */
     getBombRect() {
         return {
-            left: this.x,
-            right: this.x + this.width,
-            top: this.y,
-            bottom: this.y + this.height
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height
         };
     }
 
-    /**
-     * Checks if two rectangles collide.
-     * @param {{left:number, right:number, top:number, bottom:number}} rectA
-     * @param {{left:number, right:number, top:number, bottom:number}} rectB
-     * @returns {boolean}
-     */
+        /**
+         * Checks rectangle collision between two objects.
+         */
     isRectCollision(rectA, rectB) {
         return (
             rectA.left < rectB.right &&
@@ -152,36 +57,10 @@ class CollectibleBomb extends CollidableObject {
             rectA.bottom > rectB.top
         );
     }
-    /**
-     * Creates a CollectibleBomb instance.
-     * @param {number} x - The x position
-     * @param {number} y - The y position
-     */
-    constructor(x, y) {
-        super();
-    this.x = x;
-    this.y = y;
-    this.width = 40;
-    this.height = 40;
-    this.img = new Image();
-    this.img.src = 'img/Projectile/Other/1.png';
-    this.originX = x;
-    this.originY = y;
-    this.isCollecting = false;
-    this.collectProgress = 0;
-    this.startX = x;
-    this.startY = y;
-    this.targetX = x;
-    this.targetY = y;
-    this.startWidth = this.width;
-    this.startHeight = this.height;
-    }
 
-    /**
-     * Starts the collect animation to the bombs bar.
-     * @param {number} targetX - Target x position for animation
-     * @param {number} targetY - Target y position for animation
-     */
+        /**
+         * Starts the collecting animation for the bomb.
+         */
     startCollecting(targetX, targetY) {
         if (this.isCollecting) return;
         this.isCollecting = true;
@@ -192,52 +71,61 @@ class CollectibleBomb extends CollidableObject {
         this.targetY = targetY;
         this.startWidth = 40;
         this.startHeight = 40;
-            try {
-                const collectedSound = new Audio('sounds/collected-bomb.wav');
-                collectedSound.play();
-            } catch (e) {
-            }
+        try {
+            const collectedSound = new Audio('sounds/collected-bomb.wav');
+            collectedSound.play();
+        } catch (e) {}
         const dx = this.targetX - this.startX;
         const dy = this.targetY - this.startY;
-        this.distance = Math.sqrt(dx*dx + dy*dy);
+        this.distance = Math.sqrt(dx * dx + dy * dy);
         this.speed = 10;
         this.duration = this.distance / this.speed;
         if (this.duration < 1) this.duration = 1;
     }
 
-    /**
-     * Updates the animation if the bomb is being collected.
-     */
+        /**
+         * Updates the bomb (animation, collection).
+         */
     update() {
+        this.updateCollectingAnimation();
+    }
+
+        /**
+         * Updates collecting animation.
+         */
+    updateCollectingAnimation() {
+        this.updateCollectingProgress();
+        this.updateCollectingTransform();
+    }
+
+        /**
+         * Updates collecting progress.
+         */
+    updateCollectingProgress() {
         if (this.isCollecting) {
             if (!this.duration) this.duration = 1;
             this.collectProgress += 1 / this.duration;
-            if (this.collectProgress >= 1) {
-                this.x = this.targetX;
-                this.y = this.targetY;
-                this.width = this.startWidth * 0.4;
-                this.height = this.startHeight * 0.4;
-                if (!this._animationDone) {
-                    this._animationDone = true;
-                }
-            } else {
-                this.x = this.startX + (this.targetX - this.startX) * this.collectProgress;
-                this.y = this.startY + (this.targetY - this.startY) * this.collectProgress;
-                const shrink = 1 - 0.6 * this.collectProgress;
-                this.width = this.startWidth * shrink;
-                this.height = this.startHeight * shrink;
-            }
         }
     }
 
-    /**
-     * Draws the bomb (including animation).
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     */
-    /**
-     * Draws the bomb with animation (rotating movement and pulsating transparency).
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     */
+        /**
+         * Updates collecting transform (position, size).
+         */
+    updateCollectingTransform() {
+        if (this.isCollecting) {
+            const done = this.collectProgress >= 1;
+            this.x = done ? this.targetX : this.startX + (this.targetX - this.startX) * this.collectProgress;
+            this.y = done ? this.targetY : this.startY + (this.targetY - this.startY) * this.collectProgress;
+            const shrink = done ? 0.4 : 1 - 0.6 * this.collectProgress;
+            this.width = this.startWidth * shrink;
+            this.height = this.startHeight * shrink;
+            if (done && !this._animationDone) this._animationDone = true;
+        }
+    }
+
+        /**
+         * Draws the bomb on the canvas.
+         */
     draw(ctx) {
         ctx.save();
         if (!this.isCollecting) {
@@ -246,7 +134,6 @@ class CollectibleBomb extends CollidableObject {
             let radius = (this.width + this.height) / 32;
             let xOffset = Math.cos(angle) * radius;
             let yOffset = Math.sin(angle) * radius;
-            let flash = Math.abs(Math.sin(performance.now() * 0.012));
             ctx.globalAlpha = 1;
             ctx.drawImage(this.img, this.x + xOffset, this.y + yOffset, this.width, this.height);
         } else {
@@ -255,6 +142,5 @@ class CollectibleBomb extends CollidableObject {
         }
         ctx.restore();
     }
-
 }
 

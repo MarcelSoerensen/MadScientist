@@ -396,20 +396,34 @@ class World {
         this.addToMap(this.character);
         this.addObjectsToMap(this.throwableObjects);
         this.addObjectsToMap(this.laserBeams);
-        if (this.energyBallManager) {
+        if (this.energyBallManager && this.superShotBar) {
+            // SuperShot-Alert: Prüfe, ob sich die Anzahl der SuperShots erhöht hat
+            const prevSuperShots = this.superShotBar.getSuperShots();
             this.energyBallManager.update(this.character);
+            this.superShotBar.setBalls(this.energyBallManager.collectedCount);
+            const newSuperShots = this.superShotBar.getSuperShots();
+            if (newSuperShots > prevSuperShots) {
+                this.gameAlerts.triggerSuperlaser(newSuperShots);
+            }
             this.energyBallManager.draw(this.ctx);
+            this.superShotBar.draw(this.ctx);
         }
         if (this.bombManager) {
             this.bombManager.update(this.character);
             this.bombManager.draw(this.ctx);
         }
         if (this.heartsManager) {
+            const prevEnergy = this.statusBar.percentage;
             this.heartsManager.update(this.character);
+            // StatusBar wird vermutlich im CollisionManager oder nach Heart-Update gesetzt
+            if (prevEnergy < 100 && this.statusBar.percentage === 100) {
+                this.gameAlerts.triggerFullEnergy();
+            }
             this.heartsManager.draw(this.ctx);
         }
         if (this.bombsBar && this.bombManager) {
             this.bombsBar.setBombs(this.bombManager.collectedCount);
+            this.bombsBar.draw(this.ctx);
         }
     }
 

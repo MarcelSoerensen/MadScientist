@@ -3,6 +3,20 @@
  * @extends CollidableObject
  */
 class Character extends CollidableObject {
+    /**
+     * Gibt das Kollisionsrechteck des Charakters zurück
+     * @returns {{x:number, y:number, width:number, height:number}}
+     */
+    getCollisionRect() {
+        let x = this.x + (this.offset?.left || 0);
+        let y = this.y + (this.offset?.top || 0);
+        if (this.jumpOffsetY !== undefined) {
+            y += this.jumpOffsetY * 1.5;
+        }
+        let width = this.width - ((this.offset?.left || 0) + (this.offset?.right || 0));
+        let height = this.height - ((this.offset?.top || 0) + (this.offset?.bottom || 0));
+        return { x, y, width, height };
+    }
     _jumpSoundPlayed = false;
     _stepSoundEndHandler = null;
     stepSoundAudio = null;
