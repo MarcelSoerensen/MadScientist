@@ -21,7 +21,7 @@ class Endboss extends CollidableObject {
 
         setTimeout(() => {
             try {
-                const bombSound = new Audio('sounds/endboss-hit.wav');
+                const bombSound = new Audio('sounds/endboss-hit.mp3');
                 bombSound.volume = 0.25;
                 bombSound.play();
             } catch (e) {}
@@ -361,7 +361,7 @@ class Endboss extends CollidableObject {
                     
                     if (!this.isStepSoundPlaying) {
                         try {
-                            this.stepSoundAudio = new Audio('sounds/endboss-steps-left.wav');
+                            this.stepSoundAudio = new Audio('sounds/endboss-steps-left.mp3');
                             this.stepSoundAudio.loop = true;
                             this.stepSoundAudio.volume = 0.4;
                             this.stepSoundAudio.playbackRate = 1.5;
@@ -389,7 +389,7 @@ class Endboss extends CollidableObject {
                         }
                         setTimeout(() => {
                             try {
-                                const hitStickSound = new Audio('sounds/endboss-hit.wav');
+                                const hitStickSound = new Audio('sounds/endboss-hit.mp3');
                                 hitStickSound.volume = 0.25;
                                 hitStickSound.playbackRate = 1.35;
                                 hitStickSound.play();
@@ -475,7 +475,7 @@ class Endboss extends CollidableObject {
     let now = Date.now();
     if (!this.lastHitSoundTime || now - this.lastHitSoundTime > 1000) {
         try {
-            const hitSound = new Audio('sounds/endboss-collided.wav');
+            const hitSound = new Audio('sounds/endboss-collided.mp3');
             hitSound.volume = 0.7;
             hitSound.play();
             this.lastHitSoundTime = now;
@@ -534,7 +534,7 @@ class Endboss extends CollidableObject {
      * @returns {void}
      */
     try {
-        const deathSound = new Audio('sounds/endboss-death.wav');
+        const deathSound = new Audio('sounds/endboss-death.mp3');
         deathSound.volume = 0.4;
         deathSound.play();
         let fadeSteps = 10;

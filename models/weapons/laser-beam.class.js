@@ -122,7 +122,7 @@ class LaserBeam extends CollidableObject {
      */
     shoot() {
             try {
-                const laserSound = new Audio('sounds/laser-shot.wav');
+                const laserSound = new Audio('sounds/laser-shot.mp3');
                 laserSound.volume = 0.5;
                 laserSound.play();
             } catch (e) {

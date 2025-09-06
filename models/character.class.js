@@ -397,7 +397,7 @@ class Character extends CollidableObject {
             
             if (isJumping && !this._jumpSoundPlayed) {
                 try {
-                    const jumpSound = new Audio('sounds/character-jump.wav');
+                    const jumpSound = new Audio('sounds/character-jump.mp3');
                     jumpSound.volume = 0.2;
                     jumpSound.play();
                 } catch (e) {}
@@ -408,7 +408,7 @@ class Character extends CollidableObject {
             }
             if (isWalking && !isJumping && !this.isStepSoundPlaying) {
                 try {
-                    this.stepSoundAudio = new Audio('sounds/character-steps.wav');
+                    this.stepSoundAudio = new Audio('sounds/character-steps.mp3');
                     this.stepSoundAudio.loop = true;
                     this.stepSoundAudio.volume = 0.3;
                     this.stepSoundAudio.playbackRate = 2.3;
@@ -556,7 +556,7 @@ class Character extends CollidableObject {
 
         setTimeout(() => {
             try {
-                const bombSound = new Audio('sounds/hit-bomb.wav');
+                const bombSound = new Audio('sounds/hit-bomb.mp3');
                 bombSound.volume = 0.25;
                 bombSound.play();
             } catch (e) {}

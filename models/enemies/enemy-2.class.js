@@ -4,8 +4,6 @@
  * @classdesc Vertical-moving enemy using EnemyOne's animation, placed in the center of the level.
  */
 class EnemyTwo extends CollidableObject {
-    // ...existing code...
-    // ...existing code...
     _proximitySoundPlaying = false;
     _proximitySoundAudio = null;
     lastHitTime = 0;
@@ -91,7 +89,7 @@ class EnemyTwo extends CollidableObject {
                 const dist = Math.abs(charX - enemyX);
                 if (dist <= fadeRange) {
                     if (!this._proximitySoundPlaying) {
-                        this._proximitySoundAudio = new Audio('sounds/enemy2.wav');
+                        this._proximitySoundAudio = new Audio('sounds/enemy2.mp3');
                         this._proximitySoundAudio.loop = true;
                         this._proximitySoundAudio.volume = 0.0;
                         this._proximitySoundAudio.playbackRate = 0.90;
@@ -109,7 +107,6 @@ class EnemyTwo extends CollidableObject {
                             }
                         }, 40);
                     }
-                    // Fade-Out ab 250px Entfernung
                     if (this._proximitySoundPlaying && this._proximitySoundAudio && dist > fadeOutStart) {
                         let targetVolume = 0.5 * (1 - (dist - fadeOutStart) / (fadeRange - fadeOutStart));
                         targetVolume = Math.max(0, Math.min(0.5, targetVolume));
@@ -124,7 +121,6 @@ class EnemyTwo extends CollidableObject {
                         }, 40);
                     }
                 } else if (dist > fadeRange && dist <= fadeOutStop) {
-                    // Fade-Out bis 350px
                     if (this._proximitySoundPlaying && this._proximitySoundAudio) {
                         let targetVolume = 0.5 * (1 - (dist - fadeRange) / (fadeOutStop - fadeRange));
                         targetVolume = Math.max(0, Math.min(0.5, targetVolume));
@@ -139,7 +135,6 @@ class EnemyTwo extends CollidableObject {
                         }, 40);
                     }
                 } else if (dist > fadeOutStop) {
-                    // Sound komplett stoppen
                     if (this._proximitySoundPlaying && this._proximitySoundAudio) {
                         this._proximitySoundAudio.volume = 0;
                         this._proximitySoundAudio.pause();
@@ -159,6 +154,11 @@ class EnemyTwo extends CollidableObject {
                     if (this.deathFrame >= this.IMAGES_DEATH.length) {
                         this.deathFrame = this.IMAGES_DEATH.length - 1;
                         this.deathDone = true;
+                        if (this._proximitySoundAudio) {
+                            this._proximitySoundAudio.pause();
+                            this._proximitySoundAudio.currentTime = 0;
+                            this._proximitySoundPlaying = false;
+                        }
                     }
                 } else {
                     this.img = this.imageCache[this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1]];
@@ -229,6 +229,19 @@ class EnemyTwo extends CollidableObject {
             cancelAnimationFrame(this.animationFrame);
             this.animationFrame = null;
         }
+        // Stop proximity sound immediately on death
+        if (this._proximitySoundAudio) {
+            this._proximitySoundAudio.pause();
+            this._proximitySoundAudio.currentTime = 0;
+            this._proximitySoundPlaying = false;
+        }
+        // Play death sound
+        try {
+            const deathSound = new Audio('sounds/enemy2-death.mp3');
+            deathSound.volume = 0.7;
+            deathSound.playbackRate = 2.0;
+            deathSound.play();
+        } catch (e) {}
         this.moveVertically = function(){};
 
         let deathFrame = 0;

@@ -9,7 +9,7 @@ function init() {
 
     if (typeof window !== 'undefined') {
         if (!window.backgroundMusic) {
-            window.backgroundMusic = new Audio('sounds/background-sound.flac');
+            window.backgroundMusic = new Audio('sounds/background-sound.mp3');
             window.backgroundMusic.loop = true;
             window.backgroundMusic.volume = 0.08;
         }

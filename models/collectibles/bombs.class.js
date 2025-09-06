@@ -72,7 +72,7 @@ class CollectibleBomb extends CollidableObject {
         this.startWidth = 40;
         this.startHeight = 40;
         try {
-            const collectedSound = new Audio('sounds/collected-bomb.wav');
+            const collectedSound = new Audio('sounds/collected-bomb.mp3');
             collectedSound.play();
         } catch (e) {}
         const dx = this.targetX - this.startX;

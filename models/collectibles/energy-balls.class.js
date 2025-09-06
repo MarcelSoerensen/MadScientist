@@ -69,7 +69,7 @@ class EnergyBall extends CollidableObject {
          */
     playCollectingSound() {
         try {
-            const collectedSound = new Audio('sounds/collected-energyball.wav');
+            const collectedSound = new Audio('sounds/collected-energyball.mp3');
             collectedSound.play();
         } catch (e) {}
     }

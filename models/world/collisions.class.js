@@ -30,7 +30,7 @@ class CollisionManager {
                 const now = Date.now();
                 if (!world._lastCollisionSoundTime || now - world._lastCollisionSoundTime > 500) {
                     try {
-                        const collisionSound = new Audio('sounds/character-collided.wav');
+                        const collisionSound = new Audio('sounds/character-collided.mp3');
                         collisionSound.volume = 0.5;
                         collisionSound.play();
                         world._lastCollisionSoundTime = now;
@@ -108,7 +108,7 @@ class CollisionManager {
                         const now = Date.now();
                         if (!world._lastCollisionSoundTime || now - world._lastCollisionSoundTime > 500) {
                             try {
-                                const collisionSound = new Audio('sounds/character-collided.wav');
+                                const collisionSound = new Audio('sounds/character-collided.mp3');
                                 collisionSound.volume = 0.5;
                                 collisionSound.play();
                                 world._lastCollisionSoundTime = now;

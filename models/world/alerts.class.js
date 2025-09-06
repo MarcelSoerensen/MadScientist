@@ -15,9 +15,9 @@ class GameAlerts {
      */
     playSound(type) {
             const sounds = {
-                superlaser: 'sounds/available-superlaser.wav',
-                fullEnergy: 'sounds/full-energy.flac',
-                levelComplete: 'sounds/endboss-death.wav',
+                superlaser: 'sounds/available-superlaser.mp3',
+                fullEnergy: 'sounds/full-energy.mp3',
+                levelComplete: 'sounds/endboss-death.mp3',
                 gameOver: 'sounds/character-death.mp3'
             };
             if (sounds[type]) {
@@ -165,7 +165,7 @@ class GameAlerts {
             duration: 1500
         });
         try {
-            const fullEnergySound = new Audio('sounds/full-energy.flac');
+            const fullEnergySound = new Audio('sounds/full-energy.mp3');
             fullEnergySound.volume = 0.5;
             fullEnergySound.play();
         } catch (e) {}
@@ -179,7 +179,7 @@ class GameAlerts {
     triggerSuperlaser(superShots) {
         this.showAlert('superlaser', `Superlaser ${superShots}`);
         try {
-            const availableSound = new Audio('sounds/available-superlaser.wav');
+            const availableSound = new Audio('sounds/available-superlaser.mp3');
             availableSound.volume = 0.3;
             availableSound.play();
         } catch (e) {}
@@ -195,7 +195,7 @@ class GameAlerts {
             duration: 2000
         });
         try {
-            const levelCompleteSound = new Audio('sounds/endboss-death.wav');
+            const levelCompleteSound = new Audio('sounds/endboss-death.mp3');
             levelCompleteSound.volume = 0.5;
             levelCompleteSound.play();
         } catch (e) {}

@@ -48,7 +48,7 @@ class CollectibleHeart extends CollidableObject {
         this.fadeAlpha = 1;
         this.collectProgress = 0;
         try {
-            const heartSound = new Audio('sounds/heartbeat.wav');
+            const heartSound = new Audio('sounds/heartbeat.mp3');
             heartSound.volume = 0.7;
             heartSound.play();
             setTimeout(() => {

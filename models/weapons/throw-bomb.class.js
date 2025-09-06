@@ -70,7 +70,7 @@ class ThrowBomb extends ThrowableObjects {
         this.images = this.IMAGES_EXPLOSION;
         this.img = this.imageCache[this.IMAGES_EXPLOSION[0]];
             try {
-                const explosionSound = new Audio('sounds/explosion.flac');
+                const explosionSound = new Audio('sounds/explosion.mp3');
                 explosionSound.play();
             } catch (e) {
             }

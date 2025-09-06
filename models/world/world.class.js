@@ -64,7 +64,7 @@ class World {
             laser.height *= 2;
             laser.isSuperShot = true;
             try {
-                const shotSound = new Audio('sounds/superlaser-shot.wav');
+                const shotSound = new Audio('sounds/superlaser-shot.mp3');
                 shotSound.volume = 0.5;
                 shotSound.play();
             } catch (e) {}
@@ -204,7 +204,7 @@ class World {
                         const now = Date.now();
                         if (!this._lastCollisionSoundTime || now - this._lastCollisionSoundTime > 500) {
                             try {
-                                const collisionSound = new Audio('sounds/character-collided.wav');
+                                const collisionSound = new Audio('sounds/character-collided.mp3');
                                 collisionSound.volume = 0.5;
                                 collisionSound.play();
                                 this._lastCollisionSoundTime = now;
