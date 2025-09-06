@@ -151,7 +151,7 @@ class EnergyBall extends CollidableObject {
         let yOffset = Math.sin(randomAngle + t) * radius;
         ctx.translate(this.x + this.baseSize / 2 + xOffset - 3, this.y + this.baseSize / 2 + yOffset - 3);
         ctx.rotate(randomRotation);
-        ctx.globalAlpha = alpha;
+        ctx.globalAlpha = 0.6;
         ctx.beginPath();
         ctx.ellipse(0, 0, this.baseSize * scale * 0.7, this.baseSize * 0.13 * scale * 0.7, 0, 0, 2 * Math.PI);
         ctx.fillStyle = 'white';
