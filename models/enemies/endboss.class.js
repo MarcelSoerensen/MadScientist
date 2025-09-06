@@ -6,7 +6,28 @@
  * @extends CollidableObject
  */
 class Endboss extends CollidableObject {
-    _lastHitSoundTime = 0;
+    stepSoundAudioRight = null;
+    isStepSoundPlayingRight = false;
+    
+    stepSoundAudio = null;
+    isStepSoundPlaying = false;
+    
+    animationStarted = false;
+    
+    checkProximityInterval = null;
+    
+    playThrowAnimation() {
+        if (this.throwAnimationPlaying) return;
+
+        setTimeout(() => {
+            try {
+                const bombSound = new Audio('sounds/endboss-hit.wav');
+                bombSound.volume = 0.25;
+                bombSound.play();
+            } catch (e) {}
+        }, 500);
+    }
+    lastHitSoundTime = 0;
     /**
      * Indicates if the Endboss is collidable (for collision detection)
      * @type {boolean}
@@ -271,7 +292,17 @@ class Endboss extends CollidableObject {
         this.loadImages(this.IMAGES_DEATH);
         this.visible = true;
         this.loadImages(this.IMAGES_HIT);
-        this.animate();
+        
+        this.checkProximityInterval = setInterval(() => {
+            if (this.character && !this.animationStarted) {
+                const dist = Math.abs(this.x - this.character.x);
+                if (dist <= 500) {
+                    this.animationStarted = true;
+                    this.animate();
+                    clearInterval(this.checkProximityInterval);
+                }
+            }
+        }, 100);
     }
 
     /**
@@ -287,6 +318,10 @@ class Endboss extends CollidableObject {
         let startX = this.x;
         let leftTargetX = startX - 200;
         this.animInterval = setInterval(() => {
+            if (!this.animationStarted) {
+                this.img = this.imageCache[this.IMAGES_IDLE[0]];
+                return;
+            }
             if (this.laserHitCount >= 25 && !this.isElectricHurt) {
                 if (!deathDone) {
                     this.img = this.imageCache[this.IMAGES_DEATH[deathFrame]];
@@ -304,15 +339,17 @@ class Endboss extends CollidableObject {
                 this.playAnimation(this.IMAGES_GET_ELECTRIC);
                 return;
             }
-            /**
-             * Animation state machine for Endboss
-             * Handles idle, walking left/right, hit, and transition logic
-             */
             switch (this.animState) {
                 case 'idle':
-                    /**
-                     * Idle animation for 2 seconds
-                     */
+                    
+                    if (this.isStepSoundPlayingRight && this.stepSoundAudioRight) {
+                        try {
+                            this.stepSoundAudioRight.pause();
+                            this.stepSoundAudioRight.currentTime = 0.5;
+                        } catch (e) {}
+                        this.isStepSoundPlayingRight = false;
+                        this.stepSoundAudioRight = null;
+                    }
                     this.playAnimation(this.IMAGES_IDLE);
                     animTimer += 50;
                     if (animTimer >= 2000) {
@@ -321,9 +358,18 @@ class Endboss extends CollidableObject {
                     }
                     break;
                 case 'walkingLeft':
-                    /**
-                     * Walking left animation and movement (200px, 4px/step)
-                     */
+                    
+                    if (!this.isStepSoundPlaying) {
+                        try {
+                            this.stepSoundAudio = new Audio('sounds/endboss-steps-left.wav');
+                            this.stepSoundAudio.loop = true;
+                            this.stepSoundAudio.volume = 0.4;
+                            this.stepSoundAudio.playbackRate = 1.5;
+                            this.stepSoundAudio.currentTime = 0.5;
+                            this.stepSoundAudio.play();
+                            this.isStepSoundPlaying = true;
+                        } catch (e) {}
+                    }
                     this.playAnimation(this.IMAGES_WALKING);
                     if (this.x > leftTargetX) {
                         this.moveLeft(Math.min(4, this.x - leftTargetX));
@@ -333,13 +379,25 @@ class Endboss extends CollidableObject {
                         this.animState = 'hit';
                         animTimer = 0;
                         this.hitFrame = 0;
+                        if (this.isStepSoundPlaying && this.stepSoundAudio) {
+                            try {
+                                this.stepSoundAudio.pause();
+                                this.stepSoundAudio.currentTime = 0.5;
+                            } catch (e) {}
+                            this.isStepSoundPlaying = false;
+                            this.stepSoundAudio = null;
+                        }
+                        setTimeout(() => {
+                            try {
+                                const hitStickSound = new Audio('sounds/endboss-hit.wav');
+                                hitStickSound.volume = 0.25;
+                                hitStickSound.playbackRate = 1.35;
+                                hitStickSound.play();
+                            } catch (e) {}
+                        }, 100);
                     }
                     break;
                 case 'hit':
-                    /**
-                     * Hit animation after walking left
-                     * Set image and update hitFrame for collision frame rendering
-                     */
                     this.img = this.imageCache[this.IMAGES_HIT[this.hitFrame % this.IMAGES_HIT.length]];
                     this.hitFrame++;
                     animTimer += 50;
@@ -349,9 +407,6 @@ class Endboss extends CollidableObject {
                     }
                     break;
                 case 'idle2':
-                    /**
-                     * Idle animation after hit
-                     */
                     this.playAnimation(this.IMAGES_IDLE);
                     animTimer += 50;
                     if (animTimer >= 2000) {
@@ -360,9 +415,36 @@ class Endboss extends CollidableObject {
                     }
                     break;
                 case 'walkingRight':
-                    /**
-                     * Walking right animation and movement (200px, 4px/step)
-                     */
+                    
+                    if (!this.isStepSoundPlayingRight) {
+                        try {
+                            this.stepSoundAudioRight = new Audio('sounds/endboss-steps-right.mp3');
+                            this.stepSoundAudioRight.loop = true;
+                            this.stepSoundAudioRight.volume = 0.15;
+                            this.stepSoundAudioRight.playbackRate = 1.5;
+                            this.stepSoundAudioRight.currentTime = 0.5;
+                            this.stepSoundAudioRight.play();
+                            this.isStepSoundPlayingRight = true;
+                        } catch (e) {}
+                    }
+                    
+                    if (this.isStepSoundPlaying && this.stepSoundAudio) {
+                        try {
+                            this.stepSoundAudio.pause();
+                            this.stepSoundAudio.currentTime = 0.5;
+                        } catch (e) {}
+                        this.isStepSoundPlaying = false;
+                        this.stepSoundAudio = null;
+                    }
+                    
+                    if (this.isStepSoundPlaying && this.stepSoundAudio) {
+                        try {
+                            this.stepSoundAudio.pause();
+                            this.stepSoundAudio.currentTime = 0.5;
+                        } catch (e) {}
+                        this.isStepSoundPlaying = false;
+                        this.stepSoundAudio = null;
+                    }
                     this.playAnimation(this.IMAGES_WALKING);
                     if (this.x < startX) {
                         this.moveRight(Math.min(4, startX - this.x));
@@ -391,12 +473,12 @@ class Endboss extends CollidableObject {
      * @returns {void}
      */
     let now = Date.now();
-    if (!this._lastHitSoundTime || now - this._lastHitSoundTime > 1000) {
+    if (!this.lastHitSoundTime || now - this.lastHitSoundTime > 1000) {
         try {
             const hitSound = new Audio('sounds/endboss-collided.wav');
             hitSound.volume = 0.7;
             hitSound.play();
-            this._lastHitSoundTime = now;
+            this.lastHitSoundTime = now;
         } catch (e) {
     
         }
@@ -430,6 +512,22 @@ class Endboss extends CollidableObject {
      * Starts the death animation for the Endboss.
      */
     startDeathAnimation() {
+    if (this.isStepSoundPlaying && this.stepSoundAudio) {
+        try {
+            this.stepSoundAudio.pause();
+            this.stepSoundAudio.currentTime = 0.5;
+        } catch (e) {}
+        this.isStepSoundPlaying = false;
+        this.stepSoundAudio = null;
+    }
+    if (this.isStepSoundPlayingRight && this.stepSoundAudioRight) {
+        try {
+            this.stepSoundAudioRight.pause();
+            this.stepSoundAudioRight.currentTime = 0.5;
+        } catch (e) {}
+        this.isStepSoundPlayingRight = false;
+        this.stepSoundAudioRight = null;
+    }
     /**
      * Starts the death animation for the Endboss and plays the death sound with fade-out.
      * Sets collidable to false and marks the boss as defeated.

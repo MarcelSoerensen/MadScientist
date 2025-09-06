@@ -139,6 +139,14 @@ class World {
         this.superShotBar = new SuperShotBar();
         this.bombsBar = new BombsBar(65, 50, 5);
         this.gameAlerts = new window.GameAlerts(this.canvas);
+        // Endboss bekommt Charakter-Referenz für Distanzprüfung
+        if (this.level && this.level.enemies) {
+            this.level.enemies.forEach(enemy => {
+                if (enemy instanceof Endboss) {
+                    enemy.setCharacter(this.character);
+                }
+            });
+        }
         this.draw();
         this.run();
     }

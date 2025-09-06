@@ -5,8 +5,8 @@
 class Character extends CollidableObject {
     _jumpSoundPlayed = false;
     _stepSoundEndHandler = null;
-    _stepSoundAudio = null;
-    _isStepSoundPlaying = false;
+    stepSoundAudio = null;
+    isStepSoundPlaying = false;
     /**
      * Moves the character to the right by the given speed
      * @param {number} speed - Movement speed
@@ -392,26 +392,26 @@ class Character extends CollidableObject {
             if (!isJumping) {
                 this._jumpSoundPlayed = false;
             }
-            if (isWalking && !isJumping && !this._isStepSoundPlaying) {
+            if (isWalking && !isJumping && !this.isStepSoundPlaying) {
                 try {
-                    this._stepSoundAudio = new Audio('sounds/character-steps.wav');
-                    this._stepSoundAudio.loop = true;
-                    this._stepSoundAudio.volume = 0.3;
-                    this._stepSoundAudio.playbackRate = 2.3;
-                    this._stepSoundAudio.currentTime = 0;
-                    this._stepSoundAudio.play();
-                    this._isStepSoundPlaying = true;
+                    this.stepSoundAudio = new Audio('sounds/character-steps.wav');
+                    this.stepSoundAudio.loop = true;
+                    this.stepSoundAudio.volume = 0.3;
+                    this.stepSoundAudio.playbackRate = 2.3;
+                    this.stepSoundAudio.currentTime = 0;
+                    this.stepSoundAudio.play();
+                    this.isStepSoundPlaying = true;
                 } catch (e) {
                     
                 }
             }
-            if ((!isWalking || isJumping) && this._isStepSoundPlaying && this._stepSoundAudio) {
+            if ((!isWalking || isJumping) && this.isStepSoundPlaying && this.stepSoundAudio) {
                 try {
-                    this._stepSoundAudio.pause();
-                    this._stepSoundAudio.currentTime = 0;
+                    this.stepSoundAudio.pause();
+                    this.stepSoundAudio.currentTime = 0;
                 } catch (e) {}
-                this._isStepSoundPlaying = false;
-                this._stepSoundAudio = null;
+                this.isStepSoundPlaying = false;
+                this.stepSoundAudio = null;
             }
         }, 60);
 
