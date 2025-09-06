@@ -88,30 +88,72 @@ class HeartsManager extends DrawableObject {
         return enemies.some(enemy => tempHeart.isColliding(enemy));
     }
 
+        /**
+         * Checks minimum distance between two points.
+         */
     checkMinDistance(x1, y1, x2, y2, minDist) {
         const dx = x1 - x2;
         const dy = y1 - y2;
         return Math.sqrt(dx * dx + dy * dy) < minDist;
     }
+
+        /**
+         * Updates all hearts and handles collection/collision.
+         */
     update(character) {
         for (let i = this.hearts.length - 1; i >= 0; i--) {
             const heart = this.hearts[i];
             if (typeof heart.update === 'function') heart.update();
             if (!heart.isCollecting && character && heart.isColliding(character)) {
-                heart.startCollecting(heart.x - 100, 50);
+                if (character.energy < 100) {
+                    this.handleCollectible(heart, character);
+                } else {
+                    this.handleUncollectible(heart);
+                }
             }
             if (heart.isCollecting && heart.collectProgress >= 1) {
-                    this.hearts.splice(i, 1);
-                    this.collectedCount++;
-                    if (character) {
-                        character.energy = Math.min(100, character.energy + 20);
-                        if (character.world && character.world.statusBar) {
-                            character.world.statusBar.setPercentage(character.energy);
-                        }
-                    }
+                this.handleCollectible(heart, character, i);
             }
         }
     }
+
+        /**
+         * Handles collectible heart logic (collect or energy).
+         */
+    handleCollectible(heart, character, index) {
+        if (index === undefined) {
+            heart.startCollecting(heart.x - 100, 50);
+        } else {
+            this.hearts.splice(index, 1);
+            this.collectedCount++;
+            if (character) {
+                character.energy = Math.min(100, character.energy + 20);
+                if (character.world && character.world.statusBar) {
+                    character.world.statusBar.setPercentage(character.energy);
+                }
+            }
+        }
+    }
+
+        /**
+         * Handles uncollectible heart logic (bounce and sound).
+         */
+    handleUncollectible(heart) {
+        heart.bounceActive = true;
+        if (!this.lastNoHeartSoundTime || Date.now() - this.lastNoHeartSoundTime > 1000) {
+            try {
+                const noHeartSound = new Audio('sounds/no-heart.mp3');
+                noHeartSound.volume = 0.7;
+                noHeartSound.play();
+                setTimeout(() => {
+                    noHeartSound.pause();
+                    noHeartSound.currentTime = 0;
+                }, 500);
+            } catch (e) {}
+            this.lastNoHeartSoundTime = Date.now();
+        }
+    }
+
     draw(ctx) {
         this.hearts.forEach(heart => heart.draw(ctx));
     }
