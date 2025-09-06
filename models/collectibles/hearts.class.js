@@ -212,37 +212,8 @@ class HeartsManager extends DrawableObject {
                         character.world.statusBar.setPercentage(character.energy);
                     }
                     heart.startCollecting(heart.x, heart.y - 50);
-                    if (beforeEnergy < 100 && character.energy === 100 && character.world && typeof character.world._superlaserText !== 'undefined') {
-                        character.world._superlaserText = {
-                            text: 'Full Energy',
-                            font: 'bold 50px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
-                            x: character.world.canvas.width / 2,
-                            y: character.world.canvas.height / 2,
-                            scale: 1,
-                            alpha: 1,
-                            duration: 1500,
-                            start: Date.now()
-                        };
-                        try {
-                            const fullEnergySound = new Audio('sounds/full-energy.flac');
-                            fullEnergySound.volume = 0.5;
-                            fullEnergySound.play();
-                        } catch (e) {}
-                        if (character.world._superlaserTextAnim) {
-                            clearInterval(character.world._superlaserTextAnim);
-                        }
-                        character.world._superlaserTextAnim = setInterval(() => {
-                            if (character.world._superlaserText) {
-                                const elapsed = Date.now() - character.world._superlaserText.start;
-                                character.world._superlaserText.scale = 1 + elapsed / 700;
-                                character.world._superlaserText.alpha = Math.max(0, 1 - elapsed / character.world._superlaserText.duration);
-                                if (elapsed > character.world._superlaserText.duration) {
-                                    character.world._superlaserText = null;
-                                    clearInterval(character.world._superlaserTextAnim);
-                                    character.world._superlaserTextAnim = null;
-                                }
-                            }
-                        }, 30);
+                    if (beforeEnergy < 100 && character.energy === 100 && character.world && character.world.gameAlerts) {
+                        character.world.gameAlerts.triggerFullEnergy();
                     }
                 } else if (character.energy >= 100) {
                     if (!heart.bounceActive) heart.triggerBounce();

@@ -104,18 +104,52 @@ class CollectibleBomb extends CollidableObject {
      * @returns {boolean} True if colliding, else false
      */
     isColliding(character) {
-        const charLeft = character.x + (character.offset?.left || 0);
-        const charRight = character.x + character.width - (character.offset?.right || 0);
-        let charTop = character.y + (character.offset?.top || 0);
+        const charRect = this.getCharacterRect(character);
+        const bombRect = this.getBombRect();
+        return this.isRectCollision(charRect, bombRect);
+    }
+
+    /**
+     * Returns the rectangle of the character for collision detection.
+     * @param {Character} character
+     * @returns {{left:number, right:number, top:number, bottom:number}}
+     */
+    getCharacterRect(character) {
+        const left = character.x + (character.offset?.left || 0);
+        const right = character.x + character.width - (character.offset?.right || 0);
+        let top = character.y + (character.offset?.top || 0);
         if (character.jumpOffsetY !== undefined) {
-            charTop += character.jumpOffsetY * 1.5;
+            top += character.jumpOffsetY * 1.5;
         }
-        const charBottom = charTop + character.height - (character.offset?.top || 0) - (character.offset?.bottom || 0);
+        const bottom = top + character.height - (character.offset?.top || 0) - (character.offset?.bottom || 0);
+        return { left, right, top, bottom };
+    }
+
+    /**
+     * Returns the rectangle of the bomb for collision detection.
+     * @returns {{left:number, right:number, top:number, bottom:number}}
+     */
+    getBombRect() {
+        return {
+            left: this.x,
+            right: this.x + this.width,
+            top: this.y,
+            bottom: this.y + this.height
+        };
+    }
+
+    /**
+     * Checks if two rectangles collide.
+     * @param {{left:number, right:number, top:number, bottom:number}} rectA
+     * @param {{left:number, right:number, top:number, bottom:number}} rectB
+     * @returns {boolean}
+     */
+    isRectCollision(rectA, rectB) {
         return (
-            this.x < charRight &&
-            this.x + this.width > charLeft &&
-            this.y < charBottom &&
-            this.y + this.height > charTop
+            rectA.left < rectB.right &&
+            rectA.right > rectB.left &&
+            rectA.top < rectB.bottom &&
+            rectA.bottom > rectB.top
         );
     }
     /**

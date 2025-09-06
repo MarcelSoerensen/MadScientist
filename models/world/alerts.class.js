@@ -1,8 +1,8 @@
-/**
- * Manages and animates all game alert text overlays (Superlaser, Level Complete, Game Over).
- * Usage: Instantiate in World, call showAlert(type, text, options) and draw(ctx) in World.draw().
- */
 class GameAlerts {
+    /**
+     * Creates a new GameAlerts instance for managing animated game alerts.
+     * @param {HTMLCanvasElement} canvas - The game canvas.
+     */
     constructor(canvas) {
         this.canvas = canvas;
         this.activeAlert = null;
@@ -10,9 +10,86 @@ class GameAlerts {
     }
 
     /**
-     * Returns the style object for a given alert type, merged with custom options.
-     * @param {string} type - The type of alert (e.g. 'superlaser', 'levelComplete', 'gameOver', 'fullEnergy').
-     * @param {object} [options] - Custom style options to override defaults.
+     * Plays the sound associated with a given alert type.
+     * @param {string} type - The alert type.
+     */
+    playSound(type) {
+            const sounds = {
+                superlaser: 'sounds/available-superlaser.wav',
+                fullEnergy: 'sounds/full-energy.flac',
+                levelComplete: 'sounds/endboss-death.wav',
+                gameOver: 'sounds/character-death.mp3'
+            };
+            if (sounds[type]) {
+                const audio = new Audio(sounds[type]);
+                audio.volume = 0.5;
+                audio.play();
+            }
+        }
+
+    /**
+     * Shows an alert overlay with animation and sound.
+     * @param {string} type - The alert type.
+     * @param {string} text - The text to display.
+     * @param {object} [options] - Optional style overrides.
+     */
+    showAlert(type, text, options = {}) {
+            const style = this.getAlertStyle(type, options);
+            this.activeAlert = {
+                type,
+                text,
+                start: Date.now(),
+                duration: style.duration,
+                font: style.font,
+                scale: 1,
+                alpha: 1
+            };
+            this.playSound(type);
+            this.startAlertAnimation();
+        }
+
+    /**
+     * Triggers the Superlaser alert with animation and sound.
+     * @param {number} superShots - Number of available superlasers.
+     * @returns {void}
+     */
+    /**
+     * Triggers the Superlaser alert with the current number of available supershots.
+     * @param {number} superShots - Number of available supershots.
+     */
+    triggerSuperlaser(superShots) {
+        this.showAlert('superlaser', `Superlaser ${superShots}`);
+        this.playSound('superlaser');
+    }
+
+    /**
+     * Triggers the Full Energy alert.
+     */
+    triggerFullEnergy() {
+        this.showAlert('fullEnergy', 'Volle Energie!');
+        this.playSound('fullEnergy');
+    }
+
+    /**
+     * Triggers the Level Complete alert.
+     */
+    triggerLevelComplete() {
+        this.showAlert('levelComplete', 'Level Complete');
+        this.playSound('levelComplete');
+    }
+
+    /**
+     * Triggers the Game Over alert.
+     */
+    triggerGameOver() {
+        this.showAlert('gameOver', 'Game Over');
+        this.playSound('gameOver');
+    }
+
+    /**
+     * Returns the style object for a given alert type.
+     * @param {string} type - The alert type.
+     * @param {object} [options] - Optional style overrides.
      * @returns {object} The style object for the alert.
      */
     getAlertStyle(type, options = {}) {
@@ -38,10 +115,7 @@ class GameAlerts {
     }
 
     /**
-     * Starts the interval for animating the current alert overlay.
-     * Handles scaling and fading of the alert text.
-     * Clears the interval when the animation is finished.
-     * @returns {void}
+     * Starts the animation interval for the current alert overlay.
      */
     startAlertAnimation() {
         if (this.alertAnim) clearInterval(this.alertAnim);
@@ -61,10 +135,9 @@ class GameAlerts {
 
     /**
      * Shows a new alert overlay with animation and styling.
-     * @param {string} type - The type of alert (e.g. 'superlaser', 'levelComplete', 'gameOver', 'fullEnergy').
-     * @param {string} text - The text to display in the alert.
-     * @param {object} [options] - Custom style options to override defaults.
-     * @returns {void}
+     * @param {string} type - The alert type.
+     * @param {string} text - The text to display.
+     * @param {object} [options] - Optional style overrides.
      */
     showAlert(type, text, options = {}) {
         const style = this.getAlertStyle(type, options);
@@ -113,9 +186,24 @@ class GameAlerts {
     }
 
     /**
+     * Triggers the Level Complete alert with animation and sound.
+     * @returns {void}
+     */
+    triggerLevelComplete() {
+        this.showAlert('levelComplete', 'Level Complete', {
+            font: 'bold 60px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
+            duration: 2000
+        });
+        try {
+            const levelCompleteSound = new Audio('sounds/endboss-death.wav');
+            levelCompleteSound.volume = 0.5;
+            levelCompleteSound.play();
+        } catch (e) {}
+    }
+
+    /**
      * Draws the current alert overlay if active.
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     * @returns {void}
      */
     draw(ctx) {
         if (!this.activeAlert) return;

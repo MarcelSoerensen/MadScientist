@@ -64,13 +64,10 @@ class World {
             laser.height *= 2;
             laser.isSuperShot = true;
             try {
-                const superlaserSound = new Audio('sounds/superlaser-shot.wav');
-                superlaserSound.volume = 0.5;
-                superlaserSound.play();
-            } catch (e) {
-            }
-            
-            /* Superlaser text is not displayed when shooting */
+                const shotSound = new Audio('sounds/superlaser-shot.wav');
+                shotSound.volume = 0.5;
+                shotSound.play();
+            } catch (e) {}
             this.laserBeams.push(laser);
             this.energyBallManager.collectedCount = Math.max(0, this.energyBallManager.collectedCount - 5);
             this.laserActive = true;
@@ -133,13 +130,12 @@ class World {
         this.canvas = canvas;
         this.keyboard = keyboard;
         this.setWorld();
-        this.energyBallManager = new EnergyBallManager(4000, 600, this.character);
+    this.energyBallManager = new EnergyBallManager(4000, 600, this.character, [], this);
         this.bombManager = new BombManager(4000, 600, this.character, this.energyBallManager.balls);
         this.heartsManager = new HeartsManager(4000, 600, this.character, [], this.energyBallManager.balls, this.bombManager.bombs);
         this.superShotBar = new SuperShotBar();
         this.bombsBar = new BombsBar(65, 50, 5);
         this.gameAlerts = new window.GameAlerts(this.canvas);
-        // Endboss bekommt Charakter-Referenz für Distanzprüfung
         if (this.level && this.level.enemies) {
             this.level.enemies.forEach(enemy => {
                 if (enemy instanceof Endboss) {
@@ -296,6 +292,14 @@ class World {
      * @returns {void}
      */
     checkCollisions() {
+        if (this.checkGameOver()) return;
+    window.collisionManager.checkEnemyCollision(this);
+    window.collisionManager.checkBombCollision(this);
+    window.collisionManager.checkLaserCollision(this);
+    window.collisionManager.checkEndbossStickCollision(this);
+    }
+
+    checkGameOver() {
         if (this.gameOver || (this.character.isDead && this.character.isDead())) {
             if (!this.gameOver) {
                 this.gameOver = true;
@@ -304,8 +308,11 @@ class World {
                     this.keyboard.D = false;
                     this.keyboard.Y = false;
                 }
+                if (this.gameAlerts && typeof this.gameAlerts.showAlert === 'function') {
+                    this.gameAlerts.showAlert('gameOver', 'Game Over');
+                }
             }
-            return;
+            return true;
         }
         if (window.endbossDefeated) {
             if (!this.gameOver) {
@@ -315,105 +322,15 @@ class World {
                     this.keyboard.D = false;
                     this.keyboard.Y = false;
                 }
-                this.gameAlerts.showAlert('levelComplete', 'Level Complete');
+                this.gameAlerts.triggerLevelComplete && typeof this.gameAlerts.triggerLevelComplete === 'function'
+                    ? this.gameAlerts.triggerLevelComplete()
+                    : this.gameAlerts.showAlert('levelComplete', 'Level Complete');
             }
-            return;
+            return true;
         }
-        /**
-         * Checks collision between character and all enemies, including Endboss stick hit detection.
-         * Triggers character hit and updates status bar if collision occurs.
-         */
-        this.level.enemies.forEach(enemy => {
-            if (!enemy.collidable) {
-                return;
-            }
-
-            let collided = this.character.isColliding(enemy);
-
-            if (enemy instanceof Endboss && enemy.animState === 'hit' && enemy.collidable) {
-                const stickRect = enemy.getStickCollisionRect && enemy.getStickCollisionRect();
-                if (stickRect) {
-                    const charRect = {
-                        x: this.character.x + (this.character.offset?.left || 0),
-                        y: this.character.y + (this.character.offset?.top || 0),
-                        width: this.character.width - ((this.character.offset?.left || 0) + (this.character.offset?.right || 0)),
-                        height: this.character.height - ((this.character.offset?.top || 0) + (this.character.offset?.bottom || 0))
-                    };
-                    const stickCollision =
-                        charRect.x < stickRect.x + stickRect.width &&
-                        charRect.x + charRect.width > stickRect.x &&
-                        charRect.y < stickRect.y + stickRect.height &&
-                        charRect.y + charRect.height > stickRect.y;
-                    if (stickCollision) {
-                        collided = true;
-                    }
-                }
-            }
-
-            
-            this.throwableObjects.forEach(bomb => {
-                if (bomb.isExploding) {
-                    const bombRect = bomb.getExplosionRect();
-                    const enemyRect = {
-                        x: enemy.x + (enemy.offset?.left || 0),
-                        y: enemy.y + (enemy.offset?.top || 0),
-                        width: enemy.width - ((enemy.offset?.left || 0) + (enemy.offset?.right || 0)),
-                        height: enemy.height - ((enemy.offset?.top || 0) + (enemy.offset?.bottom || 0))
-                    };
-                    const overlap =
-                        enemyRect.x < bombRect.x + bombRect.width &&
-                        enemyRect.x + enemyRect.width > bombRect.x &&
-                        enemyRect.y < bombRect.y + bombRect.height &&
-                        enemyRect.y + enemyRect.height > bombRect.y;
-                    const contained =
-                        enemyRect.x >= bombRect.x &&
-                        enemyRect.y >= bombRect.y &&
-                        enemyRect.x + enemyRect.width <= bombRect.x + bombRect.width &&
-                        enemyRect.y + enemyRect.height <= bombRect.y + bombRect.height;
-                    if (overlap || contained) {
-                        console.log('Bomb Kollision:', { bomb, enemy, overlap, contained });
-                        if (enemy instanceof Endboss) {
-                            enemy.triggerElectricHurt(5);
-                        } else if (typeof enemy.startDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
-                            enemy.startDeathAnimation();
-                        }
-                    }
-                }
-            });
-
-            if (collided) {
-                const now = Date.now();
-                if (!this._lastCollisionSoundTime || now - this._lastCollisionSoundTime > 500) {
-                    try {
-                        const collisionSound = new Audio('sounds/character-collided.wav');
-                        collisionSound.volume = 0.5;
-                        collisionSound.play();
-                        this._lastCollisionSoundTime = now;
-                    } catch (e) {
-                    }
-                }
-                this.character.hit();
-                this.statusBar.setPercentage(this.character.energy);
-            }
-            this.laserBeams.forEach(laser => {
-                if (laser.isColliding(enemy)) {
-                    if (enemy instanceof Endboss) {
-                        if (laser.isSuperShot) {
-                            enemy.triggerElectricHurt(5);
-                        } else {
-                            enemy.triggerElectricHurt(1);
-                        }
-                    } else {
-                        if (laser.isSuperShot) {
-                            enemy.triggerElectricHurt(3);
-                        } else {
-                            enemy.triggerElectricHurt(1);
-                        }
-                    }
-                }
-            });
-        });
+        return false;
     }
+
 
     /**
      * Main rendering loop for the game. Handles camera translation and draws all game objects.
@@ -438,7 +355,6 @@ class World {
             this.bombsBar.draw(this.ctx);
         }
 
-        // Textanimationen (Superlaser, Level Complete, Game Over)
         this.gameAlerts.draw(this.ctx);
 
         let self = this;

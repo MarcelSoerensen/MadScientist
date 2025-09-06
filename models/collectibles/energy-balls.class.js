@@ -173,11 +173,12 @@ class EnergyBallManager {
      * @param {object} character - The main character object.
      * @param {Array} enemies - Array of enemy objects.
      */
-    constructor(worldWidth, worldHeight, character, enemies = []) {
+    constructor(worldWidth, worldHeight, character, enemies = [], world = null) {
         this.balls = [];
         this.collectedCount = 0;
         this.maxBalls = 20;
-    const minDist = 100;
+        this.world = world;
+        const minDist = 100;
         let tries = 0;
 
         let jumpHeight = character && typeof character.jumpHeight === 'number' ? character.jumpHeight : 100;
@@ -218,6 +219,7 @@ class EnergyBallManager {
      */
     update(character) {
         const barY = 50; 
+        let prevSuperShots = Math.floor(this.collectedCount / 5);
         for (let i = this.balls.length - 1; i >= 0; i--) {
             const ball = this.balls[i];
             ball.updatePulse();
@@ -229,7 +231,15 @@ class EnergyBallManager {
             }
             if (ball.isCollecting && ball.collectProgress >= 1) {
                 this.balls.splice(i, 1);
+                let prevSuperShots = this.world.superShotBar?.getSuperShots?.() ?? Math.floor(this.collectedCount / 5);
                 this.collectedCount++;
+                if (this.world && this.world.superShotBar) {
+                    this.world.superShotBar.setBalls(this.collectedCount);
+                }
+                let newSuperShots = this.world.superShotBar?.getSuperShots?.() ?? Math.floor(this.collectedCount / 5);
+                if (this.world && this.world.gameAlerts && newSuperShots > prevSuperShots) {
+                    this.world.gameAlerts.triggerSuperlaser(newSuperShots);
+                }
             }
         }
     }

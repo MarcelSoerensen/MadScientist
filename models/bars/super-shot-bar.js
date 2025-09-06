@@ -4,6 +4,12 @@
  * Displays the collected energy balls as a filling bar using a graphic. Shows the number of available super shots.
  */
 class SuperShotBar extends DrawableObject {
+    /**
+     * Gibt die aktuelle Anzahl der verfügbaren Supershots zurück
+     */
+    getSuperShots() {
+        return Math.floor(this.collectedCount / this.maxBalls);
+    }
     /** @type {string} Path to the bar image */
     imgPath = 'img/Projectile/Laser/skeleton-animation_2.png';
     /** @type {number} Number of collected balls (tracked internally) */
