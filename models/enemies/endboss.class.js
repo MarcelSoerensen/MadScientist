@@ -1,12 +1,6 @@
-// Instanz der ausgelagerten Animationen-Klasse
+
 const endbossAnimations = new EndbossAnimations();
-/**
- * Represents the end boss enemy in the game. Handles all logic, animation, and collision for the boss.
- * Extends CollidableObject.
- *
- * @class Endboss
- * @extends CollidableObject
- */
+
 class Endboss extends CollidableObject {
     stepSoundAudioRight = null;
     isStepSoundPlayingRight = false;
@@ -30,16 +24,9 @@ class Endboss extends CollidableObject {
         }, 500);
     }
     lastHitSoundTime = 0;
-    /**
-     * Indicates if the Endboss is collidable (for collision detection)
-     * @type {boolean}
-     */
+   
     collidable = true;
-    /**
-     * Returns the current stick collision rectangle during hit animation.
-     * The rectangle matches the visible blue stick frame.
-     * @returns {{x: number, y: number, width: number, height: number}|null}
-     */
+    
     getStickCollisionRect() {
         if (this.animState !== 'hit') return null;
         const hitFrame = this.hitFrame || 0;
@@ -57,12 +44,7 @@ class Endboss extends CollidableObject {
         };
     }
 
-    /**
-     * Draws the collision frame for the Endboss.
-     * Draws a red rectangle for the main body and a blue rectangle for the stick during hit animation.
-     * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
-     * @returns {void}
-     */
+    
     drawCollisionFrame(ctx) {
         if (!this.collidable) return;
         let leftOffset = this.offset.left;
@@ -93,51 +75,27 @@ class Endboss extends CollidableObject {
         }
         ctx.restore();
     }
-    /**
-     * Reference to the character instance.
-     * @type {Character|null}
-     */
+    
     character = null;
 
-    /**
-     * Sets the character reference for the Endboss.
-     * @param {Character} character - The character instance
-     */
+    
     setCharacter(character) {
         this.character = character;
     }
     
-    /**
-     * Number of times the Endboss was hit by a laser.
-     * @type {number}
-     */
+    
     laserHitCount = 0;
 
-    /**
-     * Indicates if the death animation is currently playing.
-     * @type {boolean}
-     */
+   
     isDeadAnimationPlaying = false;
-    /**
-     * Height of the Endboss.
-     * @type {number}
-     */
+    
     height = 600;
-    /**
-     * Width of the Endboss.
-     * @type {number}
-     */
+   
     width = 600;
-    /**
-     * Y position of the Endboss.
-     * @type {number}
-     */
+    
     y = -60;
 
-    /**
-     * Collision offset values for precise hit detection.
-     * @type {{top: number, left: number, right: number, bottom: number}}
-     */
+   
     offset = {
         top: 280,
         left: 245,
@@ -147,23 +105,14 @@ class Endboss extends CollidableObject {
 
    
     
-    /**
-     * Indicates if the Endboss is currently hit by a laser.
-     * @type {boolean}
-     */
+    
     isElectricHurt = false;
     
-    /**
-     * Timeout handler for electric hurt animation.
-     * @type {number|null}
-     */
+    
     electricHurtTimeout = null;
 
 
-    /**
-     * Creates a new Endboss instance.
-     * Initializes position and starts animation.
-     */
+   
     constructor() {
         super().loadImage('img/Enemy Characters/Enemy Character07/Idle/Idle_00.png');
     this.loadImages(endbossAnimations.IMAGES_IDLE);
@@ -179,180 +128,201 @@ class Endboss extends CollidableObject {
                 const dist = Math.abs(this.x - this.character.x);
                 if (dist <= 500) {
                     this.animationStarted = true;
-                    this.animate();
+                    this.endbossAnimation();
                     clearInterval(this.checkProximityInterval);
                 }
             }
         }, 100);
     }
 
-    /**
-     * Starts the Endboss idle animation and movement.
-     * Sets up intervals for animation and death logic.
-     */
-    animate() {
-        let deathFrame = 0;
-        let deathDone = false;
-        this.animState = 'idle'; 
-        let animTimer = 0;
+    endbossAnimation() {
+        this.startEndbossAnimationIntervals();
+    }
+
+    
+    startEndbossAnimationIntervals() {
+        this.deathFrame = 0;
+        this.deathDone = false;
+        this.animTimer = 0;
+        this.animState = 'idle';
         this.hitFrame = 0;
-        let startX = this.x;
-        let leftTargetX = startX - 200;
+        this.startX = this.x;
+        this.leftTargetX = this.startX - 200;
         this.animInterval = setInterval(() => {
-            if (!this.animationStarted) {
-                this.img = this.imageCache[endbossAnimations.IMAGES_IDLE[0]];
-                return;
-            }
-            if (this.laserHitCount >= 25 && !this.isElectricHurt) {
-                if (!deathDone) {
-                    this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[deathFrame]];
-                    deathFrame++;
-                    if (deathFrame >= endbossAnimations.IMAGES_DEATH.length) {
-                        deathFrame = endbossAnimations.IMAGES_DEATH.length - 1;
-                        deathDone = true;
-                    }
-                } else {
-                    this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[endbossAnimations.IMAGES_DEATH.length - 1]];
-                }
-                return;
-            }
-            if (this.isElectricHurt) {
-                this.playAnimation(endbossAnimations.IMAGES_GET_ELECTRIC);
-                return;
-            }
-            switch (this.animState) {
-                case 'idle':
-                    
-                    if (this.isStepSoundPlayingRight && this.stepSoundAudioRight) {
-                        try {
-                            this.stepSoundAudioRight.pause();
-                            this.stepSoundAudioRight.currentTime = 0.5;
-                        } catch (e) {}
-                        this.isStepSoundPlayingRight = false;
-                        this.stepSoundAudioRight = null;
-                    }
-                    this.playAnimation(endbossAnimations.IMAGES_IDLE);
-                    animTimer += 50;
-                    if (animTimer >= 2000) {
-                        this.animState = 'walkingLeft';
-                        animTimer = 0;
-                    }
-                    break;
-                case 'walkingLeft':
-                    
-                    if (!this.isStepSoundPlaying) {
-                        try {
-                            this.stepSoundAudio = new Audio('sounds/endboss-steps-left.mp3');
-                            this.stepSoundAudio.loop = true;
-                            this.stepSoundAudio.volume = 0.4;
-                            this.stepSoundAudio.playbackRate = 1.5;
-                            this.stepSoundAudio.currentTime = 0.5;
-                            this.stepSoundAudio.play();
-                            this.isStepSoundPlaying = true;
-                        } catch (e) {}
-                    }
-                    this.playAnimation(endbossAnimations.IMAGES_WALKING);
-                    if (this.x > leftTargetX) {
-                        this.moveLeft(Math.min(4, this.x - leftTargetX));
-                    }
-                    animTimer += 50;
-                    if (this.x <= leftTargetX || animTimer >= 5000) {
-                        this.animState = 'hit';
-                        animTimer = 0;
-                        this.hitFrame = 0;
-                        if (this.isStepSoundPlaying && this.stepSoundAudio) {
-                            try {
-                                this.stepSoundAudio.pause();
-                                this.stepSoundAudio.currentTime = 0.5;
-                            } catch (e) {}
-                            this.isStepSoundPlaying = false;
-                            this.stepSoundAudio = null;
-                        }
-                        setTimeout(() => {
-                            try {
-                                const hitStickSound = new Audio('sounds/endboss-hit.mp3');
-                                hitStickSound.volume = 0.25;
-                                hitStickSound.playbackRate = 1.35;
-                                hitStickSound.play();
-                            } catch (e) {}
-                        }, 100);
-                    }
-                    break;
-                case 'hit':
-                    this.img = this.imageCache[endbossAnimations.IMAGES_HIT[this.hitFrame % endbossAnimations.IMAGES_HIT.length]];
-                    this.hitFrame++;
-                    animTimer += 50;
-                    if (this.hitFrame >= endbossAnimations.IMAGES_HIT.length) {
-                        this.animState = 'idle2';
-                        animTimer = 0;
-                    }
-                    break;
-                case 'idle2':
-                    this.playAnimation(endbossAnimations.IMAGES_IDLE);
-                    animTimer += 50;
-                    if (animTimer >= 2000) {
-                        this.animState = 'walkingRight';
-                        animTimer = 0;
-                    }
-                    break;
-                case 'walkingRight':
-                    
-                    if (!this.isStepSoundPlayingRight) {
-                        try {
-                            this.stepSoundAudioRight = new Audio('sounds/endboss-steps-right.mp3');
-                            this.stepSoundAudioRight.loop = true;
-                            this.stepSoundAudioRight.volume = 0.15;
-                            this.stepSoundAudioRight.playbackRate = 1.5;
-                            this.stepSoundAudioRight.currentTime = 0.5;
-                            this.stepSoundAudioRight.play();
-                            this.isStepSoundPlayingRight = true;
-                        } catch (e) {}
-                    }
-                    
-                    if (this.isStepSoundPlaying && this.stepSoundAudio) {
-                        try {
-                            this.stepSoundAudio.pause();
-                            this.stepSoundAudio.currentTime = 0.5;
-                        } catch (e) {}
-                        this.isStepSoundPlaying = false;
-                        this.stepSoundAudio = null;
-                    }
-                    
-                    if (this.isStepSoundPlaying && this.stepSoundAudio) {
-                        try {
-                            this.stepSoundAudio.pause();
-                            this.stepSoundAudio.currentTime = 0.5;
-                        } catch (e) {}
-                        this.isStepSoundPlaying = false;
-                        this.stepSoundAudio = null;
-                    }
-                    this.playAnimation(endbossAnimations.IMAGES_WALKING);
-                    if (this.x < startX) {
-                        this.moveRight(Math.min(4, startX - this.x));
-                    }
-                    animTimer += 50;
-                    if (this.x >= startX || animTimer >= 5000) {
-                        this.x = startX;
-                        this.animState = 'idle';
-                        animTimer = 0;
-                    }
-                    break;
-            }
+            if (!this.animationStarted) return this.idleAnimation();
+            if (this.laserHitCount >= 25 && !this.isElectricHurt) return this.deathAnimation(this.deathFrame, this.deathDone);
+            if (this.isElectricHurt) return this.electricHurtAnimation();
+            this.handleAnimState();
         }, 50);
     }
+    handleAnimState() {
+        switch (this.animState) {
+            case 'idle': this.handleIdle(); break;
+            case 'walkingLeft': this.handleWalkingLeft(); break;
+            case 'hit': this.handleHit(); break;
+            case 'idle2': this.handleIdle2(); break;
+            case 'walkingRight': this.handleWalkingRight(); break;
+        }
+    }
+
+    handleIdle() {
+        this.idleAnimation();
+        this.animTimer += 50;
+        if (this.animTimer >= 2000) {
+            this.animState = 'walkingLeft';
+            this.animTimer = 0;
+        }
+    }
+
+    handleWalkingLeft() {
+        this.walkingLeftAnimation(this.leftTargetX, this.animTimer);
+        this.animTimer += 50;
+        if (this.x <= this.leftTargetX || this.animTimer >= 5000) {
+            this.animState = 'hit';
+            this.animTimer = 0;
+            this.hitFrame = 0;
+        }
+    }
+
+    handleHit() {
+        this.hitAnimation(this.animTimer);
+        this.animTimer += 50;
+        if (this.hitFrame >= endbossAnimations.IMAGES_HIT.length) {
+            this.animState = 'idle2';
+            this.animTimer = 0;
+        }
+    }
+
+    handleIdle2() {
+        this.idleAnimation();
+        this.animTimer += 50;
+        if (this.animTimer >= 2000) {
+            this.animState = 'walkingRight';
+            this.animTimer = 0;
+        }
+    }
+
+    handleWalkingRight() {
+        this.walkingRightAnimation(this.startX, this.animTimer);
+        this.animTimer += 50;
+        if (this.x >= this.startX || this.animTimer >= 5000) {
+            this.x = this.startX;
+            this.animState = 'idle';
+            this.animTimer = 0;
+        }
+    }
+
+    idleAnimation() {
+        if (this.isStepSoundPlayingRight && this.stepSoundAudioRight) {
+            try {
+                this.stepSoundAudioRight.pause();
+                this.stepSoundAudioRight.currentTime = 0.5;
+            } catch (e) {}
+            this.isStepSoundPlayingRight = false;
+            this.stepSoundAudioRight = null;
+        }
+        this.playAnimation(endbossAnimations.IMAGES_IDLE);
+    }
+
+    walkingLeftAnimation(leftTargetX, animTimer) {
+        this.walkingLeftSoundCreation();
+        this.walkingLeftMovement(leftTargetX);
+        if (this.x <= leftTargetX || animTimer >= 5000) {
+            this.walkingLeftStepSoundStop();
+        }
+    }
+
+    walkingLeftSoundCreation() {
+        if (!this.isStepSoundPlaying) {
+            try {
+                this.stepSoundAudio = new Audio('sounds/endboss-steps-left.mp3');
+                this.stepSoundAudio.loop = true;
+                this.stepSoundAudio.volume = 0.4;
+                this.stepSoundAudio.playbackRate = 1.5;
+                this.stepSoundAudio.currentTime = 0.5;
+                this.stepSoundAudio.play();
+                this.isStepSoundPlaying = true;
+            } catch (e) {}
+        }
+    }
+
+    walkingLeftStepSoundStop() {
+        if (this.isStepSoundPlaying && this.stepSoundAudio) {
+            try {
+                this.stepSoundAudio.pause();
+                this.stepSoundAudio.currentTime = 0.5;
+            } catch (e) {}
+            this.isStepSoundPlaying = false;
+            this.stepSoundAudio = null;
+        }
+    }
+
+    walkingLeftMovement(leftTargetX) {
+        this.playAnimation(endbossAnimations.IMAGES_WALKING);
+        if (this.x > leftTargetX) {
+            this.moveLeft(Math.min(4, this.x - leftTargetX));
+        }
+    }
+
+    hitAnimation(animTimer) {
+        this.img = this.imageCache[endbossAnimations.IMAGES_HIT[this.hitFrame % endbossAnimations.IMAGES_HIT.length]];
+        this.hitFrame++;
+        if (this.hitFrame === 1) {
+            try {
+                const hitStickSound = new Audio('sounds/endboss-hit.mp3');
+                hitStickSound.volume = 0.25;
+                hitStickSound.playbackRate = 1.35;
+                hitStickSound.play();
+            } catch (e) {}
+        }
+    }
+
+    walkingRightAnimation(startX, animTimer) {
+        if (!this.isStepSoundPlayingRight) {
+            try {
+                this.stepSoundAudioRight = new Audio('sounds/endboss-steps-right.mp3');
+                this.stepSoundAudioRight.loop = true;
+                this.stepSoundAudioRight.volume = 0.15;
+                this.stepSoundAudioRight.playbackRate = 1.5;
+                this.stepSoundAudioRight.currentTime = 0.5;
+                this.stepSoundAudioRight.play();
+                this.isStepSoundPlayingRight = true;
+            } catch (e) {}
+        }
+        if (this.isStepSoundPlaying && this.stepSoundAudio) {
+            try {
+                this.stepSoundAudio.pause();
+                this.stepSoundAudio.currentTime = 0.5;
+            } catch (e) {}
+            this.isStepSoundPlaying = false;
+            this.stepSoundAudio = null;
+        }
+        this.playAnimation(endbossAnimations.IMAGES_WALKING);
+        if (this.x < startX) {
+            this.moveRight(Math.min(4, startX - this.x));
+        }
+    }
+
+    deathAnimation(deathFrame, deathDone) {
+        if (!deathDone) {
+            this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[deathFrame]];
+            deathFrame++;
+            if (deathFrame >= endbossAnimations.IMAGES_DEATH.length) {
+                deathFrame = endbossAnimations.IMAGES_DEATH.length - 1;
+                deathDone = true;
+            }
+        } else {
+            this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[endbossAnimations.IMAGES_DEATH.length - 1]];
+        }
+    }
+
+    electricHurtAnimation() {
+        this.playAnimation(endbossAnimations.IMAGES_GET_ELECTRIC);
+    }
     
-    /**
-     * Registers an electric laser hit and triggers the electric hurt animation.
-     * Animation runs for 500ms (normal) or 1000ms (supershot) and then returns to normal state.
-     * @param {number} [force=1] - Number of hits to apply (1=normal shot, 5=supershot)
-     */
+    
     triggerElectricHurt(force = 1) {
-    /**
-     * Registers an electric laser hit and triggers the electric hurt animation and sound.
-     * Plays hit sound only every 1 second. Triggers death animation at 25 hits.
-     * @param {number} [force=1] - Number of hits to apply (1=normal shot, 5=supershot)
-     * @returns {void}
-     */
+    
     let now = Date.now();
     if (!this.lastHitSoundTime || now - this.lastHitSoundTime > 1000) {
         try {
@@ -384,61 +354,76 @@ class Endboss extends CollidableObject {
             this.isElectricHurt = false;
             this.electricHurtTimeout = null;
             if (this.laserHitCount === 25) {
-                this.startDeathAnimation();
+                this.handleDeathAnimation();
             }
         }, hurtDuration);
     }
 
+
     /**
-     * Starts the death animation for the Endboss.
+     * Handler für die Endboss-Todesanimation (Schema & Stil wie bei Character)
      */
-    startDeathAnimation() {
-    if (this.isStepSoundPlaying && this.stepSoundAudio) {
-        try {
-            this.stepSoundAudio.pause();
-            this.stepSoundAudio.currentTime = 0.5;
-        } catch (e) {}
-        this.isStepSoundPlaying = false;
-        this.stepSoundAudio = null;
-    }
-    if (this.isStepSoundPlayingRight && this.stepSoundAudioRight) {
-        try {
-            this.stepSoundAudioRight.pause();
-            this.stepSoundAudioRight.currentTime = 0.5;
-        } catch (e) {}
-        this.isStepSoundPlayingRight = false;
-        this.stepSoundAudioRight = null;
-    }
-    /**
-     * Starts the death animation for the Endboss and plays the death sound with fade-out.
-     * Sets collidable to false and marks the boss as defeated.
-     * @returns {void}
-     */
-    try {
-        const deathSound = new Audio('sounds/endboss-death.mp3');
-        deathSound.volume = 0.4;
-        deathSound.play();
-        let fadeSteps = 10;
-        let fadeInterval = 100;
-        let currentStep = 0;
-        let fade = setInterval(() => {
-            currentStep++;
-            deathSound.volume = Math.max(0, 0.4 * (1 - currentStep / fadeSteps));
-            if (currentStep >= fadeSteps) {
-                clearInterval(fade);
-            }
-        }, fadeInterval);
-    } catch (e) {
-    
-    }
-    this.collidable = false;
-    this.isDeadAnimationPlaying = true;
-    this.currentImage = 0;
-    window.endbossDefeated = true;
+    handleDeathAnimation() {
+        this.stopStepSounds();
+        this.playEndbossDeathSound();
+        this.collidable = false;
+        this.isDeadAnimationPlaying = true;
+        this.currentImage = 0;
+        window.endbossDefeated = true;
         if (this.animInterval) {
             clearInterval(this.animInterval);
             this.animInterval = null;
         }
+        this.deathAnimation();
+        setTimeout(() => this.startBlinking(), 2500);
+        setTimeout(() => this.removeEnemy(), 4000);
+    }
+
+    /**
+     * Stoppt alle Schritt-Sounds des Endboss
+     */
+    stopStepSounds() {
+        if (this.isStepSoundPlaying && this.stepSoundAudio) {
+            try {
+                this.stepSoundAudio.pause();
+                this.stepSoundAudio.currentTime = 0.5;
+            } catch (e) {}
+            this.isStepSoundPlaying = false;
+            this.stepSoundAudio = null;
+        }
+        if (this.isStepSoundPlayingRight && this.stepSoundAudioRight) {
+            try {
+                this.stepSoundAudioRight.pause();
+                this.stepSoundAudioRight.currentTime = 0.5;
+            } catch (e) {}
+            this.isStepSoundPlayingRight = false;
+            this.stepSoundAudioRight = null;
+        }
+    }
+
+    /**
+     * Spielt den Endboss-Todes-Sound mit Fade-Out
+     */
+    playEndbossDeathSound() {
+        try {
+            const deathSound = new Audio('sounds/endboss-death.mp3');
+            deathSound.volume = 0.4;
+            deathSound.play();
+            let fadeSteps = 10;
+            let fadeInterval = 100;
+            let currentStep = 0;
+            let fade = setInterval(() => {
+                currentStep++;
+                deathSound.volume = Math.max(0, 0.4 * (1 - currentStep / fadeSteps));
+                if (currentStep >= fadeSteps) {
+                    clearInterval(fade);
+                }
+            }, fadeInterval);
+        } catch (e) {}
+    }
+
+    
+    deathAnimation() {
         let deathFrame = 0;
         this.deathAnimInterval = setInterval(() => {
             if (deathFrame < endbossAnimations.IMAGES_DEATH.length) {
@@ -449,27 +434,16 @@ class Endboss extends CollidableObject {
                 clearInterval(this.deathAnimInterval);
             }
         }, 50);
-
-        setTimeout(() => {
-            this.startBlinking();
-        }, 2500);
-        setTimeout(() => {
-            this.removeEnemy();
-        }, 4000);
     }
 
-    /**
-     * Starts blinking animation after death.
-     */
+    
     startBlinking() {
         this.blinkInterval = setInterval(() => {
             this.visible = !this.visible;
         }, 200);
     }
 
-    /**
-     * Removes the Endboss from the game.
-     */
+    
     removeEnemy() {
         this.visible = false;
         this.collidable = false;

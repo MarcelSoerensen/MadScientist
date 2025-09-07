@@ -52,8 +52,8 @@ class CollisionManager {
                     if (this.isCollision(enemyRect, bombRect)) {
                         if (enemy instanceof Endboss) {
                             enemy.triggerElectricHurt(5);
-                        } else if (typeof enemy.startDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
-                            enemy.startDeathAnimation();
+                        } else if (typeof enemy.handleDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
+                            enemy.handleDeathAnimation();
                         }
                     }
                 }

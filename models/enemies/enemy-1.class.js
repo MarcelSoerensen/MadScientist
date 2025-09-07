@@ -194,7 +194,7 @@ class EnemyOne extends CollidableObject {
             this.isElectricHurt = false;
             this.electricHurtTimeout = null;
             if (this.laserHitCount === 3) {
-                this.startDeathAnimation();
+                this.handleDeathAnimation();
             }
         }, 700);
     }
@@ -202,7 +202,7 @@ class EnemyOne extends CollidableObject {
     /**
      * Starts the death animation for the enemy
      */
-    startDeathAnimation() {
+    handleDeathAnimation() {
         this.isDeadAnimationPlaying = true;
         this.currentImage = 0;
         this.collidable = false;
