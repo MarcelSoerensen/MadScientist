@@ -1,3 +1,5 @@
+// Instanz der ausgelagerten Animationen-Klasse
+const endbossAnimations = new EndbossAnimations();
 /**
  * Represents the end boss enemy in the game. Handles all logic, animation, and collision for the boss.
  * Extends CollidableObject.
@@ -104,26 +106,7 @@ class Endboss extends CollidableObject {
     setCharacter(character) {
         this.character = character;
     }
-    /**
-     * Array of idle animation image paths.
-     * @type {string[]}
-     */
-    IMAGES_IDLE = [
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_00.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_01.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_02.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_03.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_04.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_05.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_06.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_07.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_08.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_09.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_10.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_11.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_12.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_13.png',
-    ];
+    
     /**
      * Number of times the Endboss was hit by a laser.
      * @type {number}
@@ -162,109 +145,7 @@ class Endboss extends CollidableObject {
         bottom: 160
     };
 
-    /**
-     * Array of walking animation image paths.
-     * @type {string[]}
-     */
-    IMAGES_WALKING = [
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_00.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_01.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_02.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_03.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_04.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_05.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_06.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_07.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_08.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_09.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_10.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_11.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_12.png',
-        'img/Enemy Characters/Enemy Character07/Idle/Idle_13.png',
-    ];
-
-    /**
-     * Array of hit animation image paths.
-     * @type {string[]}
-     */
-    IMAGES_HIT = [
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_00.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_01.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_02.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_03.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_04.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_05.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_06.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_07.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_08.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_09.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_10.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_11.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_12.png',
-        'img/Enemy Characters/Enemy Character07/Hit/Hit_13.png',
-    ];
-
-    /**
-     * Array of electric hurt animation image paths.
-     * @type {string[]}
-     */
-    IMAGES_GET_ELECTRIC = [
-        'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_0.png',
-        'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_1.png',
-        'img/Enemy Characters/Enemy Character07/Get Electric/Get Electric_2.png',
-    ];
-
-    /**
-     * Array of death animation image paths.
-     * @type {string[]}
-     */
-    IMAGES_DEATH = [
-        'img/Enemy Characters/Enemy Character07/Death/Death_00.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_01.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_02.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_03.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_04.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_05.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_06.png',    
-        'img/Enemy Characters/Enemy Character07/Death/Death_07.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_08.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_09.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_10.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_11.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_12.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_13.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_14.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_15.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_16.png',        
-        'img/Enemy Characters/Enemy Character07/Death/Death_17.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_18.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_19.png',    
-        'img/Enemy Characters/Enemy Character07/Death/Death_20.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_21.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_22.png',
-        'img/Enemy Characters/Enemy Character07/Death/Death_23.png',
-    ];  
-
-    /**
-     * Array of walking animation image paths.
-     * @type {string[]}
-     */
-    IMAGES_WALKING = [
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_00.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_01.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_02.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_03.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_04.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_05.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_06.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_07.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_08.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_09.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_10.png',  
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_11.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_12.png',
-        'img/Enemy Characters/Enemy Character07/Walk/Walk_13.png',
-    ];
+   
     
     /**
      * Indicates if the Endboss is currently hit by a laser.
@@ -285,13 +166,13 @@ class Endboss extends CollidableObject {
      */
     constructor() {
         super().loadImage('img/Enemy Characters/Enemy Character07/Idle/Idle_00.png');
-        this.loadImages(this.IMAGES_IDLE);
-        this.loadImages(this.IMAGES_WALKING);
+    this.loadImages(endbossAnimations.IMAGES_IDLE);
+    this.loadImages(endbossAnimations.IMAGES_WALKING);
         this.x = (1952 * 2 - 900);
-        this.loadImages(this.IMAGES_GET_ELECTRIC);
-        this.loadImages(this.IMAGES_DEATH);
+    this.loadImages(endbossAnimations.IMAGES_GET_ELECTRIC);
+    this.loadImages(endbossAnimations.IMAGES_DEATH);
         this.visible = true;
-        this.loadImages(this.IMAGES_HIT);
+    this.loadImages(endbossAnimations.IMAGES_HIT);
         
         this.checkProximityInterval = setInterval(() => {
             if (this.character && !this.animationStarted) {
@@ -319,24 +200,24 @@ class Endboss extends CollidableObject {
         let leftTargetX = startX - 200;
         this.animInterval = setInterval(() => {
             if (!this.animationStarted) {
-                this.img = this.imageCache[this.IMAGES_IDLE[0]];
+                this.img = this.imageCache[endbossAnimations.IMAGES_IDLE[0]];
                 return;
             }
             if (this.laserHitCount >= 25 && !this.isElectricHurt) {
                 if (!deathDone) {
-                    this.img = this.imageCache[this.IMAGES_DEATH[deathFrame]];
+                    this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[deathFrame]];
                     deathFrame++;
-                    if (deathFrame >= this.IMAGES_DEATH.length) {
-                        deathFrame = this.IMAGES_DEATH.length - 1;
+                    if (deathFrame >= endbossAnimations.IMAGES_DEATH.length) {
+                        deathFrame = endbossAnimations.IMAGES_DEATH.length - 1;
                         deathDone = true;
                     }
                 } else {
-                    this.img = this.imageCache[this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1]];
+                    this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[endbossAnimations.IMAGES_DEATH.length - 1]];
                 }
                 return;
             }
             if (this.isElectricHurt) {
-                this.playAnimation(this.IMAGES_GET_ELECTRIC);
+                this.playAnimation(endbossAnimations.IMAGES_GET_ELECTRIC);
                 return;
             }
             switch (this.animState) {
@@ -350,7 +231,7 @@ class Endboss extends CollidableObject {
                         this.isStepSoundPlayingRight = false;
                         this.stepSoundAudioRight = null;
                     }
-                    this.playAnimation(this.IMAGES_IDLE);
+                    this.playAnimation(endbossAnimations.IMAGES_IDLE);
                     animTimer += 50;
                     if (animTimer >= 2000) {
                         this.animState = 'walkingLeft';
@@ -370,7 +251,7 @@ class Endboss extends CollidableObject {
                             this.isStepSoundPlaying = true;
                         } catch (e) {}
                     }
-                    this.playAnimation(this.IMAGES_WALKING);
+                    this.playAnimation(endbossAnimations.IMAGES_WALKING);
                     if (this.x > leftTargetX) {
                         this.moveLeft(Math.min(4, this.x - leftTargetX));
                     }
@@ -398,16 +279,16 @@ class Endboss extends CollidableObject {
                     }
                     break;
                 case 'hit':
-                    this.img = this.imageCache[this.IMAGES_HIT[this.hitFrame % this.IMAGES_HIT.length]];
+                    this.img = this.imageCache[endbossAnimations.IMAGES_HIT[this.hitFrame % endbossAnimations.IMAGES_HIT.length]];
                     this.hitFrame++;
                     animTimer += 50;
-                    if (this.hitFrame >= this.IMAGES_HIT.length) {
+                    if (this.hitFrame >= endbossAnimations.IMAGES_HIT.length) {
                         this.animState = 'idle2';
                         animTimer = 0;
                     }
                     break;
                 case 'idle2':
-                    this.playAnimation(this.IMAGES_IDLE);
+                    this.playAnimation(endbossAnimations.IMAGES_IDLE);
                     animTimer += 50;
                     if (animTimer >= 2000) {
                         this.animState = 'walkingRight';
@@ -445,7 +326,7 @@ class Endboss extends CollidableObject {
                         this.isStepSoundPlaying = false;
                         this.stepSoundAudio = null;
                     }
-                    this.playAnimation(this.IMAGES_WALKING);
+                    this.playAnimation(endbossAnimations.IMAGES_WALKING);
                     if (this.x < startX) {
                         this.moveRight(Math.min(4, startX - this.x));
                     }
@@ -560,11 +441,11 @@ class Endboss extends CollidableObject {
         }
         let deathFrame = 0;
         this.deathAnimInterval = setInterval(() => {
-            if (deathFrame < this.IMAGES_DEATH.length) {
-                this.img = this.imageCache[this.IMAGES_DEATH[deathFrame]];
+            if (deathFrame < endbossAnimations.IMAGES_DEATH.length) {
+                this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[deathFrame]];
                 deathFrame++;
             } else {
-                this.img = this.imageCache[this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1]];
+                this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[endbossAnimations.IMAGES_DEATH.length - 1]];
                 clearInterval(this.deathAnimInterval);
             }
         }, 50);
