@@ -278,6 +278,12 @@ class Endboss extends CollidableObject {
     }
 
     walkingRightAnimation(startX, animTimer) {
+        this.walkingRightSoundCreation();
+        this.walkingRightStepSoundStop();
+        this.walkingRightMovement(startX);
+    }
+
+    walkingRightSoundCreation() {
         if (!this.isStepSoundPlayingRight) {
             try {
                 this.stepSoundAudioRight = new Audio('sounds/endboss-steps-right.mp3');
@@ -289,6 +295,9 @@ class Endboss extends CollidableObject {
                 this.isStepSoundPlayingRight = true;
             } catch (e) {}
         }
+    }
+
+    walkingRightStepSoundStop() {
         if (this.isStepSoundPlaying && this.stepSoundAudio) {
             try {
                 this.stepSoundAudio.pause();
@@ -297,6 +306,9 @@ class Endboss extends CollidableObject {
             this.isStepSoundPlaying = false;
             this.stepSoundAudio = null;
         }
+    }
+
+    walkingRightMovement(startX) {
         this.playAnimation(endbossAnimations.IMAGES_WALKING);
         if (this.x < startX) {
             this.moveRight(Math.min(4, startX - this.x));
