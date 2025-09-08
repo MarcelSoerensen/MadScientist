@@ -51,7 +51,11 @@ class CollisionManager {
                     const bombRect = bomb.getExplosionRect();
                     if (this.isCollision(enemyRect, bombRect)) {
                         if (enemy instanceof Endboss) {
-                            enemy.triggerElectricHurt(5);
+                            if (enemy instanceof Endboss && enemy.handler) {
+                                enemy.handler.handleHurtAnimation(enemy, 5);
+                            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                                enemy.triggerElectricHurt(5);
+                            }
                         } else if (typeof enemy.handleDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
                             enemy.handleDeathAnimation();
                         }
@@ -68,15 +72,31 @@ class CollisionManager {
                 if (laser.isColliding(enemy)) {
                     if (enemy instanceof Endboss) {
                         if (laser.isSuperShot) {
-                            enemy.triggerElectricHurt(5);
+                            if (enemy instanceof Endboss && enemy.handler) {
+                                enemy.handler.handleHurtAnimation(enemy, 5);
+                            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                                enemy.triggerElectricHurt(5);
+                            }
                         } else {
-                            enemy.triggerElectricHurt(1);
+                            if (enemy instanceof Endboss && enemy.handler) {
+                                enemy.handler.handleHurtAnimation(enemy, 1);
+                            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                                enemy.triggerElectricHurt(1);
+                            }
                         }
                     } else {
                         if (laser.isSuperShot) {
-                            enemy.triggerElectricHurt(3);
+                            if (enemy instanceof Endboss && enemy.handler) {
+                                enemy.handler.handleHurtAnimation(enemy, 3);
+                            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                                enemy.triggerElectricHurt(3);
+                            }
                         } else {
-                            enemy.triggerElectricHurt(1);
+                            if (enemy instanceof Endboss && enemy.handler) {
+                                enemy.handler.handleHurtAnimation(enemy, 1);
+                            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                                enemy.triggerElectricHurt(1);
+                            }
                         }
                     }
                 }

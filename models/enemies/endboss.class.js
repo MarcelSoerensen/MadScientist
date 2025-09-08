@@ -1,6 +1,3 @@
-
-const endbossAnimations = new EndbossAnimations();
-
 class Endboss extends CollidableObject {
     stepSoundAudioRight = null;
     isStepSoundPlayingRight = false;
@@ -114,29 +111,30 @@ class Endboss extends CollidableObject {
 
    
     constructor() {
-        super().loadImage('img/Enemy Characters/Enemy Character07/Idle/Idle_00.png');
-    this.loadImages(endbossAnimations.IMAGES_IDLE);
-    this.loadImages(endbossAnimations.IMAGES_WALKING);
-        this.x = (1952 * 2 - 900);
-    this.loadImages(endbossAnimations.IMAGES_GET_ELECTRIC);
-    this.loadImages(endbossAnimations.IMAGES_DEATH);
-        this.visible = true;
-    this.loadImages(endbossAnimations.IMAGES_HIT);
-        
-        this.checkProximityInterval = setInterval(() => {
-            if (this.character && !this.animationStarted) {
-                const dist = Math.abs(this.x - this.character.x);
-                if (dist <= 500) {
-                    this.animationStarted = true;
-                    this.endbossAnimation();
-                    clearInterval(this.checkProximityInterval);
+            super().loadImage('img/Enemy Characters/Enemy Character07/Idle/Idle_00.png');
+            this.anim = new EndbossAnimations();
+            this.loadImages(this.anim.IMAGES_IDLE);
+            this.loadImages(this.anim.IMAGES_WALKING);
+            this.x = (1952 * 2 - 900);
+            this.loadImages(this.anim.IMAGES_GET_ELECTRIC);
+            this.loadImages(this.anim.IMAGES_DEATH);
+            this.visible = true;
+            this.loadImages(this.anim.IMAGES_HIT);
+            this.handler = new EndbossHandling();
+            this.checkProximityInterval = setInterval(() => {
+                if (this.character && !this.animationStarted) {
+                    const dist = Math.abs(this.x - this.character.x);
+                    if (dist <= 500) {
+                        this.animationStarted = true;
+                        this.handler.animateEndboss(this);
+                        clearInterval(this.checkProximityInterval);
+                    }
                 }
-            }
-        }, 100);
+            }, 100);
     }
 
-    endbossAnimation() {
-        this.startEndbossAnimationIntervals();
+    animateEndboss() {
+        this.handler.startEndbossAnimationIntervals(this);
     }
 
     
@@ -152,65 +150,14 @@ class Endboss extends CollidableObject {
             if (!this.animationStarted) return this.idleAnimation();
             if (this.laserHitCount >= 25 && !this.isElectricHurt) return this.deathAnimation(this.deathFrame, this.deathDone);
             if (this.isElectricHurt) return this.electricHurtAnimation();
-            this.handleAnimState();
+            this.handler.handleAnimState(this);
         }, 50);
     }
-    handleAnimState() {
-        switch (this.animState) {
-            case 'idle': this.handleIdle(); break;
-            case 'walkingLeft': this.handleWalkingLeft(); break;
-            case 'hit': this.handleHit(); break;
-            case 'idle2': this.handleIdle2(); break;
-            case 'walkingRight': this.handleWalkingRight(); break;
-        }
-    }
 
-    handleIdle() {
-        this.idleAnimation();
-        this.animTimer += 50;
-        if (this.animTimer >= 2000) {
-            this.animState = 'walkingLeft';
-            this.animTimer = 0;
-        }
-    }
 
-    handleWalkingLeft() {
-        this.walkingLeftAnimation(this.leftTargetX, this.animTimer);
-        this.animTimer += 50;
-        if (this.x <= this.leftTargetX || this.animTimer >= 5000) {
-            this.animState = 'hit';
-            this.animTimer = 0;
-            this.hitFrame = 0;
-        }
-    }
 
-    handleHit() {
-        this.hitAnimation(this.animTimer);
-        this.animTimer += 50;
-        if (this.hitFrame >= endbossAnimations.IMAGES_HIT.length) {
-            this.animState = 'idle2';
-            this.animTimer = 0;
-        }
-    }
 
-    handleIdle2() {
-        this.idleAnimation();
-        this.animTimer += 50;
-        if (this.animTimer >= 2000) {
-            this.animState = 'walkingRight';
-            this.animTimer = 0;
-        }
-    }
 
-    handleWalkingRight() {
-        this.walkingRightAnimation(this.startX, this.animTimer);
-        this.animTimer += 50;
-        if (this.x >= this.startX || this.animTimer >= 5000) {
-            this.x = this.startX;
-            this.animState = 'idle';
-            this.animTimer = 0;
-        }
-    }
 
     idleAnimation() {
         if (this.isStepSoundPlayingRight && this.stepSoundAudioRight) {
@@ -221,7 +168,7 @@ class Endboss extends CollidableObject {
             this.isStepSoundPlayingRight = false;
             this.stepSoundAudioRight = null;
         }
-        this.playAnimation(endbossAnimations.IMAGES_IDLE);
+    this.playAnimation(this.anim.IMAGES_IDLE);
     }
 
     walkingLeftAnimation(leftTargetX, animTimer) {
@@ -258,14 +205,14 @@ class Endboss extends CollidableObject {
     }
 
     walkingLeftMovement(leftTargetX) {
-        this.playAnimation(endbossAnimations.IMAGES_WALKING);
+    this.playAnimation(this.anim.IMAGES_WALKING);
         if (this.x > leftTargetX) {
             this.moveLeft(Math.min(4, this.x - leftTargetX));
         }
     }
 
     hitAnimation(animTimer) {
-        this.img = this.imageCache[endbossAnimations.IMAGES_HIT[this.hitFrame % endbossAnimations.IMAGES_HIT.length]];
+    this.img = this.imageCache[this.anim.IMAGES_HIT[this.hitFrame % this.anim.IMAGES_HIT.length]];
         this.hitFrame++;
         if (this.hitFrame === 1) {
             try {
@@ -309,7 +256,7 @@ class Endboss extends CollidableObject {
     }
 
     walkingRightMovement(startX) {
-        this.playAnimation(endbossAnimations.IMAGES_WALKING);
+        this.playAnimation(this.anim.IMAGES_WALKING);
         if (this.x < startX) {
             this.moveRight(Math.min(4, startX - this.x));
         }
@@ -317,93 +264,24 @@ class Endboss extends CollidableObject {
 
     deathAnimation(deathFrame, deathDone) {
         if (!deathDone) {
-            this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[deathFrame]];
+            this.img = this.imageCache[this.anim.IMAGES_DEATH[deathFrame]];
             deathFrame++;
-            if (deathFrame >= endbossAnimations.IMAGES_DEATH.length) {
-                deathFrame = endbossAnimations.IMAGES_DEATH.length - 1;
+            if (deathFrame >= this.anim.IMAGES_DEATH.length) {
+                deathFrame = this.anim.IMAGES_DEATH.length - 1;
                 deathDone = true;
             }
         } else {
-            this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[endbossAnimations.IMAGES_DEATH.length - 1]];
+            this.img = this.imageCache[this.anim.IMAGES_DEATH[this.anim.IMAGES_DEATH.length - 1]];
         }
     }
 
     electricHurtAnimation() {
-        this.playAnimation(endbossAnimations.IMAGES_GET_ELECTRIC);
+        this.playAnimation(this.anim.IMAGES_GET_ELECTRIC);
     }
     
     
-    handleHurtAnimation(force = 1) {
-        this.handleHurtSound(force);
-        if (this.laserHitCount >= 25) return;
-        if (this.isElectricHurt) return;
-        this.handleHurtStatus(force);
-        this.handleHurtTimeout(force);
-    }
-
-    handleHurtSound(force) {
-        let now = Date.now();
-        if (!this.lastHitSoundTime || now - this.lastHitSoundTime > 1000) {
-            try {
-                const hitSound = new Audio('sounds/endboss-collided.mp3');
-                hitSound.volume = 0.7;
-                hitSound.play();
-                this.lastHitSoundTime = now;
-            } catch (e) {}
-        }
-    }
-
-    handleHurtStatus(force) {
-        let now = Date.now();
-        if (force === 5) {
-            if (!this.lastSuperShotTime) this.lastSuperShotTime = 0;
-            if (now - this.lastSuperShotTime < 500) return;
-        }
-        if (force === 1 && (now - this.lastHitTime < 500)) return;
-        if (force === 1) this.lastHitTime = now;
-        this.laserHitCount += force;
-        if (force === 5) this.lastSuperShotTime = now;
-        if (this.laserHitCount > 25) this.laserHitCount = 25;
-        this.isElectricHurt = true;
-    }
-
-    handleHurtTimeout(force) {
-        if (this.electricHurtTimeout) {
-            clearTimeout(this.electricHurtTimeout);
-        }
-        let hurtDuration = (force === 5) ? 1000 : 500;
-        this.electricHurtTimeout = setTimeout(() => {
-            this.isElectricHurt = false;
-            this.electricHurtTimeout = null;
-            if (this.laserHitCount === 25) {
-                this.handleDeathAnimation();
-            }
-        }, hurtDuration);
-    }
 
 
-    /**
-     * Handler für die Endboss-Todesanimation (Schema & Stil wie bei Character)
-     */
-    handleDeathAnimation() {
-        this.stopStepSounds();
-        this.playEndbossDeathSound();
-        this.collidable = false;
-        this.isDeadAnimationPlaying = true;
-        this.currentImage = 0;
-        window.endbossDefeated = true;
-        if (this.animInterval) {
-            clearInterval(this.animInterval);
-            this.animInterval = null;
-        }
-        this.deathAnimation();
-        setTimeout(() => this.startBlinking(), 2500);
-        setTimeout(() => this.removeEnemy(), 4000);
-    }
-
-    /**
-     * Stoppt alle Schritt-Sounds des Endboss
-     */
     stopStepSounds() {
         if (this.isStepSoundPlaying && this.stepSoundAudio) {
             try {
@@ -445,11 +323,11 @@ class Endboss extends CollidableObject {
     deathAnimation() {
         let deathFrame = 0;
         this.deathAnimInterval = setInterval(() => {
-            if (deathFrame < endbossAnimations.IMAGES_DEATH.length) {
-                this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[deathFrame]];
+            if (deathFrame < this.anim.IMAGES_DEATH.length) {
+                this.img = this.imageCache[this.anim.IMAGES_DEATH[deathFrame]];
                 deathFrame++;
             } else {
-                this.img = this.imageCache[endbossAnimations.IMAGES_DEATH[endbossAnimations.IMAGES_DEATH.length - 1]];
+                this.img = this.imageCache[this.anim.IMAGES_DEATH[this.anim.IMAGES_DEATH.length - 1]];
                 clearInterval(this.deathAnimInterval);
             }
         }, 50);
