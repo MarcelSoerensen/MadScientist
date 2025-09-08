@@ -2,9 +2,9 @@
  * Represents a collectible heart object.
  */
 class CollectibleHeart extends CollidableObject {
-        /**
-         * Creates a CollectibleHeart instance.
-         */
+    /**
+     * Creates a CollectibleHeart instance.
+     */
     constructor(x, y) {
         super();
         this.x = x;
@@ -23,9 +23,9 @@ class CollectibleHeart extends CollidableObject {
         this.fadeAlpha = 1;
     }
 
-        /**
-         * Checks collision with the character.
-         */
+    /**
+     * Checks collision with the character.
+     */
     isColliding(character) {
         const charRect = character.getCollisionRect();
         const heartRect = {
@@ -37,9 +37,9 @@ class CollectibleHeart extends CollidableObject {
         return window.collisionManager.isCollision(charRect, heartRect);
     }
 
-        /**
-         * Starts the collecting animation for the heart.
-         */
+    /**
+     * Starts the collecting animation for the heart.
+     */
     startCollecting() {
         if (this.isCollecting) return;
         this.isCollecting = true;
@@ -58,24 +58,24 @@ class CollectibleHeart extends CollidableObject {
         } catch (e) {}
     }
 
-        /**
-         * Updates pulse and collecting animation.
-         */
+    /**
+     * Updates pulse and collecting animation.
+     */
     updatePulse() {
         this.updatePulseAnimation();
         this.updateCollectingAnimation();
     }
 
-        /**
-         * Updates pulse animation.
-         */
+    /**
+     * Updates pulse animation.
+     */
     updatePulseAnimation() {
         this.fadeScale = 1;
     }
 
-        /**
-         * Updates collecting animation.
-         */
+    /**
+     * Updates collecting animation.
+     */
     updateCollectingAnimation() {
         if (this.isCollecting) {
             if (this.collectProgress === undefined) this.collectProgress = 0;
@@ -83,9 +83,9 @@ class CollectibleHeart extends CollidableObject {
         }
     }
 
-        /**
-         * Draws the heart on the canvas.
-         */
+    /**
+     * Draws the heart on the canvas.
+     */
     draw(ctx) {
         if (this.collected && !this.isCollecting) return;
         if (this.bounceActive) {
@@ -97,9 +97,9 @@ class CollectibleHeart extends CollidableObject {
         }
     }
 
-        /**
-         * Draws the bounce animation.
-         */
+    /**
+     * Draws the bounce animation.
+     */
     drawBounce(ctx) {
         ctx.save();
         this.bounceProgress = (this.bounceProgress || 0) + 0.08;
@@ -117,9 +117,9 @@ class CollectibleHeart extends CollidableObject {
         ctx.restore();
     }
 
-        /**
-         * Draws the heart image.
-         */
+    /**
+     * Draws the heart image.
+     */
     drawImage(ctx) {
         ctx.save();
         let t = performance.now() * 0.004;
@@ -129,9 +129,9 @@ class CollectibleHeart extends CollidableObject {
         ctx.restore();
     }
 
-        /**
-         * Draws the collecting animation.
-         */
+    /**
+     * Draws the collecting animation.
+     */
     drawCollectingAnimation(ctx) {
         ctx.save();
         if (this.collectProgress === undefined) this.collectProgress = 0;

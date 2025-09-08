@@ -2,9 +2,9 @@
  * Represents a collectible energy ball object.
  */
 class EnergyBall extends CollidableObject {
-        /**
-         * Creates an EnergyBall instance.
-         */
+    /**
+     * Creates an EnergyBall instance.
+     */
     constructor(x, y) {
         super();
         this.x = x;
@@ -26,27 +26,27 @@ class EnergyBall extends CollidableObject {
         this.targetY = 0;
     }
 
-        /**
-         * Checks collision with the character.
-         */
+    /**
+     * Checks collision with the character.
+     */
     isColliding(character) {
         const charRect = character.getCollisionRect();
         const ballRect = { x: this.x, y: this.y, width: this.width, height: this.height };
         return window.collisionManager.isCollision(charRect, ballRect);
     }
 
-        /**
-         * Starts the collecting animation for the energy ball.
-         */
+    /**
+     * Starts the collecting animation for the energy ball.
+     */
     startCollecting(targetX, targetY) {
         if (this.isCollecting) return;
         this.startCollectingAnimation(targetX, targetY);
         this.playCollectingSound();
     }
 
-        /**
-         * Starts the collecting animation (internal).
-         */
+    /**
+     * Starts the collecting animation (internal).
+     */
     startCollectingAnimation(targetX, targetY) {
         this.isCollecting = true;
         this.collectProgress = 0;
@@ -64,9 +64,9 @@ class EnergyBall extends CollidableObject {
         if (this.duration < 1) this.duration = 1;
     }
 
-        /**
-         * Plays the collecting sound effect.
-         */
+    /**
+     * Plays the collecting sound effect.
+     */
     playCollectingSound() {
         try {
             const collectedSound = new Audio('sounds/collected-energyball.mp3');
@@ -74,17 +74,17 @@ class EnergyBall extends CollidableObject {
         } catch (e) {}
     }
 
-        /**
-         * Updates pulse and collecting animation.
-         */
+    /**
+     * Updates pulse and collecting animation.
+     */
     updatePulse() {
         this.updatePulseAnimation();
         this.updateCollectingAnimation();
     }
 
-        /**
-         * Updates pulse animation.
-         */
+    /**
+     * Updates pulse animation.
+     */
     updatePulseAnimation() {
         const step = 0.2;
         if (this.pulseUp) {
@@ -98,9 +98,9 @@ class EnergyBall extends CollidableObject {
         }
     }
 
-        /**
-         * Updates collecting animation.
-         */
+    /**
+     * Updates collecting animation.
+     */
     updateCollectingAnimation() {
         if (this.isCollecting) {
             if (!this.duration) this.duration = 1;
@@ -120,9 +120,9 @@ class EnergyBall extends CollidableObject {
         }
     }
 
-        /**
-         * Draws the energy ball on the canvas.
-         */
+    /**
+     * Draws the energy ball on the canvas.
+     */
     draw(ctx) {
         let offsetX = (this.baseSize - this.width) / 2;
         let offsetY = (this.baseSize - this.height) / 2;
@@ -138,9 +138,9 @@ class EnergyBall extends CollidableObject {
         this.drawImage(ctx, offsetX, offsetY, scale, alpha);
     }
 
-        /**
-         * Draws the electric effect.
-         */
+    /**
+     * Draws the electric effect.
+     */
     drawElectricEffect(ctx, scale, alpha) {
         ctx.save();
         let t = performance.now() * 0.005;
@@ -161,9 +161,9 @@ class EnergyBall extends CollidableObject {
         ctx.restore();
     }
 
-        /**
-         * Draws the energy ball image.
-         */
+    /**
+     * Draws the energy ball image.
+     */
     drawImage(ctx, offsetX, offsetY, scale, alpha) {
         ctx.save();
         ctx.globalAlpha = alpha;

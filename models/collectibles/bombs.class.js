@@ -2,9 +2,9 @@
  * Represents a collectible bomb object.
  */
 class CollectibleBomb extends CollidableObject {
-        /**
-         * Creates a CollectibleBomb instance.
-         */
+    /**
+     * Creates a CollectibleBomb instance.
+     */
     constructor(x, y) {
         super();
         this.x = x;
@@ -25,18 +25,18 @@ class CollectibleBomb extends CollidableObject {
         this.startHeight = this.height;
     }
 
-        /**
-         * Checks collision with the character.
-         */
+    /**
+     * Checks collision with the character.
+     */
     isColliding(character) {
         const charRect = character.getCollisionRect();
         const bombRect = this.getBombRect();
         return window.collisionManager.isCollision(charRect, bombRect);
     }
 
-        /**
-         * Returns the bomb's rectangle for collision.
-         */
+    /**
+     * Returns the bomb's rectangle for collision.
+     */
     getBombRect() {
         return {
             x: this.x,
@@ -46,9 +46,9 @@ class CollectibleBomb extends CollidableObject {
         };
     }
 
-        /**
-         * Checks rectangle collision between two objects.
-         */
+    /**
+     * Checks rectangle collision between two objects.
+     */
     isRectCollision(rectA, rectB) {
         return (
             rectA.left < rectB.right &&
@@ -58,9 +58,9 @@ class CollectibleBomb extends CollidableObject {
         );
     }
 
-        /**
-         * Starts the collecting animation for the bomb.
-         */
+    /**
+     * Starts the collecting animation for the bomb.
+     */
     startCollecting(targetX, targetY) {
         if (this.isCollecting) return;
         this.isCollecting = true;
@@ -83,24 +83,24 @@ class CollectibleBomb extends CollidableObject {
         if (this.duration < 1) this.duration = 1;
     }
 
-        /**
-         * Updates the bomb (animation, collection).
-         */
+    /**
+     * Updates the bomb (animation, collection).
+     */
     update() {
         this.updateCollectingAnimation();
     }
 
-        /**
-         * Updates collecting animation.
-         */
+    /**
+     * Updates collecting animation.
+     */
     updateCollectingAnimation() {
         this.updateCollectingProgress();
         this.updateCollectingTransform();
     }
 
-        /**
-         * Updates collecting progress.
-         */
+    /**
+     * Updates collecting progress.
+     */
     updateCollectingProgress() {
         if (this.isCollecting) {
             if (!this.duration) this.duration = 1;
@@ -108,9 +108,9 @@ class CollectibleBomb extends CollidableObject {
         }
     }
 
-        /**
-         * Updates collecting transform (position, size).
-         */
+    /**
+     * Updates collecting transform (position, size).
+     */
     updateCollectingTransform() {
         if (this.isCollecting) {
             const done = this.collectProgress >= 1;
@@ -123,9 +123,9 @@ class CollectibleBomb extends CollidableObject {
         }
     }
 
-        /**
-         * Draws the bomb on the canvas.
-         */
+    /**
+     * Draws the bomb on the canvas.
+     */
     draw(ctx) {
         ctx.save();
         if (!this.isCollecting) {

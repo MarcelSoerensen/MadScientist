@@ -2,9 +2,9 @@
  * Manages bomb collectibles in the game world.
  */
 class BombManager extends DrawableObject {
-        /**
-         * Creates a BombManager instance.
-         */   
+    /**
+     * Creates a BombManager instance.
+     */   
     constructor(levelWidth, levelHeight, character, energyBalls = [], enemies = []) {
         super();
         this.bombs = [];
@@ -14,9 +14,9 @@ class BombManager extends DrawableObject {
         this.placeBombs(levelWidth, levelHeight, energyBalls, enemies);
     }
 
-        /**
-         * Places bombs in the world at valid positions.
-         */
+    /**
+     * Places bombs in the world at valid positions.
+     */
     placeBombs(levelWidth, levelHeight, energyBalls = [], enemies = []) {
         let tries = 0;
         let bombsToPlace = this.maxBombs;
@@ -45,9 +45,9 @@ class BombManager extends DrawableObject {
         return enemies.some(enemy => tempBomb.isColliding(enemy));
     }
 
-        /**
-         * Generates a valid bomb position.
-         */
+    /**
+     * Generates a valid bomb position.
+     */
     generateBombPosition(levelWidth, lowerCount) {
         let lowerY = 330;
         let upperY = 170 + (this.character && typeof this.character.jumpHeight === 'number' ? this.character.jumpHeight / 2 : 50);
@@ -61,34 +61,35 @@ class BombManager extends DrawableObject {
         return { x, y };
     }
 
-        /**
-         * Checks if a bomb is too close to other bombs.
-         */
+    /**
+     * Checks if a bomb is too close to other bombs.
+     */
     checkDistanceToOtherBombs(x, y) {
         const minDist = 100;
         return this.bombs.some(b => this.checkMinDistance(b.x, b.y, x, y, minDist));
     }
 
-        /**
-         * Checks if a bomb is too close to energy balls.
-         */
+    /**
+     * Checks if a bomb is too close to energy balls.
+     */
     checkDistanceToEnergyBalls(x, y, energyBalls) {
         const minDist = 100;
         return energyBalls.some(e => this.checkMinDistance(e.x, e.y, x, y, minDist));
     }
 
         /**
-         * Checks minimum distance between two points.
-         */
+    /**
+     * Checks minimum distance between two points.
+     */
     checkMinDistance(x1, y1, x2, y2, minDist) {
         const dx = x1 - x2;
         const dy = y1 - y2;
         return Math.sqrt(dx * dx + dy * dy) < minDist;
     }
 
-        /**
-         * Updates all bombs (animation, collection).
-         */
+    /**
+     * Updates all bombs (animation, collection).
+     */
     update(character) {
         const barY = 50;
         for (let i = this.bombs.length - 1; i >= 0; i--) {
@@ -108,10 +109,10 @@ class BombManager extends DrawableObject {
             bomb.startCollecting(bomb.originX - 100, barY);
         }
     }
-    
-        /**
-         * Draws all bombs on the canvas.
-         */
+
+    /**
+     * Draws all bombs on the canvas.
+     */
     draw(ctx) {
         this.bombs.forEach(bomb => bomb.draw(ctx));
     }
