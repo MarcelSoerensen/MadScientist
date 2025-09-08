@@ -1,4 +1,10 @@
+/**
+ * Handles all character animation logic and image arrays for the main character.
+ */
 class CharacterAnimations {
+    /**
+     * Image paths for the character's idle animation.
+     */
     IMAGES_IDLE = [
         'img/Main Characters/Gun01/Idle/Idle_00.png',
         'img/Main Characters/Gun01/Idle/Idle_01.png',
@@ -16,6 +22,9 @@ class CharacterAnimations {
         'img/Main Characters/Gun01/Idle/Idle_13.png',
     ];
     
+    /**
+     * Image paths for the character's walking animation.
+     */
     IMAGES_WALKING = [
         'img/Main Characters/Gun01/Walk/Walk_00.png',
         'img/Main Characters/Gun01/Walk/Walk_01.png',
@@ -33,6 +42,9 @@ class CharacterAnimations {
         'img/Main Characters/Gun01/Walk/Walk_13.png',
     ];
 
+    /**
+     * Starts the jump animation for the character.
+     */
     jumpAnimation(character) {
         character.jumpFrame = 0;
         character.maxJumpHeight = 100;
@@ -40,6 +52,9 @@ class CharacterAnimations {
         this.animateJumpUp(character, this.IMAGES_JUMPING);
     }
 
+    /**
+     * Animates the upward movement of the jump.
+     */
     animateJumpUp(character, imageArray) {
         character.img = character.imageCache[imageArray[character.jumpFrame]];
         character.jumpOffsetY = -(character.jumpFrame / character.totalJumpFrames) * character.maxJumpHeight;
@@ -53,6 +68,9 @@ class CharacterAnimations {
         }
     }
 
+    /**
+     * Holds the character at the top of the jump if conditions are met.
+     */
     holdJumpOnTop(character, imageArray) {
         const maxJumpDistance = 150;
         const distance = Math.abs(character.x - character.startJumpX);
@@ -65,6 +83,9 @@ class CharacterAnimations {
         }
     }
 
+    /**
+     * Animates the downward movement of the jump.
+     */
     animateJumpDown(character, imageArray) {
         let delay = this.JUMP_DELAYS_DOWN[imageArray.length - 1 - character.jumpFrame] || 60;
         character.img = character.imageCache[imageArray[character.jumpFrame]];
@@ -80,7 +101,9 @@ class CharacterAnimations {
         }
     }
 
-
+    /**
+     * Image paths for the character's jump animation.
+     */
     IMAGES_JUMPING = [
         'img/Main Characters/Gun01/Jump/Jump_00.png',
         'img/Main Characters/Gun01/Jump/Jump_01.png',
@@ -94,6 +117,9 @@ class CharacterAnimations {
         'img/Main Characters/Gun01/Jump/Jump_09.png',
     ];
 
+    /**
+     * Plays the death animation for the character.
+     */
     deathAnimation(character) {
             let frame = 0;
             const delays = new Array(this.IMAGES_DEAD.length).fill(30);
@@ -110,6 +136,9 @@ class CharacterAnimations {
             animateDeathFrame();
         }
 
+    /**
+     * Image paths for the character's death animation.
+     */
     IMAGES_DEAD = [
         'img/Main Characters/Gun01/Death/Death_00.png',
         'img/Main Characters/Gun01/Death/Death_01.png',
@@ -156,6 +185,10 @@ class CharacterAnimations {
         'img/Main Characters/Gun01/Death/Death_42.png',
         'img/Main Characters/Gun01/Death/Death_43.png',
     ];
+
+    /**
+     * Image paths for the character's hurt animation.
+     */
     IMAGES_HURT = [
         'img/Main Characters/Gun01/Get Hit/Get Hit_00.png',
         'img/Main Characters/Gun01/Get Hit/Get Hit_01.png',
@@ -169,6 +202,9 @@ class CharacterAnimations {
         'img/Main Characters/Gun01/Get Hit/Get Hit_09.png',
     ];
 
+    /**
+     * Plays the bomb throwing animation for the character.
+     */
     throwBombAnimation(character) {
         let frame = 0;
         const delays = new Array(this.IMAGES_THROW_BOMB.length).fill(30);
@@ -187,6 +223,9 @@ class CharacterAnimations {
     }
 
 
+    /**
+     * Image paths for the character's bomb throwing animation.
+     */
     IMAGES_THROW_BOMB = [
         'img/Main Characters/Gun01/Throw bomb/Throw bomb_00.png',
         'img/Main Characters/Gun01/Throw bomb/Throw bomb_01.png',
@@ -209,6 +248,13 @@ class CharacterAnimations {
         'img/Main Characters/Gun01/Throw bomb/Throw bomb_18.png',
         'img/Main Characters/Gun01/Throw bomb/Throw bomb_19.png',
     ];
+    
+    /**
+     * Frame delays for the jump up animation.
+     */
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
+    /**
+     * Frame delays for the jump down animation (reversed).
+     */
     JUMP_DELAYS_DOWN = [...this.JUMP_DELAYS].reverse();
 }

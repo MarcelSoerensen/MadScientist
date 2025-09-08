@@ -22,20 +22,14 @@ class CollisionManager {
             rectA.y + rectA.height <= rectB.y + rectB.height;
         return overlap || contained;
     }
+
     checkEnemyCollision(world) {
         world.level.enemies.forEach(enemy => {
             if (!enemy.collidable) return;
             let collided = world.character.isColliding(enemy);
             if (collided) {
-                const now = Date.now();
-                if (!world._lastCollisionSoundTime || now - world._lastCollisionSoundTime > 500) {
-                    try {
-                        const collisionSound = new Audio('sounds/character-collided.mp3');
-                        collisionSound.volume = 0.5;
-                        collisionSound.play();
-                        world._lastCollisionSoundTime = now;
-                    } catch (e) {}
-                }
+                if (!world.character.sounds) world.character.sounds = new CharacterSounds();
+                world.character.sounds.hurtSound(world.character, world);
                 world.character.hit();
                 world.statusBar.setPercentage(world.character.energy);
             }
@@ -125,15 +119,8 @@ class CollisionManager {
                         charRect.y < stickRect.y + stickRect.height &&
                         charRect.y + charRect.height > stickRect.y;
                     if (stickCollision) {
-                        const now = Date.now();
-                        if (!world._lastCollisionSoundTime || now - world._lastCollisionSoundTime > 500) {
-                            try {
-                                const collisionSound = new Audio('sounds/character-collided.mp3');
-                                collisionSound.volume = 0.5;
-                                collisionSound.play();
-                                world._lastCollisionSoundTime = now;
-                            } catch (e) {}
-                        }
+                        if (!world.character.sounds) world.character.sounds = new CharacterSounds();
+                        world.character.sounds.hurtSound(world.character, world);
                         world.character.hit();
                         world.statusBar.setPercentage(world.character.energy);
                     }

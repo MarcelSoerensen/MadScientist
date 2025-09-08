@@ -68,28 +68,20 @@ class Character extends CollidableObject {
      * Triggers the death animation and sound.
      */
     playDeathAnimation() {
-        try {
-            const deathSound = new Audio('sounds/character-death.mp3');
-            deathSound.volume = 0.7;
-            deathSound.play();
-        } catch (e) {}
+        if (!this.sounds) this.sounds = new CharacterSounds();
+        this.sounds.deathSound(this);
         this.anim.deathAnimation(this);
     }
 
     /**
-     * Triggers the throw bomb animation and sound.
+     * Triggers the throw bomb animation.
      */
     playThrowBombAnimation() {
         if (this.throwAnimationPlaying) return;
-
+        if (!this.sounds) this.sounds = new CharacterSounds();
         setTimeout(() => {
-            try {
-                const bombSound = new Audio('sounds/hit-bomb.mp3');
-                bombSound.volume = 0.25;
-                bombSound.play();
-            } catch (e) {}
+            this.sounds.throwBombSound(this);
         }, 500);
-
         this.throwAnimationPlaying = true;
         this.anim.throwBombAnimation(this);
     }

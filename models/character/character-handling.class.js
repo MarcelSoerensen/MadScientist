@@ -17,7 +17,8 @@ class CharacterHandling {
         setInterval(() => {
             this.handleIdleAnimation(character);
             this.handleWalkingAnimation(character);
-            this.handleJumpSound(character);
+            if (!this.sounds) this.sounds = new CharacterSounds();
+            this.sounds.jumpSound(character);
             this.handleStepSound(character);
         }, 60);
 
@@ -147,64 +148,16 @@ class CharacterHandling {
     }
 
     /**
-     * Handles jump sound effect.
-     */
-    handleJumpSound(character) {
-        const isJumping = character.world.keyboard.UP;
-        if (isJumping && !character.jumpSoundPlayed) {
-            try {
-                const jumpSound = new Audio('sounds/character-jump.mp3');
-                jumpSound.volume = 0.2;
-                jumpSound.play();
-            } catch (e) {}
-            character.jumpSoundPlayed = true;
-        }
-        if (!isJumping) character.jumpSoundPlayed = false;
-    }
-
-    /**
      * Handles step sound effect.
      */
     handleStepSound(character) {
         const isWalking = character.world.keyboard.RIGHT || character.world.keyboard.LEFT;
         const isJumping = character.world.keyboard.UP;
+        if (!this.sounds) this.sounds = new CharacterSounds();
         if (isWalking && !isJumping) {
-            this.startStepSound(character);
+            this.sounds.stepSound(character);
         } else {
-            this.stopStepSound(character);
-        }
-    }
-
-    /**
-     * Starts the step sound effect.
-     */
-    startStepSound(character) {
-        if (!character.isStepSoundPlaying) {
-            try {
-                character.stepSoundAudio = new Audio('sounds/character-steps.mp3');
-                Object.assign(character.stepSoundAudio, {
-                    loop: true,
-                    volume: 0.3,
-                    playbackRate: 2.3,
-                    currentTime: 0
-                });
-                character.stepSoundAudio.play();
-                character.isStepSoundPlaying = true;
-            } catch (e) {}
-        }
-    }
-
-    /**
-     * Stops the step sound effect.
-     */
-    stopStepSound(character) {
-        if (character.isStepSoundPlaying && character.stepSoundAudio) {
-            try {
-                character.stepSoundAudio.pause();
-                character.stepSoundAudio.currentTime = 0;
-            } catch (e) {}
-            character.isStepSoundPlaying = false;
-            character.stepSoundAudio = null;
+            this.sounds.stopStepSound(character);
         }
     }
 

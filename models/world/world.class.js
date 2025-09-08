@@ -202,15 +202,9 @@ class World {
                         charRect.y + charRect.height > stickRect.y;
                     if (stickCollision) {
                         const now = Date.now();
-                        if (!this._lastCollisionSoundTime || now - this._lastCollisionSoundTime > 500) {
-                            try {
-                                const collisionSound = new Audio('sounds/character-collided.mp3');
-                                collisionSound.volume = 0.5;
-                                collisionSound.play();
-                                this._lastCollisionSoundTime = now;
-                            } catch (e) {
+                            if (!this._lastCollisionSoundTime || now - this._lastCollisionSoundTime > 500) {
+                                this.character.sounds.hurtSound(this.character, this);
                             }
-                        }
                         this.character.hit();
                         this.statusBar.setPercentage(this.character.energy);
                     }
