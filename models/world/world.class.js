@@ -480,7 +480,10 @@ class World {
             movableObject.draw(this.ctx);
             movableObject.drawFrame(this.ctx); 
 
-            if (movableObject.drawCollisionFrame && movableObject.collidable !== false) {
+            if (movableObject instanceof Endboss) {
+                movableObject.drawCollisionFrameEndboss(this.ctx);
+                movableObject.drawCollisionFrameStick(this.ctx);
+            } else if (movableObject.drawCollisionFrame && movableObject.collidable !== false) {
                 movableObject.drawCollisionFrame(this.ctx);
             }
 

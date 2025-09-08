@@ -6,7 +6,7 @@ class EndbossHandling {
      * Starts all endboss animation intervals.
      */
     animateEndboss(endboss) {
-        endboss.startEndbossAnimationIntervals();
+    this.startEndbossAnimationIntervals(endboss);
     }
 
     /**
@@ -22,8 +22,12 @@ class EndbossHandling {
         endboss.leftTargetX = endboss.startX - 200;
         endboss.animInterval = setInterval(() => {
             if (!endboss.animationStarted) return this.handleIdle(endboss);
-            if (endboss.laserHitCount >= 25 && !endboss.isElectricHurt) return endboss.deathAnimation(endboss.deathFrame, endboss.deathDone);
-            if (endboss.isElectricHurt) return endboss.electricHurtAnimation();
+            if (endboss.laserHitCount >= 25 && !endboss.isElectricHurt) {
+                this.handleDeathSound(endboss);
+                this.handleDeathStatus(endboss);
+                return this.handleDeathAnimation(endboss);
+            }
+            if (endboss.isElectricHurt) return endboss.anim.electricHurtAnimation(endboss);
             this.handleAnimState(endboss);
         }, 50);
     }
@@ -45,7 +49,7 @@ class EndbossHandling {
      * Handles the idle animation state.
      */
     handleIdle(endboss) {
-        endboss.idleAnimation();
+    endboss.anim.idleAnimation(endboss);
         endboss.animTimer += 50;
         if (endboss.animTimer >= 2000) {
             endboss.animState = 'walkingLeft';
@@ -57,7 +61,7 @@ class EndbossHandling {
      * Handles the walking left animation state.
      */
     handleWalkingLeft(endboss) {
-        endboss.walkingLeftAnimation(endboss.leftTargetX, endboss.animTimer);
+    endboss.playWalkingLeftAnimation(endboss.leftTargetX, endboss.animTimer);
         endboss.animTimer += 50;
         if (endboss.x <= endboss.leftTargetX || endboss.animTimer >= 5000) {
             endboss.animState = 'hit';
@@ -70,7 +74,7 @@ class EndbossHandling {
      * Handles the hit animation state.
      */
     handleHit(endboss) {
-        endboss.hitAnimation(endboss.animTimer);
+    endboss.anim.hitAnimation(endboss, endboss.animTimer);
         endboss.animTimer += 50;
         if (endboss.hitFrame >= endboss.anim.IMAGES_HIT.length) {
             endboss.animState = 'idle2';
@@ -79,10 +83,24 @@ class EndbossHandling {
     }
 
     /**
+     * Plays the hit sound for the Endboss.
+     */
+    handleHitSound(endboss) {
+        if (endboss.throwAnimationPlaying) return;
+        setTimeout(() => {
+            try {
+                const bombSound = new Audio('sounds/endboss-hit.mp3');
+                bombSound.volume = 0.25;
+                bombSound.play();
+            } catch (e) {}
+        }, 500);
+    }
+
+    /**
      * Handles the second idle animation state.
      */
     handleIdle2(endboss) {
-        endboss.idleAnimation();
+    endboss.anim.idleAnimation(endboss);
         endboss.animTimer += 50;
         if (endboss.animTimer >= 2000) {
             endboss.animState = 'walkingRight';
@@ -94,32 +112,13 @@ class EndbossHandling {
      * Handles the walking right animation state.
      */
     handleWalkingRight(endboss) {
-        endboss.walkingRightAnimation(endboss.startX, endboss.animTimer);
+    endboss.playWalkingRightAnimation(endboss.startX, endboss.animTimer);
         endboss.animTimer += 50;
         if (endboss.x >= endboss.startX || endboss.animTimer >= 5000) {
             endboss.x = endboss.startX;
             endboss.animState = 'idle';
             endboss.animTimer = 0;
         }
-    }
-
-    /**
-     * Handles the death animation and related effects.
-     */
-    handleDeathAnimation(endboss) {
-        endboss.stopStepSounds();
-        endboss.playEndbossDeathSound();
-        endboss.collidable = false;
-        endboss.isDeadAnimationPlaying = true;
-        endboss.currentImage = 0;
-        window.endbossDefeated = true;
-        if (endboss.animInterval) {
-            clearInterval(endboss.animInterval);
-            endboss.animInterval = null;
-        }
-        endboss.deathAnimation();
-        setTimeout(() => endboss.startBlinking(), 2500);
-        setTimeout(() => endboss.removeEnemy(), 4000);
     }
 
     /**
@@ -177,8 +176,50 @@ class EndbossHandling {
             endboss.isElectricHurt = false;
             endboss.electricHurtTimeout = null;
             if (endboss.laserHitCount === 25) {
+                this.handleDeathSound(endboss);
+                this.handleDeathStatus(endboss);
                 this.handleDeathAnimation(endboss);
             }
         }, hurtDuration);
+    }
+
+    /**
+     * Runs the death animation sequence for the Endboss.
+     */
+    handleDeathAnimation(endboss) {
+        let deathFrame = 0;
+        endboss.deathAnimInterval = setInterval(() => {
+            if (deathFrame < endboss.anim.IMAGES_DEATH.length) {
+                endboss.img = endboss.imageCache[endboss.anim.IMAGES_DEATH[deathFrame]];
+                deathFrame++;
+            } else {
+                endboss.img = endboss.imageCache[endboss.anim.IMAGES_DEATH[endboss.anim.IMAGES_DEATH.length - 1]];
+                clearInterval(endboss.deathAnimInterval);
+            }
+        }, 50);
+        setTimeout(() => endboss.startBlinking(), 2500);
+        setTimeout(() => endboss.removeEnemy(), 4000);
+    }
+
+    /**
+     * Plays the death sound of the Endboss.
+     */
+    handleDeathSound(endboss) {
+    endboss.sounds.stopStepSounds(endboss);
+    endboss.sounds.endbossDeathSound();
+    }
+
+    /**
+     * Sets status and variables for Endboss death.
+     */
+    handleDeathStatus(endboss) {
+        endboss.collidable = false;
+        endboss.isDeadAnimationPlaying = true;
+        endboss.currentImage = 0;
+        window.endbossDefeated = true;
+        if (endboss.animInterval) {
+            clearInterval(endboss.animInterval);
+            endboss.animInterval = null;
+        }
     }
 }
