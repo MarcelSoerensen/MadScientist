@@ -333,21 +333,28 @@ class Endboss extends CollidableObject {
     }
     
     
-    triggerElectricHurt(force = 1) {
-    
-    let now = Date.now();
-    if (!this.lastHitSoundTime || now - this.lastHitSoundTime > 1000) {
-        try {
-            const hitSound = new Audio('sounds/endboss-collided.mp3');
-            hitSound.volume = 0.7;
-            hitSound.play();
-            this.lastHitSoundTime = now;
-        } catch (e) {
-    
-        }
-    }
+    handleHurtAnimation(force = 1) {
+        this.handleHurtSound(force);
         if (this.laserHitCount >= 25) return;
         if (this.isElectricHurt) return;
+        this.handleHurtStatus(force);
+        this.handleHurtTimeout(force);
+    }
+
+    handleHurtSound(force) {
+        let now = Date.now();
+        if (!this.lastHitSoundTime || now - this.lastHitSoundTime > 1000) {
+            try {
+                const hitSound = new Audio('sounds/endboss-collided.mp3');
+                hitSound.volume = 0.7;
+                hitSound.play();
+                this.lastHitSoundTime = now;
+            } catch (e) {}
+        }
+    }
+
+    handleHurtStatus(force) {
+        let now = Date.now();
         if (force === 5) {
             if (!this.lastSuperShotTime) this.lastSuperShotTime = 0;
             if (now - this.lastSuperShotTime < 500) return;
@@ -356,11 +363,14 @@ class Endboss extends CollidableObject {
         if (force === 1) this.lastHitTime = now;
         this.laserHitCount += force;
         if (force === 5) this.lastSuperShotTime = now;
-    if (this.laserHitCount > 25) this.laserHitCount = 25;
+        if (this.laserHitCount > 25) this.laserHitCount = 25;
+        this.isElectricHurt = true;
+    }
+
+    handleHurtTimeout(force) {
         if (this.electricHurtTimeout) {
             clearTimeout(this.electricHurtTimeout);
         }
-        this.isElectricHurt = true;
         let hurtDuration = (force === 5) ? 1000 : 500;
         this.electricHurtTimeout = setTimeout(() => {
             this.isElectricHurt = false;
@@ -413,9 +423,6 @@ class Endboss extends CollidableObject {
         }
     }
 
-    /**
-     * Spielt den Endboss-Todes-Sound mit Fade-Out
-     */
     playEndbossDeathSound() {
         try {
             const deathSound = new Audio('sounds/endboss-death.mp3');
