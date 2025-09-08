@@ -108,6 +108,7 @@ class BombManager extends DrawableObject {
             bomb.startCollecting(bomb.originX - 100, barY);
         }
     }
+    
         /**
          * Draws all bombs on the canvas.
          */

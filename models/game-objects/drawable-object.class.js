@@ -1,20 +1,17 @@
+/**
+ * Base class for all drawable objects in the game.
+ */
 class DrawableObject {
-    /** @type {HTMLImageElement} Current image being displayed */
+    
     img;
-    /** @type {Object.<string, HTMLImageElement>} Cache of loaded images */
     imageCache = {};
-     /** @type {number} Current animation frame index */
     currentImage = 0;
-    /** @type {number} Y position of the object */
     y = 170;
-    /** @type {number} Width of the object */
     width = 300;
-    /** @type {number} Height of the object */
     height = 300;
 
     /**
-     * Loads a single image from the given path
-     * @param {string} imagePath - Path to the image file
+     * Loads a single image from the given path.
      */
     loadImage(imagePath) {
         this.img = new Image();
@@ -22,8 +19,7 @@ class DrawableObject {
     }
 
     /**
-     * Draws the object on the canvas
-     * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+     * Draws the object on the canvas.
      */
     draw(ctx) {
         if (this.visible === false) return;
@@ -40,9 +36,8 @@ class DrawableObject {
         ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
     }
 
-     /**
-     * Draws a frame around the object for debugging purposes
-     * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+    /**
+     * Draws a frame around the object for debugging purposes.
      */
     drawFrame(ctx) {
 
@@ -54,8 +49,7 @@ class DrawableObject {
     }
 
     /**
-     * Loads multiple images and stores them in the image cache
-     * @param {string[]} array - Array of image paths to load
+     * Loads multiple images and stores them in the image cache.
      */
     loadImages(array) {
         array.forEach(imagePath => {

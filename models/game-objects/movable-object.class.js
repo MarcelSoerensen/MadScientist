@@ -1,19 +1,13 @@
 /**
  * Base class for all movable objects in the game
- * Provides basic movement, animation, and collision detection functionality
  */
 class MovableObject extends DrawableObject {
-    /** @type {number} Movement speed */
+    
     speed = 0.15;
-    /** @type {boolean} Whether the object is facing the opposite direction */
     otherDirection = false;
-    /** @type {number} Vertical speed for gravity */
     speedY = 0;
-    /** @type {number} Gravity acceleration */
     acceleration = 1;
-    /** @type {number} Health/energy of the object */
     energy = 100;
-    /** @type {number} Timestamp of last hit */
     lastHit = 0;
 
     /**
@@ -39,10 +33,7 @@ class MovableObject extends DrawableObject {
     }
 
     /**
-     * Applies gravity animation with custom delays
-     * @param {string[]} images - Array of image paths for animation
-     * @param {number[]} delays - Array of delays for each frame
-     * @param {Function} onDone - Callback function when animation completes
+     * Applies gravity animation with custom delays.
      */
     applyGravityForAnimation(images, delays, onDone) {
         let frame = 0;
@@ -63,17 +54,14 @@ class MovableObject extends DrawableObject {
     }
 
     /**
-     * Checks if the object is currently above ground
-     * @returns {boolean} True if object is above ground
+     * Checks if the object is currently above ground.
      */
     isAboveGround() {
         return this.isAboveGroundActive;
     }
 
     /**
-     * Checks if this object is colliding with another movable object
-     * @param {MovableObject} movableObject - The other object to check collision with
-     * @returns {boolean} True if objects are colliding
+     * Checks if this object is colliding with another movable object.
      */
     isColliding(movableObject){
         if (this.collidable === false || movableObject.collidable === false) {
@@ -155,7 +143,6 @@ class MovableObject extends DrawableObject {
 
     /**
      * Reduces the object's energy when hit
-     * Sets the last hit timestamp for hurt animation
      */
     hit() {
         this.energy -= 5;
@@ -168,7 +155,6 @@ class MovableObject extends DrawableObject {
 
     /**
      * Checks if the object is dead (energy = 0)
-     * @returns {boolean} True if object is dead
      */
     isDead() {
         return this.energy == 0;
@@ -176,7 +162,6 @@ class MovableObject extends DrawableObject {
 
     /**
      * Checks if the object is currently hurt (recently hit)
-     * @returns {boolean} True if object is in hurt state
      */
     isHurt() {
         let timepassed = new Date().getTime() - this.lastHit;
@@ -186,7 +171,6 @@ class MovableObject extends DrawableObject {
 
     /**
      * Plays an animation by cycling through image array
-     * @param {string[]} images - Array of image paths for the animation
      */
     playAnimation(images) {
         let currentImageIndex = this.currentImage % images .length;
@@ -197,7 +181,6 @@ class MovableObject extends DrawableObject {
 
     /**
      * Moves the object to the right
-     * @param {number} moveSpeed - Speed of movement (default: this.speed)
      */
     moveRight(moveSpeed = this.speed) {
         this.x += moveSpeed;
@@ -205,7 +188,6 @@ class MovableObject extends DrawableObject {
 
     /**
      * Moves the object to the left
-     * @param {number} moveSpeed - Speed of movement (default: this.speed)
      */
     moveLeft(moveSpeed = this.speed) {
         this.x -= moveSpeed;  
