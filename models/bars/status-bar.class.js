@@ -1,32 +1,19 @@
 /**
- * @class StatusBar
- * @extends DrawableObject
  * Displays the character health and other game statistics as a status bar.
  */
 class StatusBar extends DrawableObject {
-    /** @type {Array<string>} Array of image paths for the status bar */
     IMAGES = [
         'img/User Interfaces/ProfileBar.png'
     ];
-    /** @type {number} X position of the bar */
     x = 5;
-    /** @type {number} Y position of the bar */
     y = 15;
-    /** @type {number} Width of the bar */
     width = 200;
-    /** @type {number} Height of the bar */
     height = 60;
-    /** @type {number} Current health percentage (0-100) */
     percentage = 100;
-    /** @type {number} Current calculated HP bar width in pixels */
     currentHPWidth = 148;
 
     /**
      * Creates a new StatusBar instance.
-     * @param {number} [x=5] - X position of the bar
-     * @param {number} [y=15] - Y position of the bar
-     * @param {number} [width=200] - Width of the bar
-     * @param {number} [height=60] - Height of the bar
      */
     constructor(x = 5, y = 15, width = 200, height = 60) {
         super();
@@ -40,7 +27,6 @@ class StatusBar extends DrawableObject {
 
     /**
      * Sets the health percentage and calculates the corresponding HP bar width.
-     * @param {number} percentage - The health percentage (0-100)
      */
     setPercentage(percentage) {
         this.percentage = percentage;
@@ -50,7 +36,6 @@ class StatusBar extends DrawableObject {
 
     /**
      * Draws the HP bar as a trapezoid with gradient fill on the given canvas context.
-     * @param {CanvasRenderingContext2D} ctx - The canvas context to draw on
      */
     drawHPBar(ctx) {
         if (this.percentage > 0) {
