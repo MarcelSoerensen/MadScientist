@@ -130,6 +130,7 @@ class World {
         this.canvas = canvas;
         this.keyboard = keyboard;
         this.setWorld();
+    window.collisionManager = new CollisionManager();
     this.energyBallManager = new EnergyBallManager(4000, 600, this.character, [], this);
         this.bombManager = new BombManager(4000, 600, this.character, this.energyBallManager.balls);
         this.heartsManager = new HeartsManager(4000, 600, this.character, [], this.energyBallManager.balls, this.bombManager.bombs);

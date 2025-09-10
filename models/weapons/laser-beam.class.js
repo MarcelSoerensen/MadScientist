@@ -109,8 +109,6 @@ class LaserBeam extends CollidableObject {
         }
     }
 
-    animateLaserBeam() {
-    }
 
     /**
      * Draws the laser beam

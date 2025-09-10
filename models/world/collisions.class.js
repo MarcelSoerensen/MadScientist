@@ -1,5 +1,11 @@
 
+/**
+ * Manages all collision detection and processing in the game world.
+ */
 class CollisionManager {
+    /**
+     * Returns the collision rectangle for an enemy.
+     */
     getEnemyRect(enemy) {
         return {
             x: enemy.x + (enemy.offset?.left || 0),
@@ -9,6 +15,9 @@ class CollisionManager {
         };
     }
 
+    /**
+     * Determines if two rectangles are colliding.
+     */
     isCollision(rectA, rectB) {
         const overlap =
             rectA.x < rectB.x + rectB.width &&
@@ -23,6 +32,9 @@ class CollisionManager {
         return overlap || contained;
     }
 
+    /**
+     * Checks collision between the character and all enemies.
+     */
     checkEnemyCollision(world) {
         world.level.enemies.forEach(enemy => {
             if (!enemy.collidable) return;
@@ -36,6 +48,9 @@ class CollisionManager {
         });
     }
 
+    /**
+     * Checks collision between bombs and enemies.
+     */
     checkBombCollision(world) {
         world.level.enemies.forEach(enemy => {
             if (!enemy.collidable) return;
@@ -59,75 +74,123 @@ class CollisionManager {
         });
     }
 
+    
+    /**
+     * Checks collision between laser beams and enemies.
+     */
     checkLaserCollision(world) {
         world.level.enemies.forEach(enemy => {
             if (!enemy.collidable) return;
             world.laserBeams.forEach(laser => {
                 if (laser.isColliding(enemy)) {
-                    if (enemy instanceof Endboss) {
-                        if (laser.isSuperShot) {
-                            if (enemy instanceof Endboss && enemy.handler) {
-                                enemy.handler.handleHurtAnimation(enemy, 5);
-                            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                                enemy.triggerElectricHurt(5);
-                            }
-                        } else {
-                            if (enemy instanceof Endboss && enemy.handler) {
-                                enemy.handler.handleHurtAnimation(enemy, 1);
-                            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                                enemy.triggerElectricHurt(1);
-                            }
-                        }
-                    } else {
-                        if (laser.isSuperShot) {
-                            if (enemy instanceof Endboss && enemy.handler) {
-                                enemy.handler.handleHurtAnimation(enemy, 3);
-                            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                                enemy.triggerElectricHurt(3);
-                            }
-                        } else {
-                            if (enemy instanceof Endboss && enemy.handler) {
-                                enemy.handler.handleHurtAnimation(enemy, 1);
-                            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                                enemy.triggerElectricHurt(1);
-                            }
-                        }
-                    }
+                    this.processLaserHit(enemy, laser);
                 }
             });
         });
     }
 
+    /**
+     * Processes a laser hit on an enemy.
+     */
+    processLaserHit(enemy, laser) {
+        if (enemy instanceof Endboss) {
+            this.processEndbossLaserHit(enemy, laser);
+        } else {
+            this.processEnemyLaserHit(enemy, laser);
+        }
+    }
+   
+    /**
+     * Processes a laser hit on the Endboss.
+     */
+    processEndbossLaserHit(enemy, laser) {
+        if (laser.isSuperShot) {
+            if (enemy.handler) {
+                enemy.handler.handleHurtAnimation(enemy, 5);
+            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                enemy.triggerElectricHurt(5);
+            }
+        } else {
+            if (enemy.handler) {
+                enemy.handler.handleHurtAnimation(enemy, 1);
+            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                enemy.triggerElectricHurt(1);
+            }
+        }
+    }
+
+    
+    /**
+     * Processes a laser hit on a normal enemy.
+     */
+    processEnemyLaserHit(enemy, laser) {
+        if (laser.isSuperShot) {
+            if (enemy instanceof Endboss && enemy.handler) {
+                enemy.handler.handleHurtAnimation(enemy, 3);
+            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                enemy.triggerElectricHurt(3);
+            }
+        } else {
+            if (enemy instanceof Endboss && enemy.handler) {
+                enemy.handler.handleHurtAnimation(enemy, 1);
+            } else if (typeof enemy.triggerElectricHurt === 'function') {
+                enemy.triggerElectricHurt(1);
+            }
+        }
+    }
+
+    /**
+     * Checks collision between the Endboss stick and the character.
+     */
     checkEndbossStickCollision(world) {
         world.level.enemies.forEach(enemy => {
-            if (
-                enemy instanceof Endboss &&
-                enemy.animState === 'hit' &&
-                enemy.collidable !== false
-            ) {
-                const stickRect = enemy.getStickCollisionRect && enemy.getStickCollisionRect();
-                if (stickRect) {
-                    const charRect = {
-                        x: world.character.x + (world.character.offset?.left || 0),
-                        y: world.character.y + (world.character.offset?.top || 0),
-                        width: world.character.width - ((world.character.offset?.left || 0) + (world.character.offset?.right || 0)),
-                        height: world.character.height - ((world.character.offset?.top || 0) + (world.character.offset?.bottom || 0))
-                    };
-                    const stickCollision =
-                        charRect.x < stickRect.x + stickRect.width &&
-                        charRect.x + charRect.width > stickRect.x &&
-                        charRect.y < stickRect.y + stickRect.height &&
-                        charRect.y + charRect.height > stickRect.y;
-                    if (stickCollision) {
-                        if (!world.character.sounds) world.character.sounds = new CharacterSounds();
-                        world.character.sounds.hurtSound(world.character, world);
-                        world.character.hit();
-                        world.statusBar.setPercentage(world.character.energy);
-                    }
-                }
+            const stickRect = this.getEndbossStickCollisionRect(enemy);
+            if (stickRect && this.checkEndbossStickCharacterCollision(world.character, stickRect)) {
+                this.handleEndbossStickCollisionEffects(world);
             }
         });
     }
-}
 
-window.collisionManager = new CollisionManager();
+    /**
+     * Returns the Endboss stick collision rectangle if active, otherwise null.
+     */
+    getEndbossStickCollisionRect(enemy) {
+        if (
+            enemy instanceof Endboss &&
+            enemy.animState === 'hit' &&
+            enemy.collidable !== false &&
+            typeof enemy.getStickCollisionRect === 'function'
+        ) {
+            return enemy.getStickCollisionRect();
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the character collides with the Endboss stick.
+     */
+    checkEndbossStickCharacterCollision(character, stickRect) {
+        const charRect = {
+            x: character.x + (character.offset?.left || 0),
+            y: character.y + (character.offset?.top || 0),
+            width: character.width - ((character.offset?.left || 0) + (character.offset?.right || 0)),
+            height: character.height - ((character.offset?.top || 0) + (character.offset?.bottom || 0))
+        };
+        return (
+            charRect.x < stickRect.x + stickRect.width &&
+            charRect.x + charRect.width > stickRect.x &&
+            charRect.y < stickRect.y + stickRect.height &&
+            charRect.y + charRect.height > stickRect.y
+        );
+    }
+
+    /**
+     * Applies the effects of an Endboss stick collision to the character and world.
+     */
+    applyEndbossStickCollisionEffects(world) {
+        if (!world.character.sounds) world.character.sounds = new CharacterSounds();
+        world.character.sounds.hurtSound(world.character, world);
+        world.character.hit();
+        world.statusBar.setPercentage(world.character.energy);
+    }
+}

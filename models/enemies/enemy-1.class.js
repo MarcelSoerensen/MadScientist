@@ -4,25 +4,9 @@
  */
 class EnemyOne extends CollidableObject {
     lastHitTime = 0;
-    /**
-     * Counts how many times the enemy was hit by a laser
-     * @type {number}
-     */
     laserHitCount = 0;
-
-    /**
-     * Indicates if the death animation is currently playing
-     * @type {boolean}
-     */
     isDeadAnimationPlaying = false;
-
-
-    /** 
-     * @type {Object} Collision offset values adjusted for enemy proportions
-}
-     * @property {number} right - Right offset in pixels
-     * @property {number} bottom - Bottom offset in pixels
-     */
+    
     offset = {
         top: 140,
         left: 103,

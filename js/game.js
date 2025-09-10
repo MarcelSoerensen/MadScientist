@@ -2,6 +2,10 @@ let canvas;
 let world;
 let keyboard = new Keyboard(); 
 
+/**
+ * Initialisiert das Spiel, Canvas und die Welt.
+ * Bindet Hintergrundmusik und gibt Debug-Infos aus.
+ */
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
@@ -25,6 +29,10 @@ function init() {
     console.log('my enemies are', world.enemies);
 }
 
+/**
+ * Event-Listener für Tastendruck. Setzt die jeweiligen Keyboard-Flags.
+ * @param {KeyboardEvent} event
+ */
 window.addEventListener('keydown', (event) => {
     if (world && world.gameOver) {
         if (['d', 'y', 's'].includes(event.key)) return;
@@ -56,6 +64,10 @@ window.addEventListener('keydown', (event) => {
 
 });
 
+/**
+ * Event-Listener für Loslassen einer Taste. Setzt die jeweiligen Keyboard-Flags zurück.
+ * @param {KeyboardEvent} event
+ */
 window.addEventListener('keyup', (event) => {
     if (event.key === 'ArrowLeft') {
         keyboard.LEFT = false;
