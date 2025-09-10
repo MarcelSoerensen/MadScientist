@@ -62,8 +62,8 @@ class CollisionManager {
                         if (enemy instanceof Endboss) {
                             if (enemy instanceof Endboss && enemy.handler) {
                                 enemy.handler.handleHurtAnimation(enemy, 5);
-                            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                                enemy.triggerElectricHurt(5);
+                            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
+                                enemy.handleHurtAnimation(5);
                             }
                         } else if (typeof enemy.handleDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
                             enemy.handleDeathAnimation();
@@ -107,14 +107,14 @@ class CollisionManager {
         if (laser.isSuperShot) {
             if (enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 5);
-            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                enemy.triggerElectricHurt(5);
+            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
+                enemy.handleHurtAnimation(5);
             }
         } else {
             if (enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 1);
-            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                enemy.triggerElectricHurt(1);
+            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
+                enemy.handleHurtAnimation(1);
             }
         }
     }
@@ -127,14 +127,14 @@ class CollisionManager {
         if (laser.isSuperShot) {
             if (enemy instanceof Endboss && enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 3);
-            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                enemy.triggerElectricHurt(3);
+            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
+                enemy.handleHurtAnimation(3);
             }
         } else {
             if (enemy instanceof Endboss && enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 1);
-            } else if (typeof enemy.triggerElectricHurt === 'function') {
-                enemy.triggerElectricHurt(1);
+            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
+                enemy.handleHurtAnimation(1);
             }
         }
     }

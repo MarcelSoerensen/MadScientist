@@ -34,7 +34,11 @@ class World {
                     enemy.visible = true;
                     enemy._waitingForCharacter = false;
                     if (!enemy.moveInterval && !enemy.animInterval) {
-                        enemy.animate();
+                        if (enemy instanceof EnemyOne && typeof enemy.animateEnemyOne === 'function') {
+                            enemy.animateEnemyOne();
+                        } else if (typeof enemy.animate === 'function') {
+                            enemy.animate();
+                        }
                     }
                 }
             });
