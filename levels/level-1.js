@@ -1,10 +1,3 @@
-
-// Import EnemyTwo
-// @ts-ignore
-// eslint-disable-next-line no-undef
-// If using modules, use: import EnemyTwo from '../models/enemy-2.class.js';
-// Otherwise, ensure EnemyTwo is loaded globally
-
 const levelStartX = -400;
 const level1 = new Level(
     [

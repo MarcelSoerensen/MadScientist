@@ -1,11 +1,11 @@
 /**
  * Bomb throwing object with explosion and animation
- * Inherits from ThrowableObjects
  */
 class ThrowBomb extends ThrowableObjects {
+    hasExploded = false;
+    isExploding = false;
     /**
      * Explosion image sequence
-     * @type {string[]}
      */
     IMAGES_EXPLOSION = [
         'img/Collision_Fx/Fx02/skeleton-Fx2_0.png',
@@ -20,14 +20,8 @@ class ThrowBomb extends ThrowableObjects {
         'img/Collision_Fx/Fx02/skeleton-Fx2_9.png'
     ];
 
-    hasExploded = false;
-    isExploding = false;
-
     /**
      * Creates a new bomb instance
-     * @param {number} x
-     * @param {number} y
-     * @param {boolean} otherDirection
      */
     constructor(x, y, otherDirection = false) {
         super(x, y, otherDirection, 'img/Projectile/Other/1.png');
@@ -35,7 +29,6 @@ class ThrowBomb extends ThrowableObjects {
 
     /**
      * Returns the current explosion rectangle
-     * @returns {{x: number, y: number, width: number, height: number}|null}
      */
     getExplosionRect() {
         if (!this.isExploding) return null;
@@ -57,24 +50,41 @@ class ThrowBomb extends ThrowableObjects {
         this.speedX = 0;
         this.speedY = 0;
         this.loadImages(this.IMAGES_EXPLOSION);
+        this.prepareExplosion();
+        this.playExplosionSound();
+        this.startExplosionAnimation();
+    }
 
+    /**
+     * Prepares the bomb for explosion (position, size, flags)
+     */
+    prepareExplosion() {
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
         this.width = 150;
         this.height = 150;
         this.x = centerX - this.width / 2;
         this.y = centerY - this.height / 2 - 30;
-
         this.isExploding = true;
         this.currentImage = 0;
         this.images = this.IMAGES_EXPLOSION;
         this.img = this.imageCache[this.IMAGES_EXPLOSION[0]];
-            try {
-                const explosionSound = new Audio('sounds/explosion.mp3');
-                explosionSound.play();
-            } catch (e) {
-            }
+    }
 
+    /**
+     * Plays the explosion sound effect
+     */
+    playExplosionSound() {
+        try {
+            const explosionSound = new Audio('sounds/explosion.mp3');
+            explosionSound.play();
+        } catch (e) {}
+    }
+
+    /**
+     * Starts the explosion animation interval
+     */
+    startExplosionAnimation() {
         this.explosionInterval = setInterval(() => {
             this.currentImage++;
             if (this.currentImage < this.IMAGES_EXPLOSION.length) {
@@ -88,14 +98,7 @@ class ThrowBomb extends ThrowableObjects {
     }
 
     /**
-     * Animation of the bomb (optional)
-     */
-    animate() {
-    }
-
-    /**
      * Draws the bomb including explosion and blue border
-     * @param {CanvasRenderingContext2D} ctx
      */
     draw(ctx) {
         if (this.visible === false) return;

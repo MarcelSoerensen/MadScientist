@@ -2,9 +2,9 @@
  * Manages energy ball collectibles in the game world.
  */
 class EnergyBallManager {
-        /**
-         * Creates an EnergyBallManager instance.
-         */
+    /**
+    * Creates an EnergyBallManager instance.
+    */
     constructor(worldWidth, worldHeight, character, enemies = [], world = null) {
         this.balls = [];
         this.collectedCount = 0;
