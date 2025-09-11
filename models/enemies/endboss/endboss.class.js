@@ -54,13 +54,6 @@ class Endboss extends CollidableObject {
     }   
 
     /**
-     * Starts all Endboss animation intervals using EndbossHandling.
-     */
-    animateEndboss() {
-        this.handler.startEndbossAnimationIntervals(this);
-    }
-
-    /**
      * Starts the walking-left animation and sound for the Endboss.
      */
     playWalkingLeftAnimation(leftTargetX, animTimer) {

@@ -60,10 +60,8 @@ class CollisionManager {
                     const bombRect = bomb.getExplosionRect();
                     if (this.isCollision(enemyRect, bombRect)) {
                         if (enemy instanceof Endboss) {
-                            if (enemy instanceof Endboss && enemy.handler) {
+                            if ((enemy instanceof Endboss || enemy instanceof EnemyOne) && enemy.handler) {
                                 enemy.handler.handleHurtAnimation(enemy, 5);
-                            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
-                                enemy.handleHurtAnimation(5);
                             }
                         } else if (typeof enemy.handleDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
                             enemy.handleDeathAnimation();
@@ -74,7 +72,6 @@ class CollisionManager {
         });
     }
 
-    
     /**
      * Checks collision between laser beams and enemies.
      */
@@ -105,36 +102,27 @@ class CollisionManager {
      */
     processEndbossLaserHit(enemy, laser) {
         if (laser.isSuperShot) {
-            if (enemy.handler) {
+            if ((enemy instanceof Endboss || enemy instanceof EnemyOne) && enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 5);
-            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
-                enemy.handleHurtAnimation(5);
             }
         } else {
-            if (enemy.handler) {
+            if ((enemy instanceof Endboss || enemy instanceof EnemyOne) && enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 1);
-            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
-                enemy.handleHurtAnimation(1);
             }
         }
     }
 
-    
     /**
      * Processes a laser hit on a normal enemy.
      */
     processEnemyLaserHit(enemy, laser) {
         if (laser.isSuperShot) {
-            if (enemy instanceof Endboss && enemy.handler) {
+            if ((enemy instanceof Endboss || enemy instanceof EnemyOne) && enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 3);
-            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
-                enemy.handleHurtAnimation(3);
             }
         } else {
-            if (enemy instanceof Endboss && enemy.handler) {
+            if ((enemy instanceof Endboss || enemy instanceof EnemyOne) && enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 1);
-            } else if (enemy instanceof EnemyOne && typeof enemy.handleHurtAnimation === 'function') {
-                enemy.handleHurtAnimation(1);
             }
         }
     }
@@ -146,7 +134,6 @@ class CollisionManager {
         world.level.enemies.forEach(enemy => {
             const stickRect = this.getEndbossStickCollisionRect(enemy);
             if (stickRect && this.checkEndbossStickCharacterCollision(world.character, stickRect)) {
-                this.handleEndbossStickCollisionEffects(world);
             }
         });
     }
