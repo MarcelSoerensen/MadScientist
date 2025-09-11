@@ -59,10 +59,10 @@ class CollisionManager {
                 if (bomb.isExploding) {
                     const bombRect = bomb.getExplosionRect();
                     if (this.isCollision(enemyRect, bombRect)) {
-                        if (enemy instanceof Endboss) {
-                            if ((enemy instanceof Endboss || enemy instanceof EnemyOne) && enemy.handler) {
-                                enemy.handler.handleHurtAnimation(enemy, 5);
-                            }
+                        if (enemy instanceof Endboss && enemy.handler) {
+                            enemy.handler.handleHurtAnimation(enemy, 5);
+                        } else if (enemy instanceof EnemyOne && enemy.handler && !enemy.isDeadAnimationPlaying) {
+                            enemy.handler.handleDeathAnimation(enemy);
                         } else if (typeof enemy.handleDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
                             enemy.handleDeathAnimation();
                         }
@@ -116,7 +116,9 @@ class CollisionManager {
      * Processes a laser hit on a normal enemy.
      */
     processEnemyLaserHit(enemy, laser) {
-        if (laser.isSuperShot) {
+        if (enemy instanceof EnemyTwo) {
+            enemy.triggerElectricHurt(laser.isSuperShot ? 3 : 1);
+        } else if (laser.isSuperShot) {
             if ((enemy instanceof Endboss || enemy instanceof EnemyOne) && enemy.handler) {
                 enemy.handler.handleHurtAnimation(enemy, 3);
             }
