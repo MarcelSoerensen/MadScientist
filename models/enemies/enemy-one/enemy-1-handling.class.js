@@ -8,6 +8,7 @@ class EnemyOneHandling {
 	animateEnemyOne(enemy) {
 		this.startEnemyOneAnimationIntervals(enemy);
 	}
+
 	/**
 	 * Initializes and starts the main animation interval for EnemyOne (analogous to Endboss)
 	 */
@@ -15,7 +16,6 @@ class EnemyOneHandling {
 		enemy.moveInterval = setInterval(() => {
 			enemy.moveLeft();
 		}, 1000 / 60);
-
 		enemy.deathFrame = 0;
 		enemy.deathDone = false;
 		enemy.animInterval = setInterval(() => {
@@ -30,23 +30,8 @@ class EnemyOneHandling {
 			enemy.playAnimation(enemy.animations.IMAGES_WALKING);
 		}, 50);
 	}
-	/**
-	 * Handles the death animation frame (analogous to Endboss)
-	 */
-	handleDeathAnimationFrame(enemy) {
-		if (!enemy.deathDone) {
-			enemy.img = enemy.imageCache[enemy.animations.IMAGES_DEATH[enemy.deathFrame]];
-			enemy.deathFrame++;
-			if (enemy.deathFrame >= enemy.animations.IMAGES_DEATH.length) {
-				enemy.deathFrame = enemy.animations.IMAGES_DEATH.length - 1;
-				enemy.deathDone = true;
-			}
-		} else {
-			enemy.img = enemy.imageCache[enemy.animations.IMAGES_DEATH[enemy.animations.IMAGES_DEATH.length - 1]];
-		}
-	}
 
-	/**
+    /**
 	 * Handles the hurt animation and status logic
 	 */
 	handleHurtAnimation(enemy, force = 1) {
@@ -85,7 +70,7 @@ class EnemyOneHandling {
 			}
 		}, hurtDuration);
 	}
-
+	
 	/**
 	 * Starts the death animation for the enemy
 	 */
@@ -120,6 +105,22 @@ class EnemyOneHandling {
 		if (enemy.animInterval) {
 			clearInterval(enemy.animInterval);
 			enemy.animInterval = null;
+		}
+	}
+
+    /**
+	 * Handles the death animation frame (analogous to Endboss)
+	 */
+	handleDeathAnimationFrame(enemy) {
+		if (!enemy.deathDone) {
+			enemy.img = enemy.imageCache[enemy.animations.IMAGES_DEATH[enemy.deathFrame]];
+			enemy.deathFrame++;
+			if (enemy.deathFrame >= enemy.animations.IMAGES_DEATH.length) {
+				enemy.deathFrame = enemy.animations.IMAGES_DEATH.length - 1;
+				enemy.deathDone = true;
+			}
+		} else {
+			enemy.img = enemy.imageCache[enemy.animations.IMAGES_DEATH[enemy.animations.IMAGES_DEATH.length - 1]];
 		}
 	}
 }
