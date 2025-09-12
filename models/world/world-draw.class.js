@@ -16,15 +16,14 @@ class WorldDraw {
         this.world.ctx.clearRect(0, 0, this.world.canvas.width, this.world.canvas.height);
         this.world.ctx.save();
         this.world.ctx.translate(this.world.camera_x, 0);
-        this.drawBackground();
+        this.drawMainBackground();
+        this.drawGameObjects();
+        this.drawParallaxTop();
+        this.drawParallaxBottom();
         this.world.ctx.restore();
         this.drawBars();
-        this.world.ctx.save();
-        this.world.ctx.translate(this.world.camera_x, 0);
-        this.drawGameObjects();
-        this.world.ctx.restore();
         this.drawAlerts();
-    requestAnimationFrame(() => this.draw());
+        requestAnimationFrame(() => this.draw());
     }
 
     /**
@@ -70,26 +69,19 @@ class WorldDraw {
      * Draws only the status bar and HP bar.
      */
     drawBars() {
-        if (this.world.statusBar) {
-            this.world.addToMap(this.world.statusBar);
-            this.world.statusBar.drawHPBar(this.world.ctx);
-        }
-        if (this.world.bombsBar && this.world.bombManager) {
-            this.world.bombsBar.setBombs(this.world.bombManager.collectedCount);
-            this.world.bombsBar.draw(this.world.ctx);
-        }
-        if (this.world.superShotBar && this.world.energyBallManager) {
-            this.world.superShotBar.setBalls(this.world.energyBallManager.collectedCount);
-            this.world.superShotBar.draw(this.world.ctx);
-        }
+        this.drawStatusBar();
+        this.drawBombsBar();
+        this.drawSuperShotBar();
     }
 
     /**
      * Draws the status bar and HP bar.
      */
     drawStatusBar() {
-        this.world.addToMap(this.world.statusBar);
-        this.world.statusBar.drawHPBar(this.world.ctx);
+        if (this.world.statusBar) {
+            this.world.addToMap(this.world.statusBar);
+            this.world.statusBar.drawHPBar(this.world.ctx);
+        }
     }
 
     /**
@@ -99,6 +91,12 @@ class WorldDraw {
         if (this.world.bombsBar && this.world.bombManager) {
             this.world.bombsBar.setBombs(this.world.bombManager.collectedCount);
             this.world.bombsBar.draw(this.world.ctx);
+        }
+    }
+    drawSuperShotBar() {
+        if (this.world.superShotBar && this.world.energyBallManager) {
+            this.world.superShotBar.setBalls(this.world.energyBallManager.collectedCount);
+            this.world.superShotBar.draw(this.world.ctx);
         }
     }
 
