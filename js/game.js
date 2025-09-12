@@ -3,8 +3,7 @@ let world;
 let keyboard = new Keyboard(); 
 
 /**
- * Initialisiert das Spiel, Canvas und die Welt.
- * Bindet Hintergrundmusik und gibt Debug-Infos aus.
+ * Initializes the game, canvas and world.
  */
 function init() {
     canvas = document.getElementById('canvas');
@@ -30,8 +29,7 @@ function init() {
 }
 
 /**
- * Event-Listener für Tastendruck. Setzt die jeweiligen Keyboard-Flags.
- * @param {KeyboardEvent} event
+ * Event listener for keydown. Sets the corresponding keyboard flags.
  */
 window.addEventListener('keydown', (event) => {
     if (world && world.gameOver) {

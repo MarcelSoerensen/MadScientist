@@ -29,9 +29,6 @@ class GameAlerts {
 
     /**
      * Shows an alert overlay with animation and sound.
-     * @param {string} type - The alert type.
-     * @param {string} text - The text to display.
-     * @param {object} [options] - Optional style overrides.
      */
     showAlert(type, text, options = {}) {
             const style = this.getAlertStyle(type, options);
@@ -49,13 +46,7 @@ class GameAlerts {
         }
 
     /**
-     * Triggers the Superlaser alert with animation and sound.
-     * @param {number} superShots - Number of available superlasers.
-     * @returns {void}
-     */
-    /**
      * Triggers the Superlaser alert with the current number of available supershots.
-     * @param {number} superShots - Number of available supershots.
      */
     triggerSuperlaser(superShots) {
         this.showAlert('superlaser', `Superlaser ${superShots}`);
@@ -88,9 +79,6 @@ class GameAlerts {
 
     /**
      * Returns the style object for a given alert type.
-     * @param {string} type - The alert type.
-     * @param {object} [options] - Optional style overrides.
-     * @returns {object} The style object for the alert.
      */
     getAlertStyle(type, options = {}) {
         const defaultStyles = {
@@ -135,9 +123,6 @@ class GameAlerts {
 
     /**
      * Shows a new alert overlay with animation and styling.
-     * @param {string} type - The alert type.
-     * @param {string} text - The text to display.
-     * @param {object} [options] - Optional style overrides.
      */
     showAlert(type, text, options = {}) {
         const style = this.getAlertStyle(type, options);
@@ -157,7 +142,6 @@ class GameAlerts {
 
     /**
      * Triggers the Full Energy alert with animation and sound.
-     * @returns {void}
      */
     triggerFullEnergy() {
         this.showAlert('fullEnergy', 'Full Energy', {
@@ -173,8 +157,6 @@ class GameAlerts {
 
     /**
      * Triggers the Superlaser alert with animation and sound.
-     * @param {number} superShots - Number of available superlasers.
-     * @returns {void}
      */
     triggerSuperlaser(superShots) {
         this.showAlert('superlaser', `Superlaser ${superShots}`);
@@ -187,7 +169,6 @@ class GameAlerts {
 
     /**
      * Triggers the Level Complete alert with animation and sound.
-     * @returns {void}
      */
     triggerLevelComplete() {
         this.showAlert('levelComplete', 'Level Complete', {
@@ -203,7 +184,6 @@ class GameAlerts {
 
     /**
      * Draws the current alert overlay if active.
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
         if (!this.activeAlert) return;

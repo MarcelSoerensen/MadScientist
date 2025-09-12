@@ -33,6 +33,9 @@ class BombManager extends DrawableObject {
         }
     }
 
+    /**
+     * Checks if a bomb at position (x, y) would collide with any enemy.
+     */
     checkDistanceToEnemies(x, y, enemies) {
         let tempBomb = { x, y, width: 40, height: 40, isColliding: function(enemy) {
             return (
@@ -103,7 +106,9 @@ class BombManager extends DrawableObject {
         }
     }
 
-    
+    /**
+     * Start collecting the bomb if the character collides with it.
+     */
     checkCollectibleCollision(bomb, character, barY) {
         if (typeof bomb.startCollecting === 'function' && !bomb.isCollecting && character && bomb.isColliding(character)) {
             bomb.startCollecting(bomb.originX - 100, barY);

@@ -1,10 +1,10 @@
 /**
- * Startposition der ersten Gegner im Level.
+ * Starting position of the first enemies in the level.
  */
 const levelStartX = -400;
 
 /**
- * Level-Objekt mit Gegnern und Hintergrundobjekten.
+ * Level object with enemies and background objects.
  */
 const level1 = new Level(
     [

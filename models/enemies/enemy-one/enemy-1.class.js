@@ -116,12 +116,18 @@ class EnemyOne extends CollidableObject {
         }
     }
 
+    /**
+     * Starts blinking animation (toggles visibility).
+     */
     startBlinking() {
         this.blinkInterval = setInterval(() => {
             this.visible = !this.visible;
         }, 200);
     }
 
+    /**
+     * Removes the enemy and stops blinking.
+     */
     removeEnemy() {
         this.visible = false;
         if (this.blinkInterval) {
