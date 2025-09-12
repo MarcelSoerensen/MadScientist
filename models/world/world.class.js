@@ -1,26 +1,9 @@
 /**
  * Represents the game world. Manages all game objects, rendering, and main game loop.
  */
-
 class World {
-    /**
-     * Indicates if the game is over
-     */
     gameOver = false;
-    /**
-     * Sets the world reference for all enemies after loading the level
-     */
-    setWorldReferenceForEnemies() {
-        if (this.enemies) {
-            this.enemies.forEach(enemy => {
-                enemy.world = this;
-            });
-        }
-    }
-
     lastCollisionSoundTime = 0;
-
-
     character = new Character();
     level = level1;
     enemies = level1.enemies;
@@ -30,7 +13,6 @@ class World {
     bombsBar;
     bombManager;
     backgroundObjects = level1.backgroundObjects;
-
     canvas;
     ctx;
     keyboard;
@@ -38,7 +20,6 @@ class World {
     statusBar = new StatusBar();
     throwableObjects = [];
     laserBeams = [];
-
     lastDKeyState = false;
     lastYKeyState = false;
     laserActive = false;
@@ -70,12 +51,23 @@ class World {
         this.worldDraw.draw();
         this.run();
     }
-    
+
     /**
      * Sets up bidirectional reference between world and character.
      */
     setWorld() {
         this.character.world = this;
+    }
+
+    /**
+     * Sets the world reference for all enemies after loading the level
+     */
+    setWorldReferenceForEnemies() {
+        if (this.enemies) {
+            this.enemies.forEach(enemy => {
+                enemy.world = this;
+            });
+        }
     }
 
     /**
@@ -91,13 +83,14 @@ class World {
             this.check.checkSuperShot();
             this.check.checkFirstEnemyDistance();
         }, 1000 / 60);
-
-        
         setInterval(() => {
             this.check.checkStickCollision();
         }, 50);
     }
 
+    /**
+     * Adds multiple objects to the map.
+     */
     addObjectsToMap(objects) {
         objects.forEach(object => {
             this.addToMap(object);
@@ -116,17 +109,14 @@ class World {
             if (movableObject.otherDirection) {
                 this.flipImage(movableObject);
             }
-            
             movableObject.draw(this.ctx);
-            movableObject.drawFrame(this.ctx); 
-
+            movableObject.drawFrame(this.ctx);
             if (movableObject instanceof Endboss) {
                 movableObject.drawCollisionFrameEndboss(this.ctx);
                 movableObject.drawCollisionFrameStick(this.ctx);
             } else if (movableObject.drawCollisionFrame && movableObject.collidable !== false) {
                 movableObject.drawCollisionFrame(this.ctx);
             }
-
             if (movableObject.otherDirection) {
                 this.flipImageBack(movableObject);
             }
@@ -150,5 +140,4 @@ class World {
         movableObject.x = movableObject.x * -1;
         this.ctx.restore();
     }
-            
 }
