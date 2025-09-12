@@ -89,7 +89,6 @@ class EnemyTwoHandling {
                 enemy.removeEnemy();
             }
         }, 50);
-        setTimeout(() => enemy.startBlinking(), 2500);
     }
 
     /**

@@ -4,7 +4,6 @@
 class EnemyTwoSounds {
 	/**
 	 * Plays the death sound for EnemyTwo
-	 * @param {EnemyTwo} enemy
 	 */
 	deathSoundCreation(enemy) {
 		if (typeof window !== 'undefined') {
@@ -17,7 +16,6 @@ class EnemyTwoSounds {
 
 	/**
 	 * Plays the proximity sound for EnemyTwo
-	 * @param {EnemyTwo} enemy
 	 */
 	playProximitySound(enemy) {
 		if (!enemy.world?.character) return;

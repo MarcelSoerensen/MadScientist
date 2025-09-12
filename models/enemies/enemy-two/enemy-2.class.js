@@ -58,26 +58,6 @@ class EnemyTwo extends CollidableObject {
         }
     }
 
-    triggerElectricHurt(force = 1) {
-        const now = Date.now();
-        if (this.laserHitCount >= 3) return;
-        if (force === 1 && (now - this.lastHitTime < 500)) return;
-        this.lastHitTime = now;
-        this.laserHitCount += force;
-        if (this.laserHitCount > 3) this.laserHitCount = 3;
-        if (this.electricHurtTimeout) {
-            clearTimeout(this.electricHurtTimeout);
-        }
-        this.isElectricHurt = true;
-        this.electricHurtTimeout = setTimeout(() => {
-            this.isElectricHurt = false;
-            this.electricHurtTimeout = null;
-            if (this.laserHitCount === 3) {
-                this.handler.handleDeathAnimation(this);
-            }
-        }, 700);
-    }
-
     /**
      * Removes the enemy from the game
      */
