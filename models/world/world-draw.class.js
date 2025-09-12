@@ -14,16 +14,17 @@ class WorldDraw {
      */
     draw() {
         this.world.ctx.clearRect(0, 0, this.world.canvas.width, this.world.canvas.height);
+        this.world.ctx.save();
         this.world.ctx.translate(this.world.camera_x, 0);
         this.drawBackground();
-        this.drawGameObjects();
-        this.world.ctx.translate(-this.world.camera_x, 0);
+        this.world.ctx.restore();
         this.drawBars();
+        this.world.ctx.save();
+        this.world.ctx.translate(this.world.camera_x, 0);
+        this.drawGameObjects();
+        this.world.ctx.restore();
         this.drawAlerts();
-        let self = this;
-        requestAnimationFrame(function() {
-            self.draw();
-        });
+    requestAnimationFrame(() => this.draw());
     }
 
     /**
@@ -69,7 +70,18 @@ class WorldDraw {
      * Draws only the status bar and HP bar.
      */
     drawBars() {
-        this.drawStatusBar();
+        if (this.world.statusBar) {
+            this.world.addToMap(this.world.statusBar);
+            this.world.statusBar.drawHPBar(this.world.ctx);
+        }
+        if (this.world.bombsBar && this.world.bombManager) {
+            this.world.bombsBar.setBombs(this.world.bombManager.collectedCount);
+            this.world.bombsBar.draw(this.world.ctx);
+        }
+        if (this.world.superShotBar && this.world.energyBallManager) {
+            this.world.superShotBar.setBalls(this.world.energyBallManager.collectedCount);
+            this.world.superShotBar.draw(this.world.ctx);
+        }
     }
 
     /**
@@ -100,7 +112,6 @@ class WorldDraw {
         this.drawEnergyBalls();
         this.drawBombs();
         this.drawHearts();
-        this.drawBombsBar();
     }
 
     /**
@@ -144,7 +155,7 @@ class WorldDraw {
                 this.world.gameAlerts.triggerSuperlaser(newSuperShots);
             }
             this.world.energyBallManager.draw(this.world.ctx);
-            this.world.superShotBar.draw(this.world.ctx);
+            // SuperShotBar wird nicht mehr hier gezeichnet
         }
     }
 
