@@ -1,6 +1,5 @@
 /**
  * Represents a background object that extends MovableObject
- * Used for static background elements like scenery
  */
 class BackgroundObject extends MovableObject {
 

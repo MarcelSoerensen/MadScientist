@@ -62,82 +62,85 @@ class MovableObject extends DrawableObject {
     /**
      * Checks if this object is colliding with another movable object.
      */
-    isColliding(movableObject){
+    isColliding(movableObject) {
         if (this.collidable === false || movableObject.collidable === false) {
             return false;
         }
-        if (this.offset && movableObject.offset && 
-            this.offset.left !== undefined && this.offset.right !== undefined &&
-            this.offset.top !== undefined && this.offset.bottom !== undefined &&
-            movableObject.offset.left !== undefined && movableObject.offset.right !== undefined &&
-            movableObject.offset.top !== undefined && movableObject.offset.bottom !== undefined) {
-            let thisYPos = this.y;
-            let otherYPos = movableObject.y;
-            if (this.jumpOffsetY !== undefined) {
-                thisYPos += this.jumpOffsetY * 1.5;
-            }
-            if (movableObject.jumpOffsetY !== undefined) {
-                otherYPos += movableObject.jumpOffsetY * 1.5;
-            }
-            let leftOffsetA = this.offset.left;
-            let rightOffsetA = this.offset.right;
-            if (this instanceof Character && this.otherDirection) {
-                leftOffsetA = this.offset.right;
-                rightOffsetA = this.offset.left;
-            }
-            let leftOffsetB = movableObject.offset.left;
-            let rightOffsetB = movableObject.offset.right;
-            if (movableObject instanceof Character && movableObject.otherDirection) {
-                leftOffsetB = movableObject.offset.right;
-                rightOffsetB = movableObject.offset.left;
-            }
-            const leftA = this.x + leftOffsetA;
-            const rightA = this.x + this.width - rightOffsetA;
-            const topA = thisYPos + this.offset.top;
-            const bottomA = thisYPos + this.height - this.offset.bottom;
-            const leftB = movableObject.x + leftOffsetB;
-            const rightB = movableObject.x + movableObject.width - rightOffsetB;
-            const topB = otherYPos + movableObject.offset.top;
-            const bottomB = otherYPos + movableObject.height - movableObject.offset.bottom;
-            const collision =
-                leftA < rightB &&
-                rightA > leftB &&
-                topA < bottomB &&
-                bottomA > topB;
-            const contained =
-                leftA >= leftB &&
-                rightA <= rightB &&
-                topA >= topB &&
-                bottomA <= bottomB;
-            if (collision || contained) {
-                if (this.constructor.name === 'ThrowableObjects' || movableObject.constructor.name === 'ThrowableObjects') {
-                    console.log('Bomb Kollision:', {
-                        bomb: this.constructor.name === 'ThrowableObjects' ? this : movableObject,
-                        other: this.constructor.name === 'ThrowableObjects' ? movableObject : this,
-                        collision,
-                        contained
-                    });
-                } else {
-                    console.log('isColliding detected:', {
-                        objectA: {leftA, rightA, topA, bottomA, x: this.x, y: this.y, w: this.width, h: this.height, offset: this.offset},
-                        objectB: {leftB, rightB, topB, bottomB, x: movableObject.x, y: movableObject.y, w: movableObject.width, h: movableObject.height, offset: movableObject.offset}
-                    });
-                }
-            }
-            return collision || contained;
+        if (this.hasValidOffset(this) && this.hasValidOffset(movableObject)) {
+            return this.isCollidingWithOffset(movableObject);
         } else {
-            const collision =  this.x + this.width > movableObject.x &&
-                    this.y + this.height > movableObject.y &&
-                    this.x < movableObject.x + movableObject.width &&
-                    this.y < movableObject.y + movableObject.height;
-            if (collision) {
-                console.log('isColliding detected:', {
-                    objectA: {x: this.x, y: this.y, w: this.width, h: this.height},
-                    objectB: {x: movableObject.x, y: movableObject.y, w: movableObject.width, h: movableObject.height}
-                });
-            }
-            return collision;
+            return this.isCollidingSimple(movableObject);
         }
+    }
+
+    /**
+     * Checks if the object has a valid offset.
+     */
+    hasValidOffset(obj) {
+        return obj.offset &&
+            obj.offset.left !== undefined && obj.offset.right !== undefined &&
+            obj.offset.top !== undefined && obj.offset.bottom !== undefined;
+    }
+
+    /**
+     * Checks collision using offset rectangles.
+     */
+    isCollidingWithOffset(movableObject) {
+        const rectA = this.getCollisionRect(this);
+        const rectB = this.getCollisionRect(movableObject);
+        return this.isRectCollision(rectA, rectB) || this.isRectContained(rectA, rectB);
+    }
+
+    /**
+     * Returns the collision rectangle for the object.
+     */
+    getCollisionRect(obj) {
+        let yPos = obj.y;
+        if (obj.jumpOffsetY !== undefined) {
+            yPos += obj.jumpOffsetY * 1.5;
+        }
+        let leftOffset = obj.offset.left;
+        let rightOffset = obj.offset.right;
+        if (obj instanceof Character && obj.otherDirection) {
+            leftOffset = obj.offset.right;
+            rightOffset = obj.offset.left;
+        }
+        return {
+            left: obj.x + leftOffset,
+            right: obj.x + obj.width - rightOffset,
+            top: yPos + obj.offset.top,
+            bottom: yPos + obj.height - obj.offset.bottom
+        };
+    }
+
+    /**
+     * Checks if two rectangles collide.
+     */
+    isRectCollision(rectA, rectB) {
+        return rectA.left < rectB.right &&
+            rectA.right > rectB.left &&
+            rectA.top < rectB.bottom &&
+            rectA.bottom > rectB.top;
+    }
+
+    /**
+     * Checks if one rectangle is contained in another.
+     */
+    isRectContained(rectA, rectB) {
+        return rectA.left >= rectB.left &&
+            rectA.right <= rectB.right &&
+            rectA.top >= rectB.top &&
+            rectA.bottom <= rectB.bottom;
+    }
+
+    /**
+     * Checks simple bounding box collision.
+     */
+    isCollidingSimple(movableObject) {
+        return this.x + this.width > movableObject.x &&
+            this.y + this.height > movableObject.y &&
+            this.x < movableObject.x + movableObject.width &&
+            this.y < movableObject.y + movableObject.height;
     }
 
     /**

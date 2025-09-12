@@ -23,9 +23,6 @@ function init() {
         };
         canvas.addEventListener('click', playMusic);
     }
-
-    console.log('my character is', world.character);
-    console.log('my enemies are', world.enemies);
 }
 
 /**
@@ -64,7 +61,6 @@ window.addEventListener('keydown', (event) => {
 
 /**
  * Event-Listener für Loslassen einer Taste. Setzt die jeweiligen Keyboard-Flags zurück.
- * @param {KeyboardEvent} event
  */
 window.addEventListener('keyup', (event) => {
     if (event.key === 'ArrowLeft') {
