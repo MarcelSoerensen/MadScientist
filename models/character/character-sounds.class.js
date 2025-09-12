@@ -67,12 +67,12 @@ class CharacterSounds {
      */
     hurtSound(character, world) {
         const now = Date.now();
-        if (!world._lastCollisionSoundTime || now - world._lastCollisionSoundTime > 500) {
+        if (!world.lastCollisionSoundTime || now - world.lastCollisionSoundTime > 500) {
             try {
                 const hurtSound = new Audio('sounds/character-hurt.mp3');
                 hurtSound.volume = 0.5;
                 hurtSound.play();
-                world._lastCollisionSoundTime = now;
+                world.lastCollisionSoundTime = now;
             } catch (e) {}
         }
     }
