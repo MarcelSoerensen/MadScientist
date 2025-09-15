@@ -1,10 +1,50 @@
+@font-face {
+    font-family: 'Freckle Face';
+    src: url('fonts/FreckleFace-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     display: flex;
     flex-direction: column;    
     align-items: center;
+    justify-content: center;
+    margin: 0;
+    min-height: 100vh;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-image: url('img/Backgrounds/background-sunburst.png');
+    background-size: 120vw 120vh;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Freckle Face', cursive, Arial, sans-serif;
 }
 
 canvas {
     background-color: black;
+    display: block;
+}
 
+h1 {
+    margin-top: -30px;
+    font-size: 3em;
+    color: #8e2a21;
+    text-shadow: 4px 4px 4px rgba(255, 255, 255, 0.8);
+}
+
+@media only screen and (max-width: 720px) {
+   canvas {
+       width: 100%;
+   }
+}
+
+@media only screen and (max-height: 480px) {
+
+   canvas {
+       height: 100vh;
+   }
+
+    h1 {
+        display: none;
+    }
 }
