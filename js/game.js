@@ -17,11 +17,6 @@ function init() {
             window.backgroundMusic.volume = 0.08;
         }
         window.backgroundMusic.currentTime = 0;
-        const playMusic = () => {
-            window.backgroundMusic.play();
-            canvas.removeEventListener('click', playMusic);
-        };
-        canvas.addEventListener('click', playMusic);
     }
 }
 

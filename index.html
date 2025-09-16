@@ -47,16 +47,34 @@
     <script src="models/world/world-draw.class.js"></script>
     <script src="models/world/world.class.js"></script>
     <script src="./js/game.js"></script>
+    <script src="js/startscreen.js"></script>
     
 </head>
 <body onload="init()">
-    
-    <h1>Mad Scientist</h1>
-    <canvas width="720" height="480" id="canvas">
 
-
-    </canvas>
+    <h1 class="body-title">Mad Scientist</h1>
+    <div class="canvas-container">
+        <canvas width="720" height="480" id="canvas"></canvas>
+        <div id="start_screen">
+                <h1 class="start-screen-title">Mad Scientist</h1>
+                <div class="start-screen-btn-character-group">
+                    <div class="start-screen-btn-group">
+                        <button class="start-screen-btn">Story</button>
+                        <button class="start-screen-btn">Controls</button>
+                        <button class="start-screen-btn">Play</button>
+                    </div>
+                    <div class="start-screen-laser-character-group">
+                        <div class="start-screen-laser">
+                            <img src="img/Projectile/Laser/skeleton-animation_0.png" alt="Laser Animation" style="display:none">
+                        </div>
+                        <div class="start-screen-character">
+                            <img src="img/Main Characters/Gun01/Idle/Idle_00.png" alt=""> 
+                        </div>
+                    </div>   
+                </div>
+    <div id="countdown-overlay" class="d-none"><span id="countdown-number"></span></div>
+        </div>
+    </div>
 
 </body>
-
 </html>
