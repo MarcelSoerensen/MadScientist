@@ -1,4 +1,28 @@
 /**
+ * Fades out the start screen and shows the story screen.
+ */
+window.fadeOutStartScreen = function() {
+    const startScreen = document.getElementById('start_screen');
+    const storyScreen = document.getElementById('story_screen');
+    if (!startScreen || !storyScreen) return;
+    storyScreen.style.display = 'flex';
+    storyScreen.style.opacity = '';
+    storyScreen.style.pointerEvents = '';
+    setTimeout(() => {
+        storyScreen.classList.add('fade-in-canvas');
+    }, 150);
+    startScreen.classList.remove('d-none');
+    startScreen.style.opacity = '';
+    void startScreen.offsetWidth;
+    startScreen.classList.add('fade-out');
+    setTimeout(() => {
+        startScreen.classList.add('d-none');
+        startScreen.classList.remove('fade-out');
+        startScreen.style.opacity = '';
+    }, 1500); 
+};
+
+/**
  * Resets the laser image for the given mode.
  */
 function resetLaserImg(laserImg, mode) {
@@ -163,11 +187,14 @@ function setupStartScreenButtons() {
         playBtn.addEventListener('mousedown', () => {
             animateLaser('play', () => {
                 stopStartScreenLaser();
-                showAndFadeCountdown(handleGameStart);
+                showAndFadeCountdown(handleGameStart, false); // false: do not show storyscreen
             });
         });
     }
-    if (storyBtn) storyBtn.addEventListener('mousedown', () => animateLaser('story', stopStartScreenLaser));
+    if (storyBtn) storyBtn.addEventListener('mousedown', () => animateLaser('story', () => {
+        stopStartScreenLaser();
+        showAndFadeCountdown(null, true); // true: show storyscreen
+    }));
     if (controlsBtn) controlsBtn.addEventListener('mousedown', () => animateLaser('controls', stopStartScreenLaser));
 }
 
@@ -190,23 +217,41 @@ let laserInterval;
 /**
  * Shows and fades out the countdown overlay, then starts the game.
  */
-function showAndFadeCountdown(callback) {
+function showAndFadeCountdown(callback, showStoryScreen) {
     const overlay = document.getElementById('countdown-overlay');
-    const startScreen = document.getElementById('start_screen');
     if (!overlay) return callback && callback();
     overlay.classList.remove('d-none');
     void overlay.offsetWidth;
     overlay.classList.add('fade-in');
     showCountdownOverlay(() => {
+        const canvas = document.getElementById('canvas');
+        if (canvas) {
+            canvas.classList.add('canvas-visible');
+            canvas.classList.add('fade-in-canvas');
+        }
+        if (showStoryScreen && typeof window.fadeOutStartScreen === 'function') {
+            setTimeout(() => window.fadeOutStartScreen(), 150);
+        } else {
+            // Nur Startscreen ausfaden, Storyscreen bleibt verborgen
+            const startScreen = document.getElementById('start_screen');
+            if (startScreen) {
+                setTimeout(() => {
+                    startScreen.classList.remove('d-none');
+                    startScreen.style.opacity = '';
+                    void startScreen.offsetWidth;
+                    startScreen.classList.add('fade-out');
+                    setTimeout(() => {
+                        startScreen.classList.add('d-none');
+                        startScreen.classList.remove('fade-out');
+                        startScreen.style.opacity = '';
+                    }, 1500);
+                }, 150);
+            }
+        }
         overlay.classList.add('fade-out');
-        startScreen && startScreen.classList.add('fade-out');
         setTimeout(() => {
             overlay.classList.remove('fade-out');
             overlay.classList.add('d-none');
-            if (startScreen) {
-                startScreen.classList.remove('fade-out');
-                startScreen.classList.add('d-none');
-            }
             callback && callback();
         }, 700);
     });
@@ -220,8 +265,6 @@ function handleGameStart() {
     if (canvas) {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.classList.add('canvas-visible');
-        canvas.classList.add('fade-in-canvas');
     }
     if (typeof window !== 'undefined') {
         if (!window.backgroundMusic) {
