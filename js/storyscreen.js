@@ -9,6 +9,21 @@ function showStoryScreen() {
         if (laserImg) laserImg.style.display = 'none';
         if (typeof window.fadeOutStartScreen === 'function') {
             window.fadeOutStartScreen();
+            setTimeout(() => {
+                storyScreen.classList.add('pre-fade');
+                storyScreen.style.display = 'flex';
+                startScreen.style.display = 'flex';
+                void storyScreen.offsetWidth;
+                startScreen.classList.add('fade-out');
+                storyScreen.classList.remove('pre-fade');
+                storyScreen.classList.add('fade-in');
+                setTimeout(() => {
+                    startScreen.classList.add('d-none');
+                    startScreen.classList.remove('fade-out');
+                    startScreen.style.opacity = '';
+                    storyScreen.classList.remove('fade-in');
+                }, 1500);
+            }, 1500);
         }
     });
 }

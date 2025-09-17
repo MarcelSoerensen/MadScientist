@@ -1,3 +1,14 @@
+#story_screen.pre-fade {
+    opacity: 0 !important;
+}
+#start_screen.fade-in,
+#story_screen.fade-in,
+.fade-in {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: opacity 1.5s cubic-bezier(.7,-0.2,.3,1.2);
+}
+
 #start_screen,
 #story_screen {
     transition: opacity 1.5s cubic-bezier(.7,-0.2,.3,1.2);
@@ -73,18 +84,7 @@
 }
 
 
-#start_screen.crossfade-out {
-    opacity: 0;
-    pointer-events: none;
-}
-#story_screen.crossfade-in {
-    opacity: 1;
-    pointer-events: auto;
-}
-#story_screen {
-    opacity: 0;
-    pointer-events: none;
-}
+
 
 
 @keyframes story-scroll-up {
@@ -139,25 +139,16 @@
     overflow: hidden;
 }
 
+
 #canvas {
-    opacity: 0;
+    filter: brightness(0);
     pointer-events: none;
-    transition: opacity 1s;
+    transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
 }
 
 .canvas-visible {
-    opacity: 1 !important;
+    filter: brightness(1) !important;
     pointer-events: auto;
-}
-
-.fade-in-canvas {
-    opacity: 0;
-    animation: fadeInCanvas 1.5s forwards;
-}
-
-@keyframes fadeInCanvas {
-    from { opacity: 0; }
-    to { opacity: 1; }
 }
 
 @font-face {
@@ -187,15 +178,15 @@
 }
 #countdown-overlay.fade-out {
     opacity: 0 !important;
-    transition: opacity 0.7s cubic-bezier(.7,-0.2,.3,1.2), background 1s cubic-bezier(.7,-0.2,.3,1.2);
+    transition: opacity 1.5s cubic-bezier(.7,-0.2,.3,1.2);
 }
 #countdown-overlay {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0);
+    width: 720px;
+    height: 480px;
+    background: rgba(0,0,0,0.7);
     opacity: 1;
     display: flex;
     align-items: center;
@@ -204,7 +195,7 @@
     transition: background 1s cubic-bezier(.7,-0.2,.3,1.2);
 }
 #countdown-overlay.fade-in {
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
 }
 #countdown-number {
     color: #fffbe7;
@@ -212,7 +203,7 @@
     font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
     font-weight: bold;
     text-shadow: 0 0 20px #000, 0 0 40px #f0b353;
-    opacity: 0;
+    background: rgba(0,0,0,0);
     transform: scale(1);
     transition: transform 0.45s cubic-bezier(.7,-0.2,.3,1.2), opacity 0.7s;
     will-change: transform, opacity;
@@ -225,6 +216,7 @@
 }
 .laser-tilted {
     transform: scaleX(-1) translateY(25%) rotate(10deg) !important;
+    transition: opacity 2s cubic-bezier(.7,-0.2,.3,1.2);
 }
 @font-face {
     font-family: 'Freckle Face';
@@ -526,7 +518,7 @@ canvas {
 }
 
 #start_screen.fade-out {
-    opacity: 0;
+    filter: brightness(0);
     pointer-events: none;
-    transition: opacity 1.5s cubic-bezier(.7,-0.2,.3,1.2);
+    transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
 }
