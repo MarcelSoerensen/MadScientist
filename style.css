@@ -12,8 +12,8 @@
     width: 100%;
     height: 100%;
     background: url('img/User Interfaces/PopUPbox.png') no-repeat center center;
-    background-size: contain;
-    opacity: 0.92;
+    background-size: 80% 80%;
+    opacity: 1;
     z-index: 1;
     pointer-events: none;
 }
@@ -22,35 +22,29 @@
     z-index: 2;
 }
 
-#story_screen h2 {
-    position: absolute;
-    top: 0.5vw;
-    left: 0;
-    width: 100%;
-    margin: 0;
-}
-
 #story_textbox {
-    width: 70%;
-    height: 90%;
+    width: 55%;
+    height: 55%;
+    top: -1.8em;
+    left: 0.3em;
     overflow: hidden;
     position: relative;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
     z-index: 3;
-    text-align: center;
-    font-size: 1em;
+    font-size: 1.5em;
     letter-spacing: 0.04em;
     color: #fffbe7;
     pointer-events: none;
-    position: relative;
 }
+
 #story_textbox::before,
 #story_textbox::after {
     content: '';
     position: absolute;
     left: 0;
     width: 100%;
-    height: 24px;
+    height: 20px;
     pointer-events: none;
     z-index: 10;
 }
@@ -68,12 +62,13 @@
 #story_textbox p {
     position: absolute;
     left: 0;
-    top: 100%;
+    top: 0;
     width: 100%;
-    margin: 0;
     text-align: center;
+    font-size: 1em;
     animation: story-scroll-up 60s linear 0.2s both;
     will-change: transform, opacity;
+    
 }
 
 
@@ -110,20 +105,19 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% + 2px);
+    height: 100%;
     max-width: 100vw;
     max-height: 100vh;
-    z-index: 200;
+    z-index: 100;
     background: url('img/Backgrounds/4.png') no-repeat 20% center;
     background-size: cover;
     color: #fffbe7;
     font-family: 'Freckle Face', cursive, Arial, sans-serif;
-    font-size: 2em;
-    padding: 2em;
     text-align: center;
     box-sizing: border-box;
     overflow: hidden;
 }
+
 #canvas {
     opacity: 0;
     pointer-events: none;
@@ -210,7 +204,6 @@
 }
 .laser-story-tilt {
     transform: scaleX(-1) translateY(-20%) translateX(-10%) rotate(-30deg) !important;
-    /* wie controls, aber 30 Grad */
 }
 .laser-slight-tilt {
     transform: scaleX(-1) rotate(-10deg) !important;
@@ -275,15 +268,20 @@ body {
     box-sizing: border-box;  
 }
 
-.start-screen-title {
+.start-screen-title,.story-screen-title {
     color: rgb(240, 179, 83);
     font-size: 3.5em;
-    margin-top: 0px ;
+    margin-top: clamp(-1.2em, -0.4vw, 1.8em);
     text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.8);
     opacity: 0;
     transform: scale(0.7);
     animation: title-grow-fade 2s cubic-bezier(.7,-0.2,.3,1.2) 0.1s forwards;
 }
+
+.story-screen-title {
+    top: -0.3em;
+}
+
 
 @keyframes title-grow-fade {
     from {
@@ -460,9 +458,18 @@ canvas {
        width: 100%;
        max-width: 100vw;
    }
-    .start-screen-title {
+    .start-screen-title, .story-screen-title{
         font-size: 8vw;
         margin-bottom: 4vw;
+    }
+
+    #story_textbox p {
+        font-size: clamp(0.8em, 2.5vh, 1.3em);
+    }
+
+    #story_textbox {
+        top: -8%;
+        
     }
 
     .body-title{
