@@ -1,4 +1,23 @@
 /**
+ * Returns the 'Back' button element from the story screen.
+ */
+function getBackButton() {
+    return Array.from(document.getElementsByClassName('story-screen-btn'))
+        .find(btn => btn.textContent.trim().toLowerCase() === 'back');
+}
+
+/**
+ * Sets up the 'Back' button to fade back to the start screen on click.
+ */
+function setupBackButton() {
+    const backBtn = getBackButton();
+    if (backBtn) {
+        backBtn.replaceWith(backBtn.cloneNode(true));
+        const newBackBtn = getBackButton();
+        if (newBackBtn) newBackBtn.addEventListener('click', fadeToStartScreen);
+    }
+}
+/**
  * Fades out the start screen and shows the story screen.
  */
 function showStoryScreen() {
@@ -8,40 +27,90 @@ function showStoryScreen() {
         const laserImg = document.querySelector('.start-screen-laser img');
         if (laserImg) laserImg.style.display = 'none';
         if (typeof window.fadeOutStartScreen === 'function') {
-            window.fadeOutStartScreen();
             setTimeout(() => {
+                window.fadeOutStartScreen();
                 storyScreen.classList.add('pre-fade');
                 storyScreen.style.display = 'flex';
                 startScreen.style.display = 'flex';
                 void storyScreen.offsetWidth;
-                startScreen.classList.add('fade-out');
                 storyScreen.classList.remove('pre-fade');
-                storyScreen.classList.add('fade-in');
-                setTimeout(() => {
-                    startScreen.classList.add('d-none');
-                    startScreen.classList.remove('fade-out');
-                    startScreen.style.opacity = '';
-                    storyScreen.classList.remove('fade-in');
-                }, 1500);
-            }, 1500);
+                startScreen.classList.add('fade-out');
+                startScreen.addEventListener('transitionend', onStartFadeOutEnd);
+                storyScreen.addEventListener('transitionend', onStoryFadeInEnd);
+            }, 400);
         }
     });
 }
 
 /**
- * Fades out the story screen and shows the start screen again.
+ * Event handler for the end of the fade-out transition of the start screen.
  */
-function hideStoryScreen() {
+function onStartFadeOutEnd(e) {
     const storyScreen = document.getElementById('story_screen');
     const startScreen = document.getElementById('start_screen');
+    if (e.propertyName === 'filter') {
+        storyScreen.classList.add('fade-in');
+        startScreen.removeEventListener('transitionend', onStartFadeOutEnd);
+    }
+}
+
+/**
+ * Event handler for the end of the fade-in transition of the story screen.
+ */
+function onStoryFadeInEnd(e) {
+    const storyScreen = document.getElementById('story_screen');
+    const startScreen = document.getElementById('start_screen');
+    if (e.propertyName === 'filter') {
+        startScreen.classList.remove('fade-out');
+        startScreen.style.opacity = '';
+        storyScreen.classList.remove('fade-in');
+        startScreen.classList.add('d-none');
+        storyScreen.removeEventListener('transitionend', onStoryFadeInEnd);
+    }
+}
+
+/**
+ * Fades from story screen back to start screen, using the same fade classes as the forward transition.
+ */
+function fadeToStartScreen() {
+    const storyBtn = getStoryButton();
+    if (storyBtn) storyBtn.disabled = true;
+    const startScreen = document.getElementById('start_screen');
+    const storyScreen = document.getElementById('story_screen');
+    if (!startScreen || !storyScreen) return;
+    startScreen.classList.remove('d-none', 'fade-in', 'fade-out', 'pre-fade');
+    storyScreen.classList.remove('d-none', 'fade-in', 'fade-out', 'pre-fade');
     startScreen.style.display = 'flex';
-    startScreen.classList.add('crossfade-in');
-    storyScreen.classList.add('crossfade-out');
-    setTimeout(() => {
-        storyScreen.style.display = 'none';
-        storyScreen.classList.remove('crossfade-out');
-        startScreen.classList.remove('crossfade-in');
-    }, 800);
+    storyScreen.style.display = 'flex';
+    storyScreen.classList.add('pre-fade');
+    void storyScreen.offsetWidth;
+    storyScreen.classList.remove('pre-fade');
+    startScreen.classList.add('fade-in');
+
+/**
+ * Event handler for the end of the fade-in transition of the start screen during the reverse transition.
+ */
+function onStartFadeInEnd(e) {
+    if (e.propertyName === 'filter') {
+        storyScreen.classList.add('fade-out');
+        startScreen.removeEventListener('transitionend', onStartFadeInEnd);
+    }
+}
+
+/**
+ * Hides the story screen and removes fade classes.
+ */
+function onStoryFadeOutEnd(e) {
+    if (e.propertyName === 'filter') {
+        storyScreen.classList.add('d-none');
+        storyScreen.classList.remove('fade-out');
+        startScreen.classList.remove('fade-in');
+        if (storyBtn) storyBtn.disabled = false;
+        storyScreen.removeEventListener('transitionend', onStoryFadeOutEnd);
+        }
+    }
+    startScreen.addEventListener('transitionend', onStartFadeInEnd);
+    storyScreen.addEventListener('transitionend', onStoryFadeOutEnd);
 }
 
 /**
@@ -153,4 +222,5 @@ function resetAndStartStoryTextAnimation(storyText) {
 window.addEventListener('DOMContentLoaded', () => {
     setupStoryButton();
     setupRepeatButton();
+    setupBackButton();
 });

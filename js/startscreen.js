@@ -1,14 +1,10 @@
-
-
 /**
  * Fades from start screen to story screen.
  */
 function fadeToStoryScreen(canvas) {
     if (typeof window.fadeOutStartScreen === 'function') {
-        setTimeout(() => {
-            window.fadeOutStartScreen();
-            if (canvas) canvas.classList.add('canvas-visible');
-        }, 150);
+        window.fadeOutStartScreen();
+        if (canvas) canvas.classList.add('canvas-visible');
     }
 }
 
@@ -38,14 +34,17 @@ function animateCrossfadeToStory() {
     startScreen.classList.add('fade-out');
     storyScreen.classList.remove('pre-fade');
     storyScreen.classList.add('fade-in');
-    setTimeout(() => {
-        startScreen.classList.add('d-none');
-        startScreen.classList.remove('fade-out');
-        startScreen.style.opacity = '';
-        storyScreen.classList.remove('fade-in');
-    }, 1500);
+    function onFadeOutEnd(e) {
+        if (e.propertyName === 'filter') {
+            startScreen.classList.add('d-none');
+            startScreen.classList.remove('fade-out');
+            startScreen.style.opacity = '';
+            storyScreen.classList.remove('fade-in');
+            startScreen.removeEventListener('transitionend', onFadeOutEnd);
+        }
+    }
+    startScreen.addEventListener('transitionend', onFadeOutEnd);
 }
-
 
 /**
  * Fades out the start screen and shows the canvas.
@@ -59,11 +58,15 @@ function fadeToCanvas(canvas) {
             void startScreen.offsetWidth;
             startScreen.classList.add('fade-out');
             if (canvas) canvas.classList.add('canvas-visible');
-            setTimeout(() => {
-                startScreen.classList.add('d-none');
-                startScreen.classList.remove('fade-out');
-                startScreen.style.opacity = '';
-            }, 1000);
+            function onFadeOutEnd(e) {
+                if (e.propertyName === 'filter') {
+                    startScreen.classList.add('d-none');
+                    startScreen.classList.remove('fade-out');
+                    startScreen.style.opacity = '';
+                    startScreen.removeEventListener('transitionend', onFadeOutEnd);
+                }
+            }
+            startScreen.addEventListener('transitionend', onFadeOutEnd);
         }, 150);
     }
 }
@@ -77,15 +80,17 @@ function showAndFadeCountdown(callback, showStoryScreen) {
     overlay.classList.remove('d-none');
     void overlay.offsetWidth;
     overlay.classList.add('fade-in');
-    showCountdownOverlay(() => {
-        const canvas = document.getElementById('canvas');
-        if (showStoryScreen) {
-            fadeToStoryScreen(canvas);
-        } else {
-            fadeToCanvas(canvas);
-        }
-        fadeOutOverlay(overlay, callback);
-    });
+    setTimeout(() => {
+        showCountdownOverlay(() => {
+            const canvas = document.getElementById('canvas');
+            if (showStoryScreen) {
+                fadeToStoryScreen(canvas);
+            } else {
+                fadeToCanvas(canvas);
+            }
+            fadeOutOverlay(overlay, callback);
+        });
+    }, 400);
 }
 
 /**
@@ -107,7 +112,7 @@ function showCountdownOverlay(callback) {
                 startScreen.classList.add('d-none');
                 startScreen.classList.remove('fade-out');
                 startScreen.style.opacity = '';
-            }, 1500);
+            }, 1000);
         }
     }, 2900);
     runCountdown(numberSpan, 3, () => hideCountdownOverlay(overlay, callback));
@@ -160,7 +165,6 @@ function fadeOutOverlay(overlay, callback) {
         if (callback) callback();
     }, 700);
 }
-
 
 /**
  * Crossfade from start screen to story screen (global reference).
@@ -284,27 +288,51 @@ function setBodyTitleVisible(visible) {
 function setupStartScreenButtons() {
     const [storyBtn, controlsBtn, playBtn] = document.querySelectorAll('.start-screen-btn-group button');
     if (playBtn) {
-        playBtn.addEventListener('mousedown', () => {
+        playBtn.replaceWith(playBtn.cloneNode(true));
+        const newPlayBtn = document.querySelectorAll('.start-screen-btn-group button')[2];
+        newPlayBtn.addEventListener('mousedown', () => {
             animateLaser('play', () => {
                 stopStartScreenLaser();
                 showAndFadeCountdown(handleGameStart, false);
             });
         });
     }
-    if (storyBtn) storyBtn.addEventListener('mousedown', () => animateLaser('story', () => {
-        stopStartScreenLaser();
-        showAndFadeCountdown(null, true);
-    }));
-    if (controlsBtn) controlsBtn.addEventListener('mousedown', () => animateLaser('controls', stopStartScreenLaser));
+    if (storyBtn) {
+        storyBtn.replaceWith(storyBtn.cloneNode(true));
+        const newStoryBtn = document.querySelectorAll('.start-screen-btn-group button')[0];
+        newStoryBtn.addEventListener('mousedown', () => animateLaser('story', () => {
+            stopStartScreenLaser();
+            showAndFadeCountdown(null, true);
+        }));
+    }
+    if (controlsBtn) {
+        controlsBtn.replaceWith(controlsBtn.cloneNode(true));
+        const newControlsBtn = document.querySelectorAll('.start-screen-btn-group button')[1];
+        newControlsBtn.addEventListener('mousedown', () => animateLaser('controls', stopStartScreenLaser));
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     setBodyTitleVisible(false);
     animateStartScreenCharacter();
-    setupStartScreenButtons();
+    const startScreen = document.getElementById('start_screen');
+    if (startScreen && !startScreen.classList.contains('d-none')) {
+        setupStartScreenButtons();
+    }
     const storyScreen = document.getElementById('story_screen');
     if (storyScreen) storyScreen.style.display = 'none';
 });
+// Diese Funktion kann nach jedem Screenwechsel aufgerufen werden
+function updateScreenButtonListeners() {
+    const startScreen = document.getElementById('start_screen');
+    const storyScreen = document.getElementById('story_screen');
+    if (startScreen && !startScreen.classList.contains('d-none')) {
+        setupStartScreenButtons();
+    }
+    if (storyScreen && !storyScreen.classList.contains('d-none')) {
+        if (window.setupBackButton) window.setupBackButton();
+    }
+}
 
 /**
  * Handles the start of the game after the countdown.
