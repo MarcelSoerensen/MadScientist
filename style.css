@@ -5,6 +5,7 @@
 }
 
 #story_screen::before {
+    filter: drop-shadow(8px 0 24px rgba(0,0,0,1));
     content: '';
     position: absolute;
     top: 0;
@@ -89,11 +90,31 @@
 @keyframes story-scroll-up {
     0% {
         opacity: 1;
-        transform: translateY(0%);
+        transform: translateY(30%);
     }
     100% {
         opacity: 1;
         transform: translateY(-100%);
+    }
+}
+@keyframes story-scroll-down {
+    from {
+        opacity: 1;
+        transform: translateY(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(30%);
+    }
+}
+@keyframes story-scroll-down-reverse {
+    from {
+        opacity: 1;
+        transform: translateY(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(30%);
     }
 }
 #story_screen {
@@ -138,13 +159,7 @@
     from { opacity: 0; }
     to { opacity: 1; }
 }
-.start-screen-btn.btn-animating {
-    transform: scale(0.94) translateY(4px);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-    background: #2f6874 !important;
-    color: #222 !important;
-    transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
-}
+
 @font-face {
     font-family: 'Happy Monkey';
     src: url('fonts/HappyMonkey-Regular.ttf') format('truetype');
@@ -315,7 +330,19 @@ body {
     padding-bottom:  2em;
 } 
 
-.start-screen-btn {
+.story-screen-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 2em;
+    justify-content: center;
+    align-items: center;
+    bottom: -0.2em;
+    margin-top: -0.5em;
+}
+
+
+ .start-screen-btn,
+ .story-screen-btn {
     font-family: 'Happy Monkey', 'Freckle Face', cursive, Arial, sans-serif;
     max-height: 50px;
     max-width: 130%;
@@ -331,9 +358,16 @@ body {
     transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
     position: relative;
     overflow: hidden;
+    pointer-events: auto !important;
 }
 
-.start-screen-btn:hover {
+ .story-screen-btn {
+    width: 6.5em;
+ }
+
+
+.start-screen-btn:hover,
+.story-screen-btn:hover {
     background: rgba(47, 104, 116, 0.8) !important;
     color: #fff !important;
     transform: scale(1.06);
@@ -341,7 +375,8 @@ body {
     transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
 }
 
-.start-screen-btn:active {
+.start-screen-btn:active,
+.story-screen-btn:active {
     transform: scale(0.94) translateY(4px);
     box-shadow: 0 1px 4px rgba(0,0,0,0.25);
     background: #2f6874 !important;
@@ -350,7 +385,8 @@ body {
     transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
 
 }
-.start-screen-btn::after {
+.start-screen-btn::after,
+.story-screen-btn::after {
     content: '';
     position: absolute;
     bottom: -120%;
@@ -363,7 +399,8 @@ body {
     transform: rotate(25deg) translateX(-100%) translateY(100%);
     transition: opacity 150ms, background 150ms;
 }
-.start-screen-btn:hover::after {
+.start-screen-btn:hover::after,
+.story-screen-btn:hover::after {
     opacity: 1;
     animation: glass-reflect-diag 0.7s linear;
     transition: opacity 150ms, background 150ms;
