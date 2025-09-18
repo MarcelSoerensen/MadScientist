@@ -1,10 +1,11 @@
 #start_screen,
-#story_screen {
-    transition: opacity 1s cubic-bezier(.7,-0.2,.3,1.2);
+#story_screen,
+#control_screen {
     position: relative;
 }
 
-#story_screen::before {
+#story_screen::before,
+#control_screen::before {
     filter: drop-shadow(8px 0 24px rgba(0,0,0,1));
     content: '';
     position: absolute;
@@ -18,7 +19,9 @@
     z-index: 1;
     pointer-events: none;
 }
-#story_screen > * {
+
+#story_screen > *,
+#control_screen > * {
     position: relative;
     z-index: 2;
 }
@@ -75,11 +78,11 @@
 @keyframes story-scroll-up {
     0% {
         opacity: 1;
-        transform: translateY(30%);
+        transform: translateY(calc(30%));
     }
     100% {
         opacity: 1;
-        transform: translateY(-100%);
+        transform: translateY(calc(-100%));
     }
 }
 @keyframes story-scroll-down {
@@ -102,7 +105,8 @@
         transform: translateY(30%);
     }
 }
-#story_screen {
+#story_screen,
+#control_screen {
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -161,17 +165,19 @@
    60% { background: #2f6874; color: #fff; box-shadow: 0 0 16px 4px #2f6874, 0 2px 8px rgba(0,0,0,0.2); }
    80% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
 }
+
 #countdown-overlay.fade-out {
     opacity: 0 !important;
-    transition: opacity 1.5s cubic-bezier(.7,-0.2,.3,1.2);
+    transition: opacity 1s cubic-bezier(.7,-0.2,.3,1.2);
 }
+
 #countdown-overlay {
     position: absolute;
     top: 0;
     left: 0;
-    width: 720px;
-    height: 480px;
-    background: rgba(0,0,0,0.7);
+    width: 100%;
+    height: 100%;
+    background: transparent;
     opacity: 1;
     display: flex;
     align-items: center;
@@ -179,30 +185,54 @@
     z-index: 9999;
     transition: background 1s cubic-bezier(.7,-0.2,.3,1.2);
 }
+
 #countdown-overlay.fade-in {
     background: rgba(0,0,0,0.6);
 }
+
 #countdown-number {
     color: #fffbe7;
     font-size: 100px;
     font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
     font-weight: bold;
     text-shadow: 0 0 20px #000, 0 0 40px #f0b353;
-    background: rgba(0,0,0,0);
     transform: scale(1);
     transition: transform 0.45s cubic-bezier(.7,-0.2,.3,1.2), opacity 0.7s;
     will-change: transform, opacity;
+    position: relative;
+    z-index: 2;
 }
-.laser-story-tilt {
-    transform: scaleX(-1) translateY(-20%) translateX(-10%) rotate(-30deg) !important;
+
+.countdown-blur-bg {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(.7,-0.2,.3,1.2);
+    z-index: 1;
 }
-.laser-slight-tilt {
-    transform: scaleX(-1) rotate(-10deg) !important;
+
+#countdown-overlay.fade-in .countdown-blur-bg {
+    opacity: 1;
 }
-.laser-tilted {
-    transform: scaleX(-1) translateY(25%) rotate(10deg) !important;
-    transition: opacity 2s cubic-bezier(.7,-0.2,.3,1.2);
+
+.laser-story-button {
+    transform: scaleX(-1) translateX(-9%) translateY(-20%) rotate(-30deg) !important;
+    opacity: 0.6;
 }
+
+.laser-controls-button {
+    transform: scaleX(-1) translateX(-2%) translateY(0%) rotate(-10deg) !important;
+    opacity: 0.6;
+}
+
+.laser-play-button {
+    transform: scaleX(-1) translateX(-1.5%) translateY(25%) rotate(10deg) !important;
+    opacity: 0.6;
+
+}
+
 @font-face {
     font-family: 'Freckle Face';
     src: url('fonts/FreckleFace-Regular.ttf') format('truetype');
@@ -260,7 +290,9 @@ body {
     box-sizing: border-box;  
 }
 
-.start-screen-title,.story-screen-title {
+.start-screen-title,
+.story-screen-title,
+.control-screen-title {
     color: rgb(240, 179, 83);
     font-size: 3.5em;
     margin-top: clamp(-1.2em, -0.4vw, 1.8em);
@@ -307,7 +339,8 @@ body {
     padding-bottom:  2em;
 } 
 
-.story-screen-buttons {
+.story-screen-buttons,
+.control-screen-buttons {
     display: flex;
     flex-direction: row;
     gap: 2em;
@@ -319,7 +352,8 @@ body {
 
 
  .start-screen-btn,
- .story-screen-btn {
+ .story-screen-btn,
+ .control-screen-btn {
     font-family: 'Happy Monkey', 'Freckle Face', cursive, Arial, sans-serif;
     max-height: 50px;
     max-width: 130%;
@@ -338,13 +372,15 @@ body {
     pointer-events: auto !important;
 }
 
- .story-screen-btn {
+ .story-screen-btn,
+ .control-screen-btn {
     width: 6.5em;
  }
 
 
 .start-screen-btn:hover,
-.story-screen-btn:hover {
+.story-screen-btn:hover,
+.control-screen-btn:hover {
     background: rgba(47, 104, 116, 0.8) !important;
     color: #fff !important;
     transform: scale(1.06);
@@ -353,7 +389,8 @@ body {
 }
 
 .start-screen-btn:active,
-.story-screen-btn:active {
+.story-screen-btn:active,
+.control-screen-btn:active {
     transform: scale(0.94) translateY(4px);
     box-shadow: 0 1px 4px rgba(0,0,0,0.25);
     background: #2f6874 !important;
@@ -363,7 +400,8 @@ body {
 
 }
 .start-screen-btn::after,
-.story-screen-btn::after {
+.story-screen-btn::after,
+.control-screen-btn::after {
     content: '';
     position: absolute;
     bottom: -120%;
@@ -377,11 +415,13 @@ body {
     transition: opacity 150ms, background 150ms;
 }
 .start-screen-btn:hover::after,
-.story-screen-btn:hover::after {
+.story-screen-btn:hover::after,
+.control-screen-btn:hover::after {
     opacity: 1;
     animation: glass-reflect-diag 0.7s linear;
     transition: opacity 150ms, background 150ms;
 }
+
 @keyframes glass-reflect-diag {
     0% {
         transform: rotate(25deg) translateX(-100%) translateY(100%);
@@ -446,8 +486,6 @@ body {
     height: 240%;
 }
 
-
-
 .canvas-container {
     position: relative;
     display: inline-block;
@@ -457,8 +495,6 @@ canvas {
     background-color: black;
     display: block;
 }
-
-
 
 @media only screen and (max-width: 720px) {
     .start-screen-btn-group{
@@ -472,7 +508,9 @@ canvas {
        width: 100%;
        max-width: 100vw;
    }
-    .start-screen-title, .story-screen-title{
+    .start-screen-title, 
+    .story-screen-title,
+    .control-screen-title {
         font-size: 8vw;
         margin-bottom: 4vw;
     }
@@ -503,21 +541,24 @@ canvas {
 }
 
 #start_screen.fade-out,
-#story_screen.fade-out {
+#story_screen.fade-out,
+#control_screen.fade-out {
     filter: brightness(0);
     pointer-events: none;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
 }
 
 #start_screen.fade-in,
-#story_screen.fade-in {
+#story_screen.fade-in,
+#control_screen.fade-in {
     filter: brightness(1);
     pointer-events: auto;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
 }
 
 #start_screen.pre-fade,
-#story_screen.pre-fade {
+#story_screen.pre-fade,
+#control_screen.pre-fade {
     filter: brightness(0);
     pointer-events: none;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);

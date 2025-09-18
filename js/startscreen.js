@@ -1,52 +1,4 @@
 /**
- * Fades from start screen to story screen.
- */
-function fadeToStoryScreen(canvas) {
-    if (typeof window.fadeOutStartScreen === 'function') {
-        window.fadeOutStartScreen();
-        if (canvas) canvas.classList.add('canvas-visible');
-    }
-}
-
-/**
- * Prepares both screens for crossfade.
- */
-function prepareCrossfadeScreens() {
-    const startScreen = document.getElementById('start_screen');
-    const storyScreen = document.getElementById('story_screen');
-    if (!startScreen || !storyScreen) return null;
-    storyScreen.classList.remove('d-none', 'fade-in-canvas', 'fade-in', 'fade-out', 'pre-fade');
-    startScreen.classList.remove('d-none', 'fade-in', 'fade-in-canvas', 'fade-out', 'pre-fade');
-    storyScreen.classList.add('pre-fade');
-    storyScreen.style.display = 'flex';
-    startScreen.style.display = 'flex';
-    return { startScreen, storyScreen };
-}
-
-/**
- * Animates the crossfade from start to story screen.
- */
-function animateCrossfadeToStory() {
-    const screens = prepareCrossfadeScreens();
-    if (!screens) return;
-    const { startScreen, storyScreen } = screens;
-    void storyScreen.offsetWidth;
-    startScreen.classList.add('fade-out');
-    storyScreen.classList.remove('pre-fade');
-    storyScreen.classList.add('fade-in');
-    function onFadeOutEnd(e) {
-        if (e.propertyName === 'filter') {
-            startScreen.classList.add('d-none');
-            startScreen.classList.remove('fade-out');
-            startScreen.style.opacity = '';
-            storyScreen.classList.remove('fade-in');
-            startScreen.removeEventListener('transitionend', onFadeOutEnd);
-        }
-    }
-    startScreen.addEventListener('transitionend', onFadeOutEnd);
-}
-
-/**
  * Fades out the start screen and shows the canvas.
  */
 function fadeToCanvas(canvas) {
@@ -82,10 +34,10 @@ function showAndFadeCountdown(callback, showStoryScreen) {
     overlay.classList.add('fade-in');
     setTimeout(() => {
         showCountdownOverlay(() => {
-            const canvas = document.getElementById('canvas');
             if (showStoryScreen) {
-                fadeToStoryScreen(canvas);
+                showStoryScreen();
             } else {
+                const canvas = document.getElementById('canvas');
                 fadeToCanvas(canvas);
             }
             fadeOutOverlay(overlay, callback);
@@ -167,12 +119,6 @@ function fadeOutOverlay(overlay, callback) {
 }
 
 /**
- * Crossfade from start screen to story screen (global reference).
- */
-window.fadeOutStartScreen = animateCrossfadeToStory;
-
-
-/**
  * Runs the full laser animation for the given mode.
  */
 function animateLaser(mode, callback) {
@@ -183,10 +129,8 @@ function animateLaser(mode, callback) {
     playLaserSound();
     if (charImg) charImg.style.visibility = 'visible';
     animateLaserFrames(laserImg, 6, 167, () => {
-        if (mode === 'story') toggleLaserClass(laserImg, 'laser-story-tilt', false);
-        else if (mode === 'controls') toggleLaserClass(laserImg, 'laser-slight-tilt', false);
-        else if (mode === 'play') {
-            laserImg.classList.remove('laser-tilted');
+        laserImg.classList.remove('laser-play-button', 'laser-controls-button', 'laser-story-button');
+        if (mode === 'play') {
             laserImg.style.display = 'none';
         }
         if (typeof callback === 'function') callback();
@@ -199,10 +143,10 @@ function animateLaser(mode, callback) {
 function resetLaserImg(laserImg, mode) {
     laserImg.alt = '';
     laserImg.style.display = 'inline-block';
-    laserImg.classList.remove('laser-tilted', 'laser-slight-tilt', 'laser-story-tilt');
-    if (mode === 'play') laserImg.classList.add('laser-tilted');
-    if (mode === 'story') toggleLaserClass(laserImg, 'laser-story-tilt', true);
-    if (mode === 'controls') toggleLaserClass(laserImg, 'laser-slight-tilt', true);
+    laserImg.classList.remove('laser-play-button', 'laser-controls-button', 'laser-story-button');
+    if (mode === 'play') laserImg.classList.add('laser-play-button');
+    if (mode === 'story') laserImg.classList.add('laser-story-button');
+    if (mode === 'controls') laserImg.classList.add('laser-controls-button');
     laserFrame = 0;
     laserImg.src = LASER_FRAMES[0];
 }
@@ -286,11 +230,28 @@ function setBodyTitleVisible(visible) {
  * Sets up the start screen button event listeners.
  */
 function setupStartScreenButtons() {
-    const [storyBtn, controlsBtn, playBtn] = document.querySelectorAll('.start-screen-btn-group button');
+    let [storyBtn, controlsBtn, playBtn] = document.querySelectorAll('.start-screen-btn-group button');
+    // Alle Buttons beim Betreten aktivieren
+    [storyBtn, controlsBtn, playBtn].forEach(btn => { if (btn) btn.disabled = false; });
+
     if (playBtn) {
         playBtn.replaceWith(playBtn.cloneNode(true));
-        const newPlayBtn = document.querySelectorAll('.start-screen-btn-group button')[2];
-        newPlayBtn.addEventListener('mousedown', () => {
+    }
+    if (storyBtn) {
+        storyBtn.replaceWith(storyBtn.cloneNode(true));
+    }
+    if (controlsBtn) {
+        controlsBtn.replaceWith(controlsBtn.cloneNode(true));
+    }
+    // Nach dem Ersetzen: neue Referenzen holen
+    [storyBtn, controlsBtn, playBtn] = document.querySelectorAll('.start-screen-btn-group button');
+    [storyBtn, controlsBtn, playBtn].forEach(btn => { if (btn) btn.disabled = false; });
+    function disableAll() {
+        [storyBtn, controlsBtn, playBtn].forEach(btn => { if (btn) btn.disabled = true; });
+    }
+    if (playBtn) {
+        playBtn.addEventListener('mousedown', () => {
+            disableAll();
             animateLaser('play', () => {
                 stopStartScreenLaser();
                 showAndFadeCountdown(handleGameStart, false);
@@ -298,17 +259,22 @@ function setupStartScreenButtons() {
         });
     }
     if (storyBtn) {
-        storyBtn.replaceWith(storyBtn.cloneNode(true));
-        const newStoryBtn = document.querySelectorAll('.start-screen-btn-group button')[0];
-        newStoryBtn.addEventListener('mousedown', () => animateLaser('story', () => {
-            stopStartScreenLaser();
-            showAndFadeCountdown(null, true);
-        }));
+        storyBtn.addEventListener('mousedown', () => {
+            disableAll();
+            animateLaser('story', () => {
+                stopStartScreenLaser();
+                showStoryScreen();
+            });
+        });
     }
     if (controlsBtn) {
-        controlsBtn.replaceWith(controlsBtn.cloneNode(true));
-        const newControlsBtn = document.querySelectorAll('.start-screen-btn-group button')[1];
-        newControlsBtn.addEventListener('mousedown', () => animateLaser('controls', stopStartScreenLaser));
+        controlsBtn.addEventListener('mousedown', () => {
+            disableAll();
+            animateLaser('controls', () => {
+                stopStartScreenLaser();
+                showControlScreen();
+            });
+        });
     }
 }
 
@@ -322,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const storyScreen = document.getElementById('story_screen');
     if (storyScreen) storyScreen.style.display = 'none';
 });
-// Diese Funktion kann nach jedem Screenwechsel aufgerufen werden
+
 function updateScreenButtonListeners() {
     const startScreen = document.getElementById('start_screen');
     const storyScreen = document.getElementById('story_screen');
@@ -372,5 +338,7 @@ const LASER_FRAMES = [
 ];
 let laserFrame = 0;
 let laserInterval;
+
+window.setupStartScreenButtons = setupStartScreenButtons;
 
 

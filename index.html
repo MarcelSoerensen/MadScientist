@@ -49,6 +49,7 @@
     <script src="./js/game.js"></script>
     <script src="js/startscreen.js"></script>
     <script src="js/storyscreen.js"></script>
+    <script src="js/controlscreen.js"></script>
     
 </head>
 <body onload="init()">
@@ -74,21 +75,42 @@
                     </div>   
                 </div>
         </div>
-        <div id="countdown-overlay" class="d-none"><span id="countdown-number"></span></div>
+        <div id="countdown-overlay" class="d-none">
+            <div class="countdown-blur-bg"></div>
+            <span id="countdown-number"></span>
+        </div>
 
-    <div id="story_screen" tabindex="-1">
+    <div id="story_screen" class="d-none" tabindex="-1">
         <h1 class="story-screen-title">Story</h1>
         <div id="story_textbox">
             <p>
-                Im Hochsicherheitslabor für die Erforschung kostenloser Energie ist das Unvorstellbare passiert: Feinde haben das Labor infiltriert!<br><br>
-                In letzter Sekunde gelingt es dem genialen, aber verrückten Professor – dem Mad Scientist – einen Blitzgenerator an sich zu reißen. Nun liegt es an dir, mit Köpfchen und Geschick das Labor zu verteidigen!<br><br>
-                Sammle Energyballs, um mächtige Supershots abzufeuern, und halte mit Herzen dein Leben aufrecht. Nutze Bomben, um Gegner schneller auszuschalten, und gehe clever mit deiner Munition um, damit du dem Endgegner gewachsen bist.<br><br>
-                Jeder gesammelte Energyball erhöht deinen Punktestand – zeig am Ende, was in dir steckt und rette die Zukunft der Energie!
+                In the high-security laboratory for free energy research, the unthinkable has happened: enemies have infiltrated the lab!<br><br>
+                At the last second, the brilliant but mad professor – the Mad Scientist – manages to grab a lightning generator. Now it’s up to you to defend the lab with brains and skill!<br><br>
+                Collect energy balls to unleash powerful supershots and keep your life up with hearts. Use bombs to take out enemies faster, and manage your ammo wisely so you’re ready for the final boss.<br><br>
+                Every collected energy ball increases your score – show what you’re made of and save the future of energy!
             </p>
         </div>
         <div class="story-screen-buttons">
             <button class="story-screen-btn">Back</button>
             <button class="story-screen-btn">Repeat</button>
+        </div>
+    </div>
+
+    <div id="control_screen" class="d-none">
+        <h1 class="control-screen-title">Controls</h1>
+        <div id="control_textbox" class="control-textbox">
+            <ul class="control-list">
+                <li><strong>Move Left:</strong> A</li>
+                <li><strong>Move Right:</strong> D</li>
+                <li><strong>Jump:</strong> W</li>
+                <li><strong>Bomb:</strong> D</li>
+                <li><strong>Superlaser:</strong> S</li>
+                <li><strong>Shoot:</strong> Space</li>
+                <li><strong>Pause:</strong> P</li>
+            </ul>
+        </div>
+        <div class="control-screen-buttons">
+            <button class="control-screen-btn">Back</button>
         </div>
     </div>
         </div>
