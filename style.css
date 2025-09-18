@@ -26,7 +26,8 @@
     z-index: 2;
 }
 
-#story_textbox {
+#story_textbox,
+#control_textbox {
     width: 55%;
     height: 55%;
     top: -1.8em;
@@ -40,6 +41,26 @@
     letter-spacing: 0.04em;
     color: #fffbe7;
     pointer-events: none;
+}
+
+#control_textbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}   
+
+.control-list {
+    list-style-type: none;
+    padding-left: 0;
+    width: 70%;
+}
+
+.control-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    line-height: 1.4em;
 }
 
 #story_textbox::before,
@@ -302,7 +323,8 @@ body {
     animation: title-grow-fade 2s cubic-bezier(.7,-0.2,.3,1.2) 0.1s forwards;
 }
 
-.story-screen-title {
+.story-screen-title,
+.control-screen-title {
     top: -0.3em;
 }
 
@@ -503,6 +525,7 @@ canvas {
     .start-screen-btn {
         font-size: clamp(0.8em, 4vw, 16px);
     }
+
    canvas,
    #start_screen {
        width: 100%;
