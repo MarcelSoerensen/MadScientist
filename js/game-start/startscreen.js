@@ -1,58 +1,92 @@
 /**
+ * Global laser animation frames and state variables.
+ */
+const LASER_FRAMES = [
+    'img/Projectile/Laser/skeleton-animation_0.png',
+    'img/Projectile/Laser/skeleton-animation_1.png',
+    'img/Projectile/Laser/skeleton-animation_2.png',
+    'img/Projectile/Laser/skeleton-animation_3.png',
+    'img/Projectile/Laser/skeleton-animation_4.png',
+];
+let laserFrame = 0;
+let laserInterval;
+
+/**
  * Fades out the start screen and shows the canvas.
  */
 function fadeToCanvas(canvas) {
     const startScreen = document.getElementById('start_screen');
-    if (startScreen) {
-        setTimeout(() => {
-            startScreen.classList.remove('d-none');
-            startScreen.style.opacity = '';
-            void startScreen.offsetWidth;
-            startScreen.classList.add('fade-out');
-            if (canvas) canvas.classList.add('canvas-visible');
-            function onFadeOutEnd(e) {
-                if (e.propertyName === 'filter') {
-                    startScreen.classList.add('d-none');
-                    startScreen.classList.remove('fade-out');
-                    startScreen.style.opacity = '';
-                    startScreen.removeEventListener('transitionend', onFadeOutEnd);
-                }
-            }
-            startScreen.addEventListener('transitionend', onFadeOutEnd);
-        }, 150);
-    }
+    if (!startScreen) return;
+    setTimeout(() => {
+        startScreen.classList.remove('d-none');
+        startScreen.style.opacity = '';
+        void startScreen.offsetWidth;
+        startScreen.classList.add('fade-out');
+        if (canvas) canvas.classList.add('canvas-visible');
+        fadeOutStartScreen(startScreen);
+    }, 150);
 }
 
 /**
- * Shows countdown overlay and handles transition.
+ * Handles the fade-out transition for the start screen (to canvas).
  */
-function showAndFadeCountdown(callback, showStoryScreen) {
+function fadeOutStartScreen(startScreen) {
+    const handler = event => {
+        if (event.propertyName !== 'filter') return;
+        startScreen.classList.add('d-none');
+        startScreen.classList.remove('fade-out');
+        startScreen.style.opacity = '';
+        startScreen.removeEventListener('transitionend', handler);
+    };
+    startScreen.addEventListener('transitionend', handler);
+}
+
+/**
+ * Shows and fades in the countdown overlay.
+ */
+function showAndFadeCountdown(onCountdownEnd, showStoryScreen) {
     const overlay = document.getElementById('countdown-overlay');
-    if (!overlay) return callback && callback();
+    if (!overlay) return onCountdownEnd && onCountdownEnd();
     overlay.classList.remove('d-none');
     void overlay.offsetWidth;
     overlay.classList.add('fade-in');
     setTimeout(() => {
-        showCountdownOverlay(() => {
-            if (showStoryScreen) {
-                showStoryScreen();
-            } else {
-                const canvas = document.getElementById('canvas');
-                fadeToCanvas(canvas);
-            }
-            fadeOutOverlay(overlay, callback);
-        });
+        handleCountdownTransition(overlay, onCountdownEnd, showStoryScreen);
     }, 400);
 }
 
 /**
- * Shows the countdown overlay and starts countdown.
+ * Handles the transition after the countdown overlay.
+ */
+function handleCountdownTransition(overlay, callback, showStoryScreen) {
+    showCountdownOverlay(() => {
+        if (showStoryScreen) {
+            showStoryScreen();
+        } else {
+            const canvas = document.getElementById('canvas');
+            fadeToCanvas(canvas);
+        }
+        fadeOutOverlay(overlay, callback);
+    });
+}
+
+/**
+ * Shows and fades in the countdown overlay, then starts the countdown and handles the start screen fade-out.
  */
 function showCountdownOverlay(callback) {
     const overlay = document.getElementById('countdown-overlay');
     const numberSpan = document.getElementById('countdown-number');
     if (!overlay || !numberSpan) return callback && callback();
     overlay.classList.remove('d-none');
+    setTimeout(() => {
+        handleCountdownFadeOut(overlay, numberSpan, callback);
+    }, 0);
+}
+
+/**
+ * Handles the fade-out of the start screen and runs the countdown.
+ */
+function handleCountdownFadeOut(overlay, numberSpan, callback) {
     const startScreen = document.getElementById('start_screen');
     setTimeout(() => {
         if (startScreen) {
@@ -230,55 +264,74 @@ function setBodyTitleVisible(visible) {
  * Sets up the start screen button event listeners.
  */
 function setupStartScreenButtons() {
-    let [storyBtn, controlsBtn, playBtn] = document.querySelectorAll('.start-screen-btn-group button');
-    // Alle Buttons beim Betreten aktivieren
-    [storyBtn, controlsBtn, playBtn].forEach(btn => { if (btn) btn.disabled = false; });
-
-    if (playBtn) {
-        playBtn.replaceWith(playBtn.cloneNode(true));
-    }
-    if (storyBtn) {
-        storyBtn.replaceWith(storyBtn.cloneNode(true));
-    }
-    if (controlsBtn) {
-        controlsBtn.replaceWith(controlsBtn.cloneNode(true));
-    }
-    // Nach dem Ersetzen: neue Referenzen holen
-    [storyBtn, controlsBtn, playBtn] = document.querySelectorAll('.start-screen-btn-group button');
-    [storyBtn, controlsBtn, playBtn].forEach(btn => { if (btn) btn.disabled = false; });
-    function disableAll() {
-        [storyBtn, controlsBtn, playBtn].forEach(btn => { if (btn) btn.disabled = true; });
-    }
-    if (playBtn) {
-        playBtn.addEventListener('mousedown', () => {
-            disableAll();
-            animateLaser('play', () => {
-                stopStartScreenLaser();
-                showAndFadeCountdown(handleGameStart, false);
-            });
-        });
-    }
-    if (storyBtn) {
-        storyBtn.addEventListener('mousedown', () => {
-            disableAll();
-            animateLaser('story', () => {
-                stopStartScreenLaser();
-                showStoryScreen();
-            });
-        });
-    }
-    if (controlsBtn) {
-        controlsBtn.addEventListener('mousedown', () => {
-            disableAll();
-            animateLaser('controls', () => {
-                stopStartScreenLaser();
-                showControlScreen();
-            });
-        });
-    }
+    const buttons = Array.from(document.querySelectorAll('.start-screen-btn-group button'));
+    buttons.forEach(btn => {
+        const clone = btn.cloneNode(true);
+        btn.replaceWith(clone);
+        clone.disabled = false;
+    });
+    const freshButtons = Array.from(document.querySelectorAll('.start-screen-btn-group button'));
+    const [storyBtn, controlsBtn, playBtn] = freshButtons;
+    setupPlayButton(playBtn, storyBtn, controlsBtn);
+    setupStoryButton(storyBtn, playBtn, controlsBtn);
+    setupControlsButton(controlsBtn, playBtn, storyBtn);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+/**
+ * Disables all start screen buttons to prevent multiple clicks and race conditions.
+ */
+function disableStartScreenButtons(playBtn, storyBtn, controlsBtn) {
+    if (playBtn) playBtn.disabled = true;
+    if (storyBtn) storyBtn.disabled = true;
+    if (controlsBtn) controlsBtn.disabled = true;
+}
+
+/**
+ * Sets up the event listener for the play button.
+ */
+function setupPlayButton(playBtn, storyBtn, controlsBtn) {
+    if (!playBtn) return;
+    playBtn.addEventListener('mousedown', function() {
+        disableStartScreenButtons(playBtn, storyBtn, controlsBtn);
+        animateLaser('play', function() {
+            stopStartScreenLaser();
+            showAndFadeCountdown(handleGameStart, false);
+        });
+    });
+}
+
+/**
+ * Sets up the event listener for the story button.
+ */
+function setupStoryButton(storyBtn, playBtn, controlsBtn) {
+    if (!storyBtn) return;
+    storyBtn.addEventListener('mousedown', function() {
+        disableStartScreenButtons(playBtn, storyBtn, controlsBtn);
+        animateLaser('story', function() {
+            stopStartScreenLaser();
+            showStoryScreen();
+        });
+    });
+}
+
+/**
+ * Sets up the event listener for the controls button.
+ */
+function setupControlsButton(controlsBtn, playBtn, storyBtn) {
+    if (!controlsBtn) return;
+    controlsBtn.addEventListener('mousedown', function() {
+        disableStartScreenButtons(playBtn, storyBtn, controlsBtn);
+        animateLaser('controls', function() {
+            stopStartScreenLaser();
+            showControlScreen();
+        });
+    });
+}
+
+/**
+ * Initializes the start screen and related UI elements on DOMContentLoaded.
+ */
+function initStartScreen() {
     setBodyTitleVisible(false);
     animateStartScreenCharacter();
     const startScreen = document.getElementById('start_screen');
@@ -287,8 +340,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const storyScreen = document.getElementById('story_screen');
     if (storyScreen) storyScreen.style.display = 'none';
-});
+}
 
+document.addEventListener('DOMContentLoaded', initStartScreen);
+
+/**
+ * Updates the event listeners for the start and story screen buttons depending on which screen is visible.
+ */
 function updateScreenButtonListeners() {
     const startScreen = document.getElementById('start_screen');
     const storyScreen = document.getElementById('story_screen');
@@ -305,39 +363,69 @@ function updateScreenButtonListeners() {
  */
 function handleGameStart() {
     const canvas = document.getElementById('canvas');
+    resetGameCanvas(canvas);
+    startBackgroundMusic();
+    runGameInit();
+    showBodyTitle();
+    removeCanvasFadeIn(canvas);
+}
+
+/**
+ * Clears the game canvas.
+ */
+function resetGameCanvas(canvas) {
     if (canvas) {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-    if (typeof window !== 'undefined') {
-        if (!window.backgroundMusic) {
-            window.backgroundMusic = new Audio('sounds/background-sound.mp3');
-            window.backgroundMusic.loop = true;
-            window.backgroundMusic.volume = 0.08;
-        }
-        window.backgroundMusic.currentTime = 0;
-        window.backgroundMusic.play().catch(() => {});
+}
+
+/**
+ * Starts or restarts the background music.
+ */
+function startBackgroundMusic() {
+    if (typeof window === 'undefined') return;
+    if (!window.backgroundMusic) {
+        window.backgroundMusic = new Audio('sounds/background-sound.mp3');
+        window.backgroundMusic.loop = true;
+        window.backgroundMusic.volume = 0.08;
     }
-    if (typeof init === 'function') init();
+    window.backgroundMusic.currentTime = 0;
+    window.backgroundMusic.play().catch(() => {});
+}
+
+/**
+ * Calls the global game init function if available.
+ */
+function runGameInit() {
+    if (typeof init === 'function') {
+        init();
+    }
+}
+
+/**
+ * Shows the body title by setting its opacity and pointer events.
+ */
+function showBodyTitle() {
     const bodyTitle = document.querySelector('.body-title');
     if (bodyTitle) {
         bodyTitle.style.opacity = 1;
         bodyTitle.style.pointerEvents = 'auto';
     }
+}
+
+/**
+ * Removes the fade-in-canvas class from the canvas after a delay.
+ */
+function removeCanvasFadeIn(canvas) {
     setTimeout(() => {
-        if (canvas) canvas.classList.remove('fade-in-canvas');
+        if (canvas) {
+            canvas.classList.remove('fade-in-canvas');
+        }
     }, 1000);
 }
 
-const LASER_FRAMES = [
-    'img/Projectile/Laser/skeleton-animation_0.png',
-    'img/Projectile/Laser/skeleton-animation_1.png',
-    'img/Projectile/Laser/skeleton-animation_2.png',
-    'img/Projectile/Laser/skeleton-animation_3.png',
-    'img/Projectile/Laser/skeleton-animation_4.png',
-];
-let laserFrame = 0;
-let laserInterval;
+
 
 window.setupStartScreenButtons = setupStartScreenButtons;
 
