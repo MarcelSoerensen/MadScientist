@@ -1,23 +1,4 @@
 /**
- * Returns the 'Back' button element from the story screen.
- */
-function getBackButton() {
-    return Array.from(document.getElementsByClassName('story-screen-btn'))
-        .find(btn => btn.textContent.trim().toLowerCase() === 'back');
-}
-
-/**
- * Sets up the 'Back' button to fade back to the start screen on click.
- */
-function setupBackButton() {
-    const backBtn = getBackButton();
-    if (backBtn) {
-        backBtn.replaceWith(backBtn.cloneNode(true));
-        const newBackBtn = getBackButton();
-        if (newBackBtn) newBackBtn.addEventListener('click', fadeToStartScreen);
-    }
-}
-/**
  * Fades out the start screen and shows the story screen.
  */
 function showStoryScreen() {
@@ -28,6 +9,15 @@ function showStoryScreen() {
     if (!startScreen || !storyScreen) return;
     const storyText = document.querySelector('#story_textbox p');
     if (storyText) resetAndStartStoryTextAnimation(storyText);
+
+    prepareStoryScreenTransition(startScreen, storyScreen);
+    handleStoryScreenTransition(startScreen, storyScreen);
+}
+
+/**
+ * Prepares the transition classes and styles for showing the story screen and hiding the start screen.
+ */
+function prepareStoryScreenTransition(startScreen, storyScreen) {
     storyScreen.classList.remove('fade-in', 'fade-out', 'pre-fade');
     startScreen.classList.remove('d-none', 'fade-in', 'fade-out', 'pre-fade');
     storyScreen.classList.add('pre-fade');
@@ -35,40 +25,63 @@ function showStoryScreen() {
     void storyScreen.offsetWidth;
     storyScreen.classList.remove('pre-fade');
     startScreen.classList.add('fade-out');
-    startScreen.addEventListener('transitionend', function handler(e) {
-        if (e.propertyName === 'filter') {
+}
+
+/**
+ * Handles the two-phase transition from start screen to story screen (fade out, then fade in).
+ */
+function handleStoryScreenTransition(startScreen, storyScreen) {
+    let phase = 0;
+    const handler = event => {
+        if (event.propertyName !== 'filter') return;
+        if (!phase++) {
             startScreen.removeEventListener('transitionend', handler);
             startScreen.classList.add('d-none');
             startScreen.classList.remove('fade-out');
             storyScreen.classList.remove('d-none');
             storyScreen.classList.add('fade-in');
-        }
-    });
-    storyScreen.addEventListener('transitionend', function handler(e) {
-        if (e.propertyName === 'filter') {
+            storyScreen.addEventListener('transitionend', handler);
+        } else {
             storyScreen.classList.remove('fade-in');
             storyScreen.removeEventListener('transitionend', handler);
         }
-    });
+    };
+    startScreen.addEventListener('transitionend', handler);
 }
 
 window.showStoryScreen = showStoryScreen;
 
 /**
- * Fades from story screen back to start screen, using the same fade classes as the forward transition.
+ * Handles the transition from the story screen back to the start screen.
  */
-function fadeToStartScreen() {
+function storyToStartScreen() {
     const storyBtn = getStoryButton();
     if (storyBtn) storyBtn.disabled = true;
     const startScreen = document.getElementById('start_screen');
     const storyScreen = document.getElementById('story_screen');
     if (!startScreen || !storyScreen) return;
+    storyToStartFreeze();
+    storyToStartFade(startScreen, storyScreen);
+    storyToStartFadeIn(startScreen);
+    storyToStartFadeOut(storyScreen, storyBtn);
+}
+
+/**
+ * Freezes the current story text animation and stores its position.
+ */
+function storyToStartFreeze() {
     const storyText = document.querySelector('#story_textbox p');
     if (storyText) {
         const currentPercent = getCurrentStoryTextPercent(storyText);
         storyText.style.animation = 'none';
         storyText.style.transform = `translateY(${currentPercent}%)`;
     }
+}
+
+/**
+ * Handles the fade transition classes for both start and story screens.
+ */
+function storyToStartFade(startScreen, storyScreen) {
     startScreen.classList.remove('d-none', 'fade-in', 'fade-out', 'pre-fade');
     storyScreen.classList.remove('d-none', 'fade-in', 'fade-out', 'pre-fade');
     startScreen.style.display = 'flex';
@@ -76,88 +89,99 @@ function fadeToStartScreen() {
     void storyScreen.offsetWidth;
     startScreen.classList.add('fade-in');
     storyScreen.classList.add('fade-out');
-    function onStartFadeInEnd(e) {
+}
+
+
+/**
+ * Handles the fade-in transition for the start screen.
+ */
+function storyToStartFadeIn(startScreen) {
+    function handler(e) {
         if (e.propertyName === 'filter') {
             startScreen.classList.remove('fade-in');
             startScreen.style.display = '';
-            startScreen.removeEventListener('transitionend', onStartFadeInEnd);
+            startScreen.removeEventListener('transitionend', handler);
             if (typeof window.setupStartScreenButtons === 'function') window.setupStartScreenButtons();
         }
     }
-    function onStoryFadeOutEnd(e) {
+    startScreen.addEventListener('transitionend', handler);
+}
+
+/**
+ * Handles the fade-out transition for the story screen.
+ */
+function storyToStartFadeOut(storyScreen, storyBtn) {
+    function handler(e) {
         if (e.propertyName === 'filter') {
             storyScreen.classList.add('d-none');
             storyScreen.classList.remove('fade-out');
             storyScreen.style.display = '';
             if (storyBtn) storyBtn.disabled = false;
-            storyScreen.removeEventListener('transitionend', onStoryFadeOutEnd);
+            storyScreen.removeEventListener('transitionend', handler);
         }
     }
-    startScreen.addEventListener('transitionend', onStartFadeInEnd);
-    storyScreen.addEventListener('transitionend', onStoryFadeOutEnd);
+    storyScreen.addEventListener('transitionend', handler);
+}
+
+/**
+ * Returns the 'Back' button element from the story screen.
+ */
+function getButton(className, text) {
+    return Array.from(document.getElementsByClassName(className))
+        .find(btn => btn.textContent.trim().toLowerCase() === text.toLowerCase());
 }
 
 /**
  * Returns the 'Story' button element from the start screen.
  */
 function getStoryButton() {
-    return Array.from(document.getElementsByClassName('start-screen-btn'))
-        .find(btn => btn.textContent.trim().toLowerCase() === 'story');
+    return getButton('start-screen-btn', 'story');
 }
+
 /**
- * Returns the 'Repeat' button element from the story screen.
+ * Replaces the 'Back' button and registers the event handler.
  */
-function getRepeatButton() {
-    return Array.from(document.getElementsByClassName('story-screen-btn'))
-        .find(btn => btn.textContent.trim().toLowerCase() === 'repeat');
+function setupBackButton() {
+    const oldBackBtn = getButton('story-screen-btn', 'back');
+    if (oldBackBtn) {
+        const newBackBtn = oldBackBtn.cloneNode(true);
+        oldBackBtn.replaceWith(newBackBtn);
+        newBackBtn.addEventListener('click', storyToStartScreen);
+    }
 }
 
 /**
  * Sets up the 'Repeat' button to animate the story text down and restart the scroll animation on click.
  */
 function setupRepeatButton() {
-    const repeatBtn = getRepeatButton();
-    if (repeatBtn) {
-        repeatBtn.addEventListener('click', () => {
-            const storyText = document.querySelector('#story_textbox p');
-            if (storyText) {
-                const currentPercent = getCurrentStoryTextPercent(storyText);
-                const targetPercent = 30;
-                if (currentPercent >= targetPercent - 1) {
-                    resetAndStartStoryTextAnimation(storyText);
-                    return;
-                }
-                animateStoryTextDown(storyText, currentPercent, targetPercent, 400, () => {
-                    resetAndStartStoryTextAnimation(storyText);
-                });
-            }
-        });
-    }
+    const btn = Array.from(document.getElementsByClassName('story-screen-btn'))
+        .find(btn => btn.textContent.trim().toLowerCase() === 'repeat');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        const storyText = document.querySelector('#story_textbox p');
+        if (!storyText) return;
+        const percent = getCurrentStoryTextPercent(storyText);
+        if (percent >= 29) return resetAndStartStoryTextAnimation(storyText);
+        animateStoryTextDown(storyText, percent, 30, 400, () => resetAndStartStoryTextAnimation(storyText));
+    });
 }
 
 /**
  * Calculates the current translateY percentage of the story text for animation purposes.
  */
 function getCurrentStoryTextPercent(storyText) {
-    let currentPercent = -100;
     const match = storyText.style.transform.match(/translateY\((-?\d+(?:\.\d+)?)%\)/);
-    if (match) {
-        currentPercent = parseFloat(match[1]);
-    } else {
-        const style = window.getComputedStyle(storyText);
-        const anim = style.animationName;
-        if (anim === 'story-scroll-up') {
-            const duration = 60000;
-            const elapsed = (performance.now() - (storyText._storyAnimStart || 0));
-            currentPercent = 30 - 130 * (elapsed / duration);
-            if (currentPercent < -100) currentPercent = -100;
-            if (currentPercent > 30) currentPercent = 30;
-        } else if (anim === 'story-scroll-down-reverse') {
-            currentPercent = 30;
-        }
+    if (match) return parseFloat(match[1]);
+    const anim = window.getComputedStyle(storyText).animationName;
+    if (anim === 'story-scroll-up') {
+        const duration = 60000;
+        const elapsed = performance.now() - (storyText._storyAnimStart || 0);
+        return Math.max(-100, Math.min(30 - 130 * (elapsed / duration), 30));
     }
-    return currentPercent;
+    if (anim === 'story-scroll-down-reverse') return 30;
+    return -100;
 }
+
 /**
  * Animates the story text smoothly from its current Y position down to the start position.
  */
@@ -178,6 +202,7 @@ function animateStoryTextDown(storyText, fromPercent, toPercent, duration, onDon
     storyText.style.animation = 'none';
     requestAnimationFrame(animateDown);
 }
+
 /**
  * Resets and restarts the story text scroll animation from the beginning.
  */
@@ -187,6 +212,19 @@ function resetAndStartStoryTextAnimation(storyText) {
     void storyText.offsetWidth;
     storyText.style.animation = '';
     storyText._storyAnimStart = performance.now();
+}
+
+/**
+ * Replaces a button (by class and text) and registers a click handler.
+ */
+function replaceButtonWithHandler(className, text, handler) {
+    const oldBtn = Array.from(document.getElementsByClassName(className))
+        .find(btn => btn.textContent.trim().toLowerCase() === text.toLowerCase());
+    if (oldBtn) {
+        const newBtn = oldBtn.cloneNode(true);
+        oldBtn.replaceWith(newBtn);
+        newBtn.addEventListener('click', handler);
+    }
 }
 
 /**
