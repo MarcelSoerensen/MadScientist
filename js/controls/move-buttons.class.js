@@ -78,10 +78,9 @@ class MoveButtons {
      */
     checkGameState() {
         const canvas = document.getElementById('canvas');
-        if (!canvas) return;
-
-        const computedStyle = window.getComputedStyle(canvas);
-        const isCanvasVisible = computedStyle.display !== 'none';
+        const isCanvasVisible = canvas && 
+                               canvas.classList.contains('canvas-visible') &&
+                               canvas.style.pointerEvents === 'auto';
 
         if (isCanvasVisible && !this.isGameRunning) {
             this.showMoveButtons();
