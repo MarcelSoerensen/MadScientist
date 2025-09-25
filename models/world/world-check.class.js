@@ -258,8 +258,8 @@ class WorldCheck {
                 w.keyboard.D = false;
                 w.keyboard.Y = false;
             }
-            if (w.gameAlerts && typeof w.gameAlerts.showAlert === 'function') {
-                w.gameAlerts.showAlert('gameOver', 'Game Over');
+            if (w.gameAlerts && typeof w.gameAlerts.triggerGameOver === 'function') {
+                w.gameAlerts.triggerGameOver();
             }
         }
     }

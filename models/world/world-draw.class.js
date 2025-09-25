@@ -23,7 +23,7 @@ class WorldDraw {
         this.world.ctx.restore();
         this.drawBars();
         this.drawAlerts();
-        requestAnimationFrame(() => this.draw());
+        this.animationFrameId = requestAnimationFrame(() => this.draw());
     }
 
     /**
@@ -153,7 +153,6 @@ class WorldDraw {
                 this.world.gameAlerts.triggerSuperlaser(newSuperShots);
             }
             this.world.energyBallManager.draw(this.world.ctx);
-            // SuperShotBar wird nicht mehr hier gezeichnet
         }
     }
 

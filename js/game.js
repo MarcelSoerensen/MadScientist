@@ -21,6 +21,55 @@ function init() {
 }
 
 /**
+ * Restarts the game by cleaning up the old world and creating a new one.
+ */
+function restartGame() {
+    cleanup();
+    createNewGame();
+    resetKeyboard();
+}
+
+/**
+ * Cleans up the current game state by destroying the world and resetting variables.
+ */
+function cleanup() {
+    if (world) {
+        world.cleanup();
+        world = null;
+    }
+
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    window.endbossDefeated = false;
+    if (window.enemySpawnPositions) {
+        window.enemySpawnPositions = [];
+    }
+}
+
+/**
+ * Creates a new game by generating a fresh level and initializing the world.
+ */
+function createNewGame() {
+    if (typeof createLevel1 === 'function') {
+        level1 = createLevel1();
+    }
+    init();
+}
+
+/**
+ * Resets all keyboard input flags to false.
+ */
+function resetKeyboard() {
+    Object.assign(keyboard, {
+        LEFT: false, RIGHT: false, UP: false, DOWN: false,
+        SPACE: false, D: false, Y: false, S: false
+    });
+}
+
+/**
  * Event listener for keydown. Sets the corresponding keyboard flags.
  */
 window.addEventListener('keydown', (event) => {
@@ -55,7 +104,7 @@ window.addEventListener('keydown', (event) => {
 });
 
 /**
- * Event-Listener für Loslassen einer Taste. Setzt die jeweiligen Keyboard-Flags zurück.
+ * Event listener for keyup. Resets the corresponding keyboard flags.
  */
 window.addEventListener('keyup', (event) => {
     if (event.key === 'ArrowLeft') {

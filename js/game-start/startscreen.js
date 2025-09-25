@@ -17,14 +17,12 @@ let laserInterval;
 function fadeToCanvas(canvas) {
     const startScreen = document.getElementById('start_screen');
     if (!startScreen) return;
-    setTimeout(() => {
-        startScreen.classList.remove('d-none');
-        startScreen.style.opacity = '';
-        void startScreen.offsetWidth;
-        startScreen.classList.add('fade-out');
-        if (canvas) canvas.classList.add('canvas-visible');
-        fadeOutStartScreen(startScreen);
-    }, 150);
+    
+    startScreen.classList.remove('d-none');
+    startScreen.style.opacity = '';
+    void startScreen.offsetWidth;
+    startScreen.classList.add('fade-out');
+    fadeOutStartScreen(startScreen);
 }
 
 /**
@@ -296,11 +294,38 @@ function updateScreenButtonListeners() {
  */
 function handleGameStart() {
     const canvas = document.getElementById('canvas');
-    resetGameCanvas(canvas);
-    startBackgroundMusic();
-    runGameInit();
-    showBodyTitle();
-    removeCanvasFadeIn(canvas);
+        prepareGameStart(canvas);
+        showCanvas(canvas);
+        showBodyTitle();
+        removeCanvasFadeIn(canvas);
+}
+
+/**
+ * Prepares the canvas and initializes the game for starting.
+ */
+function prepareGameStart(canvas) {
+    if (canvas) {
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.filter = 'brightness(0)';
+        canvas.style.pointerEvents = 'none';
+    }
+        startBackgroundMusic();
+        runGameInit();
+}
+
+/**
+ * Makes the canvas visible with brightness transition.
+ */
+function showCanvas(canvas) {
+    canvas.classList.add('canvas-visible');
+    canvas.style.filter = 'brightness(1)';
+    canvas.style.pointerEvents = 'auto';
+    
+    canvas.addEventListener('transitionend', function handler(event) {
+        if (event.propertyName === 'filter') {
+            canvas.removeEventListener('transitionend', handler);
+        }
+    });
 }
 
 /**
@@ -331,7 +356,9 @@ function startBackgroundMusic() {
  * Calls the global game init function if available.
  */
 function runGameInit() {
-    if (typeof init === 'function') {
+    if (typeof window.restartGame === 'function') {
+        window.restartGame();
+    } else if (typeof init === 'function') {
         init();
     }
 }

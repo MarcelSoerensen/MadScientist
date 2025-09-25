@@ -23,6 +23,7 @@ class World {
     lastDKeyState = false;
     lastYKeyState = false;
     laserActive = false;
+    gameIntervals = [];
 
     /**
      * Creates a new World instance.
@@ -74,18 +75,103 @@ class World {
      * Starts the main game loop. Runs collision detection and throwable object checks at different intervals.
      */
     run() {
-        setInterval(() => {
+        this.gameIntervals.push(setInterval(() => {
             this.check.checkCollisions();
-        }, 200);
-        setInterval(() => {
+        }, 200));
+        
+        this.gameIntervals.push(setInterval(() => {
             this.check.checkThrowableObjects();
             this.check.checkLaserBeams();
             this.check.checkSuperShot();
             this.check.checkFirstEnemyDistance();
-        }, 1000 / 60);
-        setInterval(() => {
+        }, 1000 / 60));
+        
+        this.gameIntervals.push(setInterval(() => {
             this.check.checkStickCollision();
-        }, 50);
+        }, 50));
+    }
+
+    /**
+     * Cleans up the world by clearing all intervals and references.
+     */
+    cleanup() {
+        this.cleanupIntervals();
+        this.cleanupAnimations();
+        this.cleanupCharacter();
+        this.cleanupEnemies();
+        this.cleanupManagers();
+        this.cleanupCanvas();
+    }
+
+    /**
+     * Cleans up all game intervals.
+     */
+    cleanupIntervals() {
+        this.gameIntervals.forEach(interval => {
+            clearInterval(interval);
+        });
+        this.gameIntervals = [];
+    }
+
+    /**
+     * Cleans up animation frames and drawing loops.
+     */
+    cleanupAnimations() {
+        if (this.worldDraw && this.worldDraw.animationFrameId) {
+            cancelAnimationFrame(this.worldDraw.animationFrameId);
+        }
+    }
+
+    /**
+     * Cleans up character-related intervals.
+     */
+    cleanupCharacter() {
+        if (this.character && this.character.handler && typeof this.character.handler.clearAllIntervals === 'function') {
+            this.character.handler.clearAllIntervals();
+        }
+    }
+
+    /**
+     * Cleans up all enemy intervals and references.
+     */
+    cleanupEnemies() {
+        if (this.enemies) {
+            this.enemies.forEach(enemy => {
+                if (enemy.clearIntervals && typeof enemy.clearIntervals === 'function') {
+                    enemy.clearIntervals();
+                }
+                if (enemy.moveInterval) {
+                    clearInterval(enemy.moveInterval);
+                    enemy.moveInterval = null;
+                }
+                if (enemy.animInterval) {
+                    clearInterval(enemy.animInterval);
+                    enemy.animInterval = null;
+                }
+                if (enemy.deathAnimInterval) {
+                    clearInterval(enemy.deathAnimInterval);
+                    enemy.deathAnimInterval = null;
+                }
+            });
+        }
+    }
+
+    /**
+     * Cleans up manager references.
+     */
+    cleanupManagers() {
+        if (this.energyBallManager) this.energyBallManager = null;
+        if (this.bombManager) this.bombManager = null;
+        if (this.heartsManager) this.heartsManager = null;
+    }
+
+    /**
+     * Cleans up canvas content.
+     */
+    cleanupCanvas() {
+        if (this.ctx) {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
     }
 
     /**

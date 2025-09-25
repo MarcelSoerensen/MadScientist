@@ -1,7 +1,6 @@
 class GameAlerts {
     /**
      * Creates a new GameAlerts instance for managing animated game alerts.
-     * @param {HTMLCanvasElement} canvas - The game canvas.
      */
     constructor(canvas) {
         this.canvas = canvas;
@@ -11,7 +10,6 @@ class GameAlerts {
 
     /**
      * Plays the sound associated with a given alert type.
-     * @param {string} type - The alert type.
      */
     playSound(type) {
             const sounds = {
@@ -70,11 +68,18 @@ class GameAlerts {
     }
 
     /**
-     * Triggers the Game Over alert.
+     * Triggers the Game Over alert and shows the game over screen after the alert.
      */
     triggerGameOver() {
         this.showAlert('gameOver', 'Game Over');
         this.playSound('gameOver');
+        
+        // Show game over screen after the alert duration
+        setTimeout(() => {
+            if (typeof window.showGameOverScreen === 'function') {
+                window.showGameOverScreen();
+            }
+        }, 2500); // Duration matches the gameOver alert duration
     }
 
     /**

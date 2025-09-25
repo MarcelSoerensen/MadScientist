@@ -51,9 +51,10 @@
     <script src="js/game-start/startscreen.js"></script>
     <script src="js/game-start/storyscreen.js"></script>
     <script src="js/game-start/controlscreen.js"></script>
+    <script src="js/game-end/game-over.js"></script>
     
 </head>
-<body onload="init()">
+<body>
 
     <h1 class="body-title">Mad Scientist</h1>
     <div class="canvas-container">
@@ -112,6 +113,17 @@
         </div>
         <div class="control-screen-buttons">
             <button class="control-screen-btn">Back</button>
+        </div>
+    </div>
+
+    <div id="game_over_screen" class="d-none">
+        <h1 class="game-over-screen-title">Game Over</h1>
+        <div id="game_over_textbox" class="game-over-textbox">
+            <p>Experiment failed! Time to try again, genius.</p>
+        </div>
+        <div class="game-over-screen-buttons">
+            <button class="game-over-screen-btn">Retry</button>
+            <button class="game-over-screen-btn">Menu</button>
         </div>
     </div>
         </div>
