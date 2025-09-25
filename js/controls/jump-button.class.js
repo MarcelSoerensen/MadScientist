@@ -95,6 +95,22 @@ class JumpButton {
         const canvas = document.getElementById('canvas');
         if (!canvas) return;
         
+        this.createJumpButton();
+        
+        let mobileControlsContainer = document.querySelector('.mobile-controls-container');
+        if (!mobileControlsContainer) {
+            mobileControlsContainer = document.createElement('div');
+            mobileControlsContainer.className = 'mobile-controls-container';
+            canvas.parentElement.appendChild(mobileControlsContainer);
+        }
+        
+        mobileControlsContainer.appendChild(this.jumpButtonContainer);
+    }
+
+    /**
+     * Create the jump button
+     */
+    createJumpButton() {
         this.jumpButtonContainer = document.createElement('div');
         this.jumpButtonContainer.className = 'jump-button-container';
         
@@ -105,14 +121,12 @@ class JumpButton {
         
         this.jumpButton.innerHTML = `
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                <path d="M12 2L4 10H8V20H16V10H20L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 15L12 9L6 15" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         `;
         
         this.addTouchListeners();
-        
         this.jumpButtonContainer.appendChild(this.jumpButton);
-        canvas.parentElement.appendChild(this.jumpButtonContainer);
     }
 
     /**
@@ -124,6 +138,12 @@ class JumpButton {
             this.jumpButtonContainer = null;
             this.jumpButton = null;
             this.stopJumping();
+            
+            // Remove mobile controls container if it's empty
+            const mobileControlsContainer = document.querySelector('.mobile-controls-container');
+            if (mobileControlsContainer && mobileControlsContainer.children.length === 0) {
+                mobileControlsContainer.parentElement.removeChild(mobileControlsContainer);
+            }
         }
     }
 

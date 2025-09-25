@@ -1,17 +1,13 @@
 /**
- * Mobile movement controls (left/right) for Mad Scientist game
+ * Mobile right movement control for Mad Scientist game
  */
-class MoveButtons {
+class RightButton {
     constructor() {
-        this.leftButton = null;
         this.rightButton = null;
-        this.leftButtonContainer = null;
         this.rightButtonContainer = null;
         this.keyboard = null;
         
-        this.isMovingLeft = false;
         this.isMovingRight = false;
-        this.leftInterval = null;
         this.rightInterval = null;
         
         this.isGameRunning = false;
@@ -20,7 +16,7 @@ class MoveButtons {
     }
 
     /**
-     * Initialize the movement buttons system
+     * Initialize the right movement button system
      */
     init() {
         this.tryGetKeyboard();
@@ -74,7 +70,7 @@ class MoveButtons {
     }
 
     /**
-     * Check if game is running and show/hide buttons accordingly
+     * Check if game is running and show/hide button accordingly
      */
     checkGameState() {
         const canvas = document.getElementById('canvas');
@@ -83,50 +79,35 @@ class MoveButtons {
                                canvas.style.pointerEvents === 'auto';
 
         if (isCanvasVisible && !this.isGameRunning) {
-            this.showMoveButtons();
+            this.showRightButton();
             this.isGameRunning = true;
         } else if (!isCanvasVisible && this.isGameRunning) {
-            this.hideMoveButtons();
+            this.hideRightButton();
             this.isGameRunning = false;
         }
     }
 
     /**
-     * Creates and shows the movement buttons
+     * Creates and shows the right movement button
      */
-    showMoveButtons() {
-        if (this.leftButton || this.rightButton) return;
+    showRightButton() {
+        if (this.rightButton) return;
         
         const canvas = document.getElementById('canvas');
         if (!canvas) return;
         
-        this.createLeftButton();
         this.createRightButton();
         
-        canvas.parentElement.appendChild(this.leftButtonContainer);
-        canvas.parentElement.appendChild(this.rightButtonContainer);
-    }
-
-    /**
-     * Create the left movement button
-     */
-    createLeftButton() {
-        this.leftButtonContainer = document.createElement('div');
-        this.leftButtonContainer.className = 'move-button-container move-left-container';
+        // Create or find the mobile controls container
+        let mobileControlsContainer = document.querySelector('.mobile-controls-container');
+        if (!mobileControlsContainer) {
+            mobileControlsContainer = document.createElement('div');
+            mobileControlsContainer.className = 'mobile-controls-container';
+            canvas.parentElement.appendChild(mobileControlsContainer);
+        }
         
-        this.leftButton = document.createElement('button');
-        this.leftButton.className = 'move-btn move-left-btn';
-        this.leftButton.title = 'Move Left (Hold to move)';
-        this.leftButton.setAttribute('aria-label', 'Move left button');
-        
-        this.leftButton.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                <path d="M15 18L9 12L15 6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        `;
-        
-        this.addLeftTouchListeners();
-        this.leftButtonContainer.appendChild(this.leftButton);
+        // Append at the end (right position)
+        mobileControlsContainer.appendChild(this.rightButtonContainer);
     }
 
     /**
@@ -152,69 +133,15 @@ class MoveButtons {
     }
 
     /**
-     * Hides and removes the movement buttons
+     * Hides and removes the right movement button
      */
-    hideMoveButtons() {
-        if (this.leftButtonContainer && this.leftButtonContainer.parentElement) {
-            this.leftButtonContainer.parentElement.removeChild(this.leftButtonContainer);
-            this.leftButtonContainer = null;
-            this.leftButton = null;
-            this.stopMovingLeft();
-        }
-        
+    hideRightButton() {
         if (this.rightButtonContainer && this.rightButtonContainer.parentElement) {
             this.rightButtonContainer.parentElement.removeChild(this.rightButtonContainer);
             this.rightButtonContainer = null;
             this.rightButton = null;
             this.stopMovingRight();
         }
-    }
-
-    /**
-     * Add touch event listeners for left button
-     */
-    addLeftTouchListeners() {
-        if (!this.leftButton) return;
-
-        this.leftButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.add('pressed');
-            this.startMovingLeft();
-        });
-
-        this.leftButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.remove('pressed');
-            this.stopMovingLeft();
-        });
-
-        this.leftButton.addEventListener('touchcancel', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.remove('pressed');
-            this.stopMovingLeft();
-        });
-
-        this.leftButton.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.add('pressed');
-            this.startMovingLeft();
-        });
-
-        this.leftButton.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.remove('pressed');
-            this.stopMovingLeft();
-        });
-
-        this.leftButton.addEventListener('mouseleave', (e) => {
-            this.leftButton.classList.remove('pressed');
-            this.stopMovingLeft();
-        });
     }
 
     /**
@@ -265,36 +192,6 @@ class MoveButtons {
     }
 
     /**
-     * Start moving left while button is held
-     */
-    startMovingLeft() {
-        if (this.isMovingLeft) return;
-        
-        if (!this.keyboard) {
-            if (window.keyboard) {
-                this.keyboard = window.keyboard;
-            } else if (window.world && window.world.keyboard) {
-                this.keyboard = window.world.keyboard;
-            }
-        }
-        
-        this.isMovingLeft = true;
-        this.leftButton.classList.add('moving');
-        
-        if (this.keyboard) {
-            this.keyboard.LEFT = true;
-        } else {
-            this.triggerLeftManually();
-        }
-        
-        this.leftInterval = setInterval(() => {
-            if (this.keyboard) {
-                this.keyboard.LEFT = true;
-            }
-        }, 16);
-    }
-
-    /**
      * Start moving right while button is held
      */
     startMovingRight() {
@@ -322,40 +219,6 @@ class MoveButtons {
                 this.keyboard.RIGHT = true;
             }
         }, 16);
-    }
-
-    /**
-     * Stop moving left
-     */
-    stopMovingLeft() {
-        if (!this.isMovingLeft) return;
-        
-        this.isMovingLeft = false;
-        
-        if (this.leftButton) {
-            this.leftButton.classList.remove('moving');
-        }
-        
-        if (this.leftInterval) {
-            clearInterval(this.leftInterval);
-            this.leftInterval = null;
-        }
-        
-        if (this.keyboard) {
-            this.keyboard.LEFT = false;
-        } else {
-            try {
-                const keyUpEvent = new KeyboardEvent('keyup', {
-                    key: 'ArrowLeft',
-                    code: 'ArrowLeft',
-                    keyCode: 37,
-                    which: 37,
-                    bubbles: true
-                });
-                window.dispatchEvent(keyUpEvent);
-            } catch (error) {
-            }
-        }
     }
 
     /**
@@ -388,28 +251,8 @@ class MoveButtons {
                 });
                 window.dispatchEvent(keyUpEvent);
             } catch (error) {
+                // Silent fallback
             }
-        }
-    }
-
-    /**
-     * Fallback method to trigger left movement manually if keyboard is not available
-     */
-    triggerLeftManually() {
-        try {
-            if (window.world && window.world.character) {
-                const character = window.world.character;
-                
-                if (character && typeof character.moveLeft === 'function') {
-                    character.moveLeft();
-                } else {
-                    this.simulateLeftKeyboardEvent();
-                }
-            } else {
-                this.simulateLeftKeyboardEvent();
-            }
-        } catch (error) {
-            this.simulateLeftKeyboardEvent();
         }
     }
 
@@ -435,23 +278,6 @@ class MoveButtons {
     }
 
     /**
-     * Simulate left keyboard event as final fallback
-     */
-    simulateLeftKeyboardEvent() {
-        try {
-            const keyEvent = new KeyboardEvent('keydown', {
-                key: 'ArrowLeft',
-                code: 'ArrowLeft',
-                keyCode: 37,
-                which: 37,
-                bubbles: true
-            });
-            window.dispatchEvent(keyEvent);
-        } catch (error) {
-        }
-    }
-
-    /**
      * Simulate right keyboard event as final fallback
      */
     simulateRightKeyboardEvent() {
@@ -465,14 +291,15 @@ class MoveButtons {
             });
             window.dispatchEvent(keyEvent);
         } catch (error) {
+            // Silent fallback
         }
     }
 }
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.moveButtons = new MoveButtons();
+        window.rightButton = new RightButton();
     });
 } else {
-    window.moveButtons = new MoveButtons();
+    window.rightButton = new RightButton();
 }
