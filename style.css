@@ -1,13 +1,7 @@
-#start_screen,
-#story_screen,
-#control_screen,
-#game_over_screen {
-    position: relative;
-}
-
 #story_screen::before,
 #control_screen::before,
-#game_over_screen::before {
+#game_over_screen::before,
+#win_screen::before {
     filter: drop-shadow(8px 0 24px rgba(0,0,0,1));
     content: '';
     position: absolute;
@@ -24,14 +18,16 @@
 
 #story_screen > *,
 #control_screen > *,
-#game_over_screen > * {
+#game_over_screen > *,
+#win_screen > * {
     position: relative;
     z-index: 2;
 }
 
 #story_textbox,
 #control_textbox,
-#game_over_textbox {
+#game_over_textbox,
+#win_textbox {
     width: 55%;
     height: 55%;
     top: -1.8em;
@@ -48,7 +44,8 @@
 }
 
 #control_textbox,
-#game_over_textbox {
+#game_over_textbox,
+#win_textbox {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -131,7 +128,8 @@
         transform: translateY(30%);
     }
 }
-#game_over_textbox p {
+#game_over_textbox p,
+#win_textbox p {
     text-align: center;
     font-size: 1.2em;
     line-height: 1.4em;
@@ -140,7 +138,8 @@
 
 #story_screen,
 #control_screen,
-#game_over_screen {
+#game_over_screen,
+#win_screen {
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -327,7 +326,8 @@ body {
 .start-screen-title,
 .story-screen-title,
 .control-screen-title,
-.game-over-screen-title {
+.game-over-screen-title,
+.win-screen-title {
     color: rgb(240, 179, 83);
     font-size: 3.5em;
     margin-top: clamp(-1.2em, -0.4vw, 1.8em);
@@ -339,7 +339,8 @@ body {
 
 .story-screen-title,
 .control-screen-title,
-.game-over-screen-title {
+.game-over-screen-title,
+.win-screen-title {
     top: -0.3em;
 }
 
@@ -378,7 +379,8 @@ body {
 
 .story-screen-buttons,
 .control-screen-buttons,
-.game-over-screen-buttons {
+.game-over-screen-buttons,
+.win-screen-buttons {
     display: flex;
     flex-direction: row;
     gap: 2em;
@@ -392,7 +394,8 @@ body {
  .start-screen-btn,
  .story-screen-btn,
  .control-screen-btn,
- .game-over-screen-btn {
+ .game-over-screen-btn,
+ .win-screen-btn {
     font-family: 'Happy Monkey', 'Freckle Face', cursive, Arial, sans-serif;
     max-height: 50px;
     max-width: 130%;
@@ -413,7 +416,8 @@ body {
 
  .story-screen-btn,
  .control-screen-btn,
- .game-over-screen-btn {
+ .game-over-screen-btn,
+ .win-screen-btn {
     width: 6.5em;
  }
 
@@ -421,7 +425,8 @@ body {
 .start-screen-btn:hover,
 .story-screen-btn:hover,
 .control-screen-btn:hover,
-.game-over-screen-btn:hover {
+.game-over-screen-btn:hover,
+.win-screen-btn:hover {
     background: rgba(47, 104, 116, 0.8) !important;
     color: #fff !important;
     transform: scale(1.06);
@@ -432,7 +437,8 @@ body {
 .start-screen-btn:active,
 .story-screen-btn:active,
 .control-screen-btn:active,
-.game-over-screen-btn:active {
+.game-over-screen-btn:active,
+.win-screen-btn:active {
     transform: scale(0.94) translateY(4px);
     box-shadow: 0 1px 4px rgba(0,0,0,0.25);
     background: #2f6874 !important;
@@ -444,7 +450,8 @@ body {
 .start-screen-btn::after,
 .story-screen-btn::after,
 .control-screen-btn::after,
-.game-over-screen-btn::after {
+.game-over-screen-btn::after,
+.win-screen-btn::after {
     content: '';
     position: absolute;
     bottom: -120%;
@@ -460,7 +467,8 @@ body {
 .start-screen-btn:hover::after,
 .story-screen-btn:hover::after,
 .control-screen-btn:hover::after,
-.game-over-screen-btn:hover::after {
+.game-over-screen-btn:hover::after,
+.win-screen-btn:hover::after {
     opacity: 1;
     animation: glass-reflect-diag 0.7s linear;
     transition: opacity 150ms, background 150ms;
@@ -556,7 +564,8 @@ canvas {
     .start-screen-title, 
     .story-screen-title,
     .control-screen-title,
-    .game-over-screen-title {
+    .game-over-screen-title,
+    .win-screen-title {
         font-size: 8vw;
         margin-bottom: 4vw;
     }
@@ -589,7 +598,8 @@ canvas {
 #start_screen.fade-out,
 #story_screen.fade-out,
 #control_screen.fade-out,
-#game_over_screen.fade-out {
+#game_over_screen.fade-out,
+#win_screen.fade-out {
     filter: brightness(0);
     pointer-events: none;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
@@ -598,7 +608,8 @@ canvas {
 #start_screen.fade-in,
 #story_screen.fade-in,
 #control_screen.fade-in,
-#game_over_screen.fade-in {
+#game_over_screen.fade-in,
+#win_screen.fade-in {
     filter: brightness(1);
     pointer-events: auto;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
@@ -607,7 +618,8 @@ canvas {
 #start_screen.pre-fade,
 #story_screen.pre-fade,
 #control_screen.pre-fade,
-#game_over_screen.pre-fade {
+#game_over_screen.pre-fade,
+#win_screen.pre-fade {
     filter: brightness(0);
     pointer-events: none;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);

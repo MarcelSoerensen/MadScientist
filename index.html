@@ -53,6 +53,7 @@
     <script src="js/game-start/storyscreen.js"></script>
     <script src="js/game-start/controlscreen.js"></script>
     <script src="js/game-end/game-over.js"></script>
+    <script src="js/game-end/game-win.js"></script>
     
 </head>
 <body>
@@ -105,7 +106,7 @@
             <ul class="control-list">
                 <li><strong>Move Left:</strong> left</li>
                 <li><strong>Move Right:</strong> right</li>
-                <li><strong>Jump:</strong> up</li>
+                <li><strong>Jump:</strong> up (hold)</li>
                 <li><strong>Shoot:</strong> Y</li>
                 <li><strong>Bomb:</strong> D</li>
                 <li><strong>Superlaser:</strong> S</li>
@@ -125,6 +126,17 @@
         <div class="game-over-screen-buttons">
             <button class="game-over-screen-btn">Retry</button>
             <button class="game-over-screen-btn">Menu</button>
+        </div>
+    </div>
+
+    <div id="win_screen" class="d-none">
+        <h1 class="win-screen-title">You Win!</h1>
+        <div id="win_textbox" class="win-textbox">
+            <p>Experiment successful! The mad scientist prevails!</p>
+        </div>
+        <div class="win-screen-buttons">
+            <button class="win-screen-btn">Retry</button>
+            <button class="win-screen-btn">Menu</button>
         </div>
     </div>
         </div>

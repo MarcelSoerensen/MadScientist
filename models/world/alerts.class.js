@@ -74,12 +74,11 @@ class GameAlerts {
         this.showAlert('gameOver', 'Game Over');
         this.playSound('gameOver');
         
-        // Show game over screen after the alert duration
         setTimeout(() => {
             if (typeof window.showGameOverScreen === 'function') {
                 window.showGameOverScreen();
             }
-        }, 2500); // Duration matches the gameOver alert duration
+        }, 2500); 
     }
 
     /**
@@ -173,18 +172,63 @@ class GameAlerts {
     }
 
     /**
-     * Triggers the Level Complete alert with animation and sound.
+     * Triggers the Level Complete alert with animation and sound, then shows win screen.
      */
     triggerLevelComplete() {
         this.showAlert('levelComplete', 'Level Complete', {
             font: 'bold 60px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
             duration: 2000
         });
+        
+        this.playLevelCompleteSound();
+        
+        const scoreData = this.getScoreData();
+        
+        setTimeout(() => {
+            if (typeof window.showWinScreen === 'function') {
+                window.showWinScreen(scoreData);
+            }
+        }, 2500); 
+    }
+
+    /**
+     * Plays the level complete sound effect with fade out.
+     */
+    playLevelCompleteSound() {
         try {
             const levelCompleteSound = new Audio('sounds/endboss-death.mp3');
             levelCompleteSound.volume = 0.5;
             levelCompleteSound.play();
+            
+            const startVolume = 0.5;
+            const fadeStep = startVolume / (2000 / 50); // Update every 50ms
+            
+            const fadeInterval = setInterval(() => {
+                if (levelCompleteSound.volume > 0.01) {
+                    levelCompleteSound.volume = Math.max(0, levelCompleteSound.volume - fadeStep);
+                } else {
+                    levelCompleteSound.volume = 0;
+                    levelCompleteSound.pause();
+                    clearInterval(fadeInterval);
+                }
+            }, 50);
         } catch (e) {}
+    }
+
+    /**
+     * Gets the current score data for win screen display.
+     */
+    getScoreData() {
+        const defaultScore = { collected: 0, total: 20 };
+        
+        if (this.world?.energyBallManager) {
+            return {
+                collected: this.world.energyBallManager.totalCollectedCount || 0,
+                total: this.world.energyBallManager.maxBalls || 20
+            };
+        }
+        
+        return window.gameScoreData ? { ...window.gameScoreData } : defaultScore;
     }
 
     /**

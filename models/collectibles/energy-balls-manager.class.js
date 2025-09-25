@@ -8,6 +8,7 @@ class EnergyBallManager {
     constructor(worldWidth, worldHeight, character, enemies = [], world = null) {
         this.balls = [];
         this.collectedCount = 0;
+        this.totalCollectedCount = 0;
         this.maxBalls = 20;
         this.world = world;
         this.placeEnergyBalls(worldWidth, worldHeight, character, enemies);
@@ -92,6 +93,12 @@ class EnergyBallManager {
             if (ball.isCollecting && ball.collectProgress >= 1) {
                 this.balls.splice(i, 1);
                 this.collectedCount++;
+                this.totalCollectedCount++; 
+                
+                window.gameScoreData = {
+                    collected: this.totalCollectedCount,
+                    total: this.maxBalls
+                };
             }
         }
     }
