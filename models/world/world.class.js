@@ -49,6 +49,7 @@ class World {
         }
         this.check = new WorldCheck(this);
         this.worldDraw = new WorldDraw(this);
+        this.cleaner = new WorldCleanup(this);
         this.worldDraw.draw();
         this.run();
     }
@@ -95,83 +96,7 @@ class World {
      * Cleans up the world by clearing all intervals and references.
      */
     cleanup() {
-        this.cleanupIntervals();
-        this.cleanupAnimations();
-        this.cleanupCharacter();
-        this.cleanupEnemies();
-        this.cleanupManagers();
-        this.cleanupCanvas();
-    }
-
-    /**
-     * Cleans up all game intervals.
-     */
-    cleanupIntervals() {
-        this.gameIntervals.forEach(interval => {
-            clearInterval(interval);
-        });
-        this.gameIntervals = [];
-    }
-
-    /**
-     * Cleans up animation frames and drawing loops.
-     */
-    cleanupAnimations() {
-        if (this.worldDraw && this.worldDraw.animationFrameId) {
-            cancelAnimationFrame(this.worldDraw.animationFrameId);
-        }
-    }
-
-    /**
-     * Cleans up character-related intervals.
-     */
-    cleanupCharacter() {
-        if (this.character && this.character.handler && typeof this.character.handler.clearAllIntervals === 'function') {
-            this.character.handler.clearAllIntervals();
-        }
-    }
-
-    /**
-     * Cleans up all enemy intervals and references.
-     */
-    cleanupEnemies() {
-        if (this.enemies) {
-            this.enemies.forEach(enemy => {
-                if (enemy.clearIntervals && typeof enemy.clearIntervals === 'function') {
-                    enemy.clearIntervals();
-                }
-                if (enemy.moveInterval) {
-                    clearInterval(enemy.moveInterval);
-                    enemy.moveInterval = null;
-                }
-                if (enemy.animInterval) {
-                    clearInterval(enemy.animInterval);
-                    enemy.animInterval = null;
-                }
-                if (enemy.deathAnimInterval) {
-                    clearInterval(enemy.deathAnimInterval);
-                    enemy.deathAnimInterval = null;
-                }
-            });
-        }
-    }
-
-    /**
-     * Cleans up manager references.
-     */
-    cleanupManagers() {
-        if (this.energyBallManager) this.energyBallManager = null;
-        if (this.bombManager) this.bombManager = null;
-        if (this.heartsManager) this.heartsManager = null;
-    }
-
-    /**
-     * Cleans up canvas content.
-     */
-    cleanupCanvas() {
-        if (this.ctx) {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        }
+        this.cleaner.cleanup();
     }
 
     /**
