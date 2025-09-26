@@ -557,18 +557,19 @@ canvas {
 }
 
 .fullscreen-btn {
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(0, 0, 0, 0.2);
     border-radius: 8px;
-    color: #fffbe7;
+    color: #000;
     cursor: pointer;
     padding: 12px;
     transition: all 0.1s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.08);
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -590,10 +591,11 @@ canvas {
 
 .fullscreen-btn:active {
     transform: scale(0.95);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
 }
 
 .fullscreen-btn svg {
+    fill: rgba(252, 245, 191, 1);
     transition: transform 0.2s ease;
 }
 
@@ -653,6 +655,101 @@ canvas {
     gap: 1vw;
     z-index: 99999;
     pointer-events: none;
+}
+
+/* Mobile portrait mode: Buttons at bottom */
+body.mobile-portrait .mobile-controls-container,
+body.mobile-portrait .weapon-controls-container {
+    bottom: 1vh !important;
+}
+
+body.mobile-portrait .jump-btn,
+body.mobile-portrait .move-btn,
+body.mobile-portrait .weapon-btn {
+    width: 2.75em;
+    height: 2.75em;
+    min-width: 38px;
+    min-height: 38px;
+    max-width: 55px;
+    max-height: 55px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+body.mobile-portrait .jump-btn:active,
+body.mobile-portrait .jump-btn.jumping,
+body.mobile-portrait .jump-btn.pressed,
+body.mobile-portrait .move-btn:active,
+body.mobile-portrait .move-btn.moving,
+body.mobile-portrait .move-btn.pressed,
+body.mobile-portrait .weapon-btn:active,
+body.mobile-portrait .weapon-btn.using,
+body.mobile-portrait .weapon-btn.pressed {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.4),
+                inset 0 0 25px rgba(255, 255, 255, 0.2);
+}
+
+body.mobile-portrait .jump-btn svg,
+body.mobile-portrait .move-btn svg,
+body.mobile-portrait .weapon-btn svg {
+    stroke: rgba(240, 179, 83, 1);
+}
+
+/* Portrait superlaser styling */
+body.mobile-portrait .weapon-btn.superlaser-ready {
+    background: rgba(252, 245, 191, 0.9);
+    border-color: rgba(255, 215, 0, 0.8);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6),
+                0 0 20px rgba(255, 215, 0, 0.4),
+                inset 0 0 20px rgba(255, 215, 0, 0.1);
+}
+
+/* Mobile landscape mode: Standard side positioning */
+body.mobile-landscape .mobile-controls-container {
+    left: 2vw !important;
+    bottom: 2vh !important;
+}
+
+body.mobile-landscape .weapon-controls-container {
+    right: 2vw !important;
+    bottom: 2vh !important;
+}
+
+body.mobile-landscape .jump-btn,
+body.mobile-landscape .move-btn,
+body.mobile-landscape .weapon-btn {
+    width: 2.75em !important;
+    height: 2.75em !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    max-width: 55px !important;
+    max-height: 55px !important;
+}
+
+/* Landscape orientation: Buttons on sides (default behavior) */
+@media screen and (orientation: landscape) {
+    .mobile-controls-container {
+        bottom: 2vh;
+        left: 2vw;
+        transform: none;
+        justify-content: flex-start;
+        gap: 1vw;
+    }
+    
+    .weapon-controls-container {
+        bottom: 2vh;
+        right: 2vw;
+        left: auto;
+        transform: none;
+        margin-left: 0;
+        justify-content: flex-end;
+        gap: 1vw;
+    }
 }
 
 .jump-button-container,
@@ -791,6 +888,25 @@ canvas {
     50% {
         transform: scale(1.2);
         opacity: 0.8;
+    }
+}
+
+/* Portrait mode optimizations */
+@media screen and (orientation: portrait) {
+    .jump-btn,
+    .move-btn,
+    .weapon-btn {
+        width: 10vw;
+        height: 10vw;
+        min-width: 45px;
+        min-height: 45px;
+        max-width: 55px;
+        max-height: 55px;
+    }
+    
+    .mobile-controls-container,
+    .weapon-controls-container {
+        gap: 1.5vw;
     }
 }
 
