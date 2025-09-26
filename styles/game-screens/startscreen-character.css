@@ -1,0 +1,71 @@
+.start-screen-btn-character-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 60%;
+}
+
+.start-screen-laser-character-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    width: 60%;
+}
+
+.start-screen-character {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 50%;
+    margin-right: 15%;
+}
+
+.start-screen-character img {
+    transform: scaleX(-1) translateY(-9%) translateX(-2.5%);
+    aspect-ratio: 5 / 7;
+    height: 240%;
+}
+
+.start-screen-laser {
+    width: 100%;    
+    min-width: 2em;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+}
+
+.start-screen-laser img {
+    left: 0;
+    transform: scaleX(-1) translateY(14%);
+    height: 60%;
+    width: 160%;
+    object-fit: contain;
+    display: none;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.laser-story-button {
+    transform: scaleX(-1) translateX(-9%) translateY(-20%) rotate(-30deg) !important;
+    opacity: 0.6;
+}
+
+.laser-controls-button {
+    transform: scaleX(-1) translateX(-2%) translateY(0%) rotate(-10deg) !important;
+    opacity: 0.6;
+}
+
+.laser-play-button {
+    transform: scaleX(-1) translateX(-1.5%) translateY(25%) rotate(10deg) !important;
+    opacity: 0.6;
+
+}

@@ -1,0 +1,47 @@
+#countdown-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: background 1s cubic-bezier(.7,-0.2,.3,1.2);
+}
+
+#countdown-overlay.fade-in {
+    background: rgba(0,0,0,0.6);
+    opacity: 1;
+}
+
+#countdown-overlay.fade-out {
+    opacity: 0 !important;
+    transition: opacity 1s cubic-bezier(.7,-0.2,.3,1.2);
+}
+
+#countdown-number {
+    color: #fffbe7;
+    font-size: 100px;
+    font-family: 'Comic Relief', 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+    font-weight: bold;
+    text-shadow: 0 0 20px #000, 0 0 40px #f0b353;
+    transform: scale(1);
+    transition: transform 0.45s cubic-bezier(.7,-0.2,.3,1.2), opacity 0.7s;
+    will-change: transform, opacity;
+    position: relative;
+    z-index: 2;
+}
+
+.countdown-blur-bg {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    backdrop-filter: blur(3px);
+    opacity: 1;
+    transition: opacity 1s cubic-bezier(.7,-0.2,.3,1.2);
+    z-index: 1;
+}

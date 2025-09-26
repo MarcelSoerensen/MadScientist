@@ -87,19 +87,19 @@ class GameAlerts {
     getAlertStyle(type, options = {}) {
         const defaultStyles = {
             superlaser: {
-                font: 'bold 50px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
+                font: 'bold 50px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
                 duration: 1500
             },
             levelComplete: {
-                font: 'bold 60px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
+                font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
                 duration: 2000
             },
             gameOver: {
-                font: 'bold 60px Arial, sans-serif',
+                font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
                 duration: 2500
             },
             fullEnergy: {
-                font: 'bold 50px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
+                font: 'bold 50px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
                 duration: 1500
             }
         };
@@ -148,10 +148,7 @@ class GameAlerts {
      * Triggers the Full Energy alert with animation and sound.
      */
     triggerFullEnergy() {
-        this.showAlert('fullEnergy', 'Full Energy', {
-            font: 'bold 50px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
-            duration: 1500
-        });
+        this.showAlert('fullEnergy', 'Full Energy');
         try {
             const fullEnergySound = new Audio('sounds/full-energy.mp3');
             fullEnergySound.volume = 0.5;
@@ -176,7 +173,7 @@ class GameAlerts {
      */
     triggerLevelComplete() {
         this.showAlert('levelComplete', 'Level Complete', {
-            font: 'bold 60px "Comic Sans MS", "Comic Sans", cursive, sans-serif',
+            font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
             duration: 2000
         });
         
