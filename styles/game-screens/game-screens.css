@@ -76,7 +76,7 @@
 .win-screen-title {
     top: -0.3em;
     color: rgb(240, 179, 83);
-    font-size: 3.5em;
+    font-size: clamp(1.5em, 8vw, 3.5em);
     margin-top: clamp(-1.2em, -0.4vw, 1.8em);
     text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.8);
     opacity: 0;
@@ -233,5 +233,38 @@
     filter: brightness(0);
     pointer-events: none;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
+}
+
+@media only screen and (max-width: 720px) {
+   canvas,
+   #start_screen {
+       width: 100%;
+       max-width: 100vw;
+   }
+    .start-screen-title, 
+    .story-screen-title,
+    .control-screen-title,
+    .game-over-screen-title,
+    .win-screen-title {
+        font-size: 8vw;
+        margin-bottom: 4vw;
+    }
+
+    #story_textbox p {
+        font-size: clamp(0.8em, 2.5vh, 1.3em);
+    }
+
+    #control_textbox li {
+        font-size: clamp(0.5em, 3.5vw, 1.5em) !important;
+    }
+
+    #story_textbox,
+    #control_textbox{
+        top: -8%;   
+    }
+
+    .body-title{
+        display: none;
+    }
 }
 

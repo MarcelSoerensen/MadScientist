@@ -18,15 +18,34 @@
     pointer-events: none;
 }
 
+.jump-button-container,
+.weapon-button-container,
+.move-button-container {
+    pointer-events: auto;
+}
+
 .jump-btn,
 .move-btn,
 .weapon-btn {
+    width: 2.75em;
+    height: 2.75em;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.1s ease;
     opacity: 0;
-    transform: scale(0.7);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
     animation: title-grow-fade 1.2s cubic-bezier(.7,-0.2,.3,1.2) 0.1s forwards;
 }
 
-/* Mobile portrait mode: Buttons at bottom */
 body.mobile-portrait .mobile-controls-container,
 body.mobile-portrait .weapon-controls-container {
     bottom: 1vh !important;
@@ -35,17 +54,15 @@ body.mobile-portrait .weapon-controls-container {
 body.mobile-portrait .jump-btn,
 body.mobile-portrait .move-btn,
 body.mobile-portrait .weapon-btn {
-    width: 2.75em;
-    height: 2.75em;
-    min-width: 38px;
-    min-height: 38px;
-    max-width: 55px;
-    max-height: 55px;
     background: rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
+    border: 2px solid rgba(0, 0, 0, 0.3);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
-                inset 0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+body.mobile-portrait .jump-btn svg,
+body.mobile-portrait .move-btn svg,
+body.mobile-portrait .weapon-btn svg {
+    stroke: rgba(240, 179, 83, 1);
 }
 
 body.mobile-portrait .jump-btn:active,
@@ -57,129 +74,106 @@ body.mobile-portrait .move-btn.pressed,
 body.mobile-portrait .weapon-btn:active,
 body.mobile-portrait .weapon-btn.using,
 body.mobile-portrait .weapon-btn.pressed {
-    background: rgba(0, 0, 0, 0.9);
-    border-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.4),
-                inset 0 0 25px rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    scale: 0.95;
+    border-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5),
+                inset 0 0 25px rgba(0, 0, 0, 0.3);
 }
 
-body.mobile-portrait .jump-btn svg,
-body.mobile-portrait .move-btn svg,
-body.mobile-portrait .weapon-btn svg {
-    stroke: rgba(240, 179, 83, 1);
-}
-
-/* Portrait superlaser styling */
-body.mobile-portrait .weapon-btn.superlaser-ready {
-    background: rgba(252, 245, 191, 0.9);
-    border-color: rgba(255, 215, 0, 0.8);
-    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6),
-                0 0 20px rgba(255, 215, 0, 0.4),
-                inset 0 0 20px rgba(255, 215, 0, 0.1);
-}
-
-/* Mobile landscape mode: Standard side positioning */
-body.mobile-landscape .mobile-controls-container {
-    left: 2vw !important;
-    bottom: 2vh !important;
-}
-
-body.mobile-landscape .weapon-controls-container {
-    right: 2vw !important;
-    bottom: 2vh !important;
+body.mobile-portrait .jump-btn:active svg,
+body.mobile-portrait .jump-btn.jumping svg,
+body.mobile-portrait .jump-btn.pressed svg,
+body.mobile-portrait .move-btn:active svg,
+body.mobile-portrait .move-btn.moving svg,
+body.mobile-portrait .move-btn.pressed svg,
+body.mobile-portrait .weapon-btn:active svg,
+body.mobile-portrait .weapon-btn.using svg,
+body.mobile-portrait .weapon-btn.pressed svg {
+    scale: 0.8;
 }
 
 body.mobile-landscape .jump-btn,
 body.mobile-landscape .move-btn,
 body.mobile-landscape .weapon-btn {
-    width: 2.75em !important;
-    height: 2.75em !important;
-    min-width: 38px !important;
-    min-height: 38px !important;
-    max-width: 55px !important;
-    max-height: 55px !important;
-}
-
-.jump-button-container,
-.weapon-button-container {
-    pointer-events: auto;
-}
-/* Default size for mobile control buttons to prevent initial oversize before orientation class is set */
-.jump-btn,
-.move-btn,
-.weapon-btn {
-    width: 2.75em;
-    height: 2.75em;
-}
-
-.jump-btn,
-.move-btn,
-.weapon-btn {
     background: transparent;
     border: 2px solid rgba(255, 255, 255, 0.4);
-    border-radius: 50%;
-    color: #fffbe7;
-    cursor: pointer;
-    font-size: 1.2em;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
     box-shadow: 0 4px 12px rgba(47, 104, 116, 0.4);
-    transition: all 0.1s ease;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
 }
 
-.jump-btn:active,
-.jump-btn.jumping,
-.jump-btn.pressed,
-.move-btn:active,
-.move-btn.moving,
-.move-btn.pressed,
-.weapon-btn:active,
-.weapon-btn.using,
-.weapon-btn.pressed {
+body.mobile-landscape .jump-btn svg,
+body.mobile-landscape .move-btn svg,
+body.mobile-landscape .weapon-btn svg {
+    stroke: rgba(255, 255, 255, 0.8);
+}
+
+body.mobile-landscape .jump-btn:active,
+body.mobile-landscape .jump-btn.jumping,
+body.mobile-landscape .jump-btn.pressed,
+body.mobile-landscape .move-btn:active,
+body.mobile-landscape .move-btn.moving,
+body.mobile-landscape .move-btn.pressed,
+body.mobile-landscape .weapon-btn:active,
+body.mobile-landscape .weapon-btn.using,
+body.mobile-landscape .weapon-btn.pressed {
     background: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.8);
-    transform: scale(0.9);
     box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3),
-                inset 0 0 20px rgba(255, 255, 255, 0.1);
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+                scale: 0.95;
 }
 
-.jump-btn svg,
-.move-btn svg,
-.weapon-btn svg {
-    width: 36px;
-    height: 36px;
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.8);
-    transition: all 0.1s ease;
+body.mobile-landscape .jump-btn:active svg,
+body.mobile-landscape .jump-btn.jumping svg,
+body.mobile-landscape .jump-btn.pressed svg,
+body.mobile-landscape .move-btn:active svg,
+body.mobile-landscape .move-btn.moving svg,
+body.mobile-landscape .move-btn.pressed svg,
+body.mobile-portrait .weapon-btn:active svg,
+body.mobile-portrait .weapon-btn.using svg,
+body.mobile-landscape .weapon-btn.pressed svg {
+    scale: 0.8;
 }
 
-.jump-btn:active svg,
-.jump-btn.jumping svg,
-.jump-btn.pressed svg,
-.move-btn:active svg,
-.move-btn.moving svg,
-.move-btn.pressed svg,
-.weapon-btn:active svg,
-.weapon-btn.using svg,
-.weapon-btn.pressed svg {
-    transform: scale(1.1);
-    stroke: rgba(255, 255, 255, 0.9);
+body.mobile-landscape .mobile-controls-container {
+    bottom: 2vh !important;
+    left: 2vw !important;
+    transform: none;
+    justify-content: flex-start;
+    gap: 1vw;
+}
+
+body.mobile-landscape .weapon-controls-container {
+    bottom: 2vh !important;
+    right: 2vw !important;
+    left: auto !important;
+    transform: none;
+    margin-left: 0 !important;
+    justify-content: flex-end;
+    gap: 1vw;
 }
 
 .weapon-btn.superlaser-ready {
     opacity: 1 !important;
-    border-color: rgba(255, 215, 0, 0.8);
-    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5),
-                0 0 20px rgba(255, 215, 0, 0.3);
-    animation: superlaserGlow 2s ease-in-out infinite alternate;
     position: relative;
+}
+
+body.mobile-landscape .weapon-btn.superlaser-ready {
+    background: rgba(252, 245, 191, 0.3);
+    border-color: rgba(240, 179, 83, 0.8);
+    box-shadow: 0 4px 12px rgba(240, 179, 83, 0.6),
+                0 0 12px rgba(240, 179, 83, 0.4),
+                inset 0 0 20px rgba(240, 179, 83, 0.1);
+    animation: superlaserGlowLandscape 1.5s ease-in-out infinite alternate;
+
+}
+
+body.mobile-portrait .weapon-btn.superlaser-ready {
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8),
+                0 0 20px rgba(240, 179, 83, 0.1),
+                inset 0 0 20px rgba(255, 255, 255, 1);
+    animation: superlaserGlowPortrait 1.5s ease-in-out infinite alternate;
 }
 
 .weapon-btn.superlaser-ready::before {
@@ -187,7 +181,7 @@ body.mobile-landscape .weapon-btn {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: rgba(255, 215, 0, 0.9);
+    background: rgba(240, 179, 83, 0.9);
     color: #000;
     font-size: 10px;
     font-weight: bold;
@@ -202,19 +196,41 @@ body.mobile-landscape .weapon-btn {
 }
 
 .weapon-btn.superlaser-ready svg {
-    stroke: rgba(255, 215, 0, 0.9);
-    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+    stroke: rgba(240, 179, 83, 0.9);
+    filter: drop-shadow(0 0 4px rgba(240, 179, 83, 0.6));
 }
 
 .weapon-btn.superlaser-ready:active,
 .weapon-btn.superlaser-ready.pressed {
-    border-color: rgba(255, 215, 0, 1);
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.8),
-                inset 0 0 20px rgba(255, 215, 0, 0.2);
+    border-color: rgba(240, 179, 83, 1);
+    box-shadow: 0 2px 8px rgba(240, 179, 83, 0.8),
+                inset 0 0 20px rgba(240, 179, 83, 0.2);
 }
 
 .weapon-btn.superlaser-ready:active svg,
 .weapon-btn.superlaser-ready.pressed svg {
-    stroke: rgba(255, 215, 0, 1);
-    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+    stroke: rgba(240, 179, 83, 1);
+    filter: drop-shadow(0 0 6px rgba(240, 179, 83, 0.8));
+}
+
+@keyframes superlaserGlowLandscape {
+    0% { box-shadow: 0 0 4px 0px #f9e79f; }
+    100% { box-shadow: 0 0 12px 0px #f7ca18; }
+}
+
+@keyframes superlaserGlowPortrait {
+    0% { box-shadow: 0 0 0 0 rgba(75, 160, 209, 1); }
+    100% { box-shadow: 0 0 8px 0px rgba(75, 160, 209, 1); }
+}
+
+@keyframes doubleTapPulse {
+    0%, 100% {
+        background-shadow: 0 0 12px 0px rgba(0, 0, 0, 0.9);
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
 }

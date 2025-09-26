@@ -33,8 +33,6 @@ body {
     background-repeat: no-repeat;
     font-family: 'Freckle Face', cursive, Arial, sans-serif;
 }
-
-
 .body-title {
     margin-top: -30px;
     font-size: 3em;
@@ -123,100 +121,16 @@ canvas {
 
 
 
-/* Landscape orientation: Buttons on sides (default behavior) */
-@media screen and (orientation: landscape) {
-    .mobile-controls-container {
-        bottom: 2vh;
-        left: 2vw;
-        transform: none;
-        justify-content: flex-start;
-        gap: 1vw;
-    }
-    
-    .weapon-controls-container {
-        bottom: 2vh;
-        right: 2vw;
-        left: auto;
-        transform: none;
-        margin-left: 0;
-        justify-content: flex-end;
-        gap: 1vw;
-    }
-}
 
 
 
-@keyframes superlaserGlow {
-    0% {
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5),
-                    0 0 20px rgba(255, 215, 0, 0.3);
-    }
-    100% {
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.7),
-                    0 0 25px rgba(255, 215, 0, 0.5);
-    }
-}
 
-@keyframes doubleTapPulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.2);
-        opacity: 0.8;
-    }
-}
 
-/* Portrait mode optimizations */
-@media screen and (orientation: portrait) {
-    .jump-btn,
-    .move-btn,
-    .weapon-btn {
-        width: 10vw;
-        height: 10vw;
-        min-width: 45px;
-        min-height: 45px;
-        max-width: 55px;
-        max-height: 55px;
-    }
-    
-    .mobile-controls-container,
-    .weapon-controls-container {
-        gap: 1.5vw;
-    }
-}
+
+
+
 
 @media only screen and (max-width: 720px) {
-    .mobile-controls-container,
-    .weapon-controls-container {
-        gap: 2vw;
-    }
-    
-    .jump-btn,
-    .move-btn,
-    .weapon-btn {
-        width: 12vw;
-        height: 12vw;
-        min-width: 50px;
-        min-height: 50px;
-        max-width: 80px;
-        max-height: 80px;
-    }
-}
-
-.move-button-container {
-    pointer-events: auto;
-}
-
-@media only screen and (max-width: 720px) {
-    .start-screen-btn-group{
-        gap: 1em;
-    }
-    .start-screen-btn {
-        font-size: clamp(0.8em, 4vw, 16px);
-    }
-
    canvas,
    #start_screen {
        width: 100%;
