@@ -64,6 +64,30 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.18), 6px 6px 12px 0 rgba(0,0,0,0.18);
     transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
 }
+    @keyframes glass-reflect-diag {
+        0% {
+            transform: rotate(25deg) translateX(-100%) translateY(100%);
+            opacity: 0.2;
+        }
+        40% {
+            opacity: 0.7;
+        }
+        60% {
+            opacity: 0.7;
+        }
+        100% {
+            transform: rotate(25deg) translateX(100%) translateY(-100%);
+            opacity: 0;
+        }
+    }
+
+    @keyframes button-flicker {
+        0%, 100% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
+        20% { background: #2f6874; color: #fff; box-shadow: 0 0 16px 4px #2f6874, 0 2px 8px rgba(0,0,0,0.2); }
+        40% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
+        60% { background: #2f6874; color: #fff; box-shadow: 0 0 16px 4px #2f6874, 0 2px 8px rgba(0,0,0,0.2); }
+        80% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
+    }
 
 .start-screen-btn:active,
 .story-screen-btn:active,

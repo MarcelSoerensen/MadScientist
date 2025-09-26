@@ -68,68 +68,6 @@ canvas {
     pointer-events: auto;
 }
 
-
-@keyframes button-flicker {
-    0%, 100% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
-   20% { background: #2f6874; color: #fff; box-shadow: 0 0 16px 4px #2f6874, 0 2px 8px rgba(0,0,0,0.2); }
-   40% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
-   60% { background: #2f6874; color: #fff; box-shadow: 0 0 16px 4px #2f6874, 0 2px 8px rgba(0,0,0,0.2); }
-   80% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
-}
-
-
-
-
-
-
-
-@keyframes glass-reflect-diag {
-    0% {
-        transform: rotate(25deg) translateX(-100%) translateY(100%);
-        opacity: 0.2;
-    }
-    40% {
-        opacity: 0.7;
-    }
-    60% {
-        opacity: 0.7;
-    }
-    100% {
-        transform: rotate(25deg) translateX(100%) translateY(-100%);
-        opacity: 0;
-    }
-}
-
-
-
-
-
-
-
-@media only screen and (max-width: 720px) {
-    .fullscreen-button-container {
-        bottom: 10px;
-        right: 10px;
-    }
-    
-    .fullscreen-btn {
-        padding: 8px;
-        border-radius: 6px;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 @media only screen and (max-width: 720px) {
    canvas,
    #start_screen {
@@ -172,8 +110,4 @@ canvas {
    .body-title {
         display: none;
     }
-}
-
-.alert-text {
-    font-family: 'Comic Relief', 'Comic Sans MS', 'Comic Sans', cursive, sans-serif !important;
 }
