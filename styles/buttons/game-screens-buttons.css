@@ -81,14 +81,6 @@
         }
     }
 
-    @keyframes button-flicker {
-        0%, 100% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
-        20% { background: #2f6874; color: #fff; box-shadow: 0 0 16px 4px #2f6874, 0 2px 8px rgba(0,0,0,0.2); }
-        40% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
-        60% { background: #2f6874; color: #fff; box-shadow: 0 0 16px 4px #2f6874, 0 2px 8px rgba(0,0,0,0.2); }
-        80% { background: #fff; color: #226; box-shadow: 0 0 16px 4px #fff, 0 2px 8px rgba(0,0,0,0.2); }
-    }
-
 .start-screen-btn:active,
 .story-screen-btn:active,
 .control-screen-btn:active,

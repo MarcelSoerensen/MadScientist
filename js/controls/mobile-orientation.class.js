@@ -8,6 +8,14 @@ class MobileOrientationManager {
     constructor() {
         this.isPortrait = false;
         this.isMobile = false;
+        document.body.appendChild(
+            document.querySelector('.mobile-controls-container') ||
+            Object.assign(document.createElement('div'), { className: 'mobile-controls-container' })
+        );
+        document.body.appendChild(
+            document.querySelector('.weapon-controls-container') ||
+            Object.assign(document.createElement('div'), { className: 'weapon-controls-container' })
+        );
         this.init();
     }
 
@@ -45,16 +53,6 @@ class MobileOrientationManager {
     repositionControls() {
         let mobileContainer = document.querySelector('.mobile-controls-container');
         let weaponContainer = document.querySelector('.weapon-controls-container');
-        if (!mobileContainer) {
-            mobileContainer = document.createElement('div');
-            mobileContainer.className = 'mobile-controls-container';
-            document.body.appendChild(mobileContainer);
-        }
-        if (!weaponContainer) {
-            weaponContainer = document.createElement('div');
-            weaponContainer.className = 'weapon-controls-container';
-            document.body.appendChild(weaponContainer);
-        }
         if (!this.isMobile) {
             this.hideControls();
             return;

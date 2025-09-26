@@ -217,8 +217,8 @@ function winToStartFadeIn(startScreen) {
     function handler(event) {
         if (event.propertyName === 'filter') {
             startScreen.classList.remove('fade-in');
-            startScreen.classList.remove('d-none'); // Ensure d-none is removed
-            startScreen.style.display = ''; // Reset display style
+            startScreen.classList.remove('d-none');
+            startScreen.style.display = '';
             startScreen.removeEventListener('transitionend', handler);
             if (typeof window.setupStartScreenButtons === 'function') window.setupStartScreenButtons();
         }
