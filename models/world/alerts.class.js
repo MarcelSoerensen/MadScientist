@@ -59,13 +59,7 @@ class GameAlerts {
         this.playSound('fullEnergy');
     }
 
-    /**
-     * Triggers the Level Complete alert.
-     */
-    triggerLevelComplete() {
-        this.showAlert('levelComplete', 'Level Complete');
-        this.playSound('levelComplete');
-    }
+
 
     /**
      * Triggers the Game Over alert and shows the game over screen after the alert.
@@ -74,6 +68,10 @@ class GameAlerts {
         let callback = null;
         if (arguments.length > 0 && typeof arguments[0] === 'function') {
             callback = arguments[0];
+        }
+        if (typeof window !== 'undefined' && window.backgroundMusic) {
+            window.backgroundMusic.pause();
+            window.backgroundMusic.currentTime = 0;
         }
         this.showAlert('gameOver', 'Game Over');
         this.playSound('gameOver');
@@ -173,23 +171,24 @@ class GameAlerts {
     }
 
     /**
-     * Triggers the Level Complete alert with animation and sound, then shows win screen.
+     * Triggers the Level Complete alert mit Musik-Stop, Animation und Sound, dann Win-Screen.
      */
     triggerLevelComplete() {
+        if (typeof window !== 'undefined' && window.backgroundMusic) {
+            window.backgroundMusic.pause();
+            window.backgroundMusic.currentTime = 0;
+        }
         this.showAlert('levelComplete', 'Level Complete', {
             font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
             duration: 2000
         });
-        
         this.playLevelCompleteSound();
-        
         const scoreData = this.getScoreData();
-        
         setTimeout(() => {
             if (typeof window.showWinScreen === 'function') {
                 window.showWinScreen(scoreData);
             }
-        }, 2500); 
+        }, 2500);
     }
 
     /**
@@ -202,7 +201,7 @@ class GameAlerts {
             levelCompleteSound.play();
             
             const startVolume = 0.5;
-            const fadeStep = startVolume / (2000 / 50); // Update every 50ms
+            const fadeStep = startVolume / (2000 / 50);
             
             const fadeInterval = setInterval(() => {
                 if (levelCompleteSound.volume > 0.01) {

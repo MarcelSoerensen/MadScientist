@@ -111,6 +111,9 @@ function handleRetryGame() {
     const canvas = document.getElementById('canvas');
     if (!gameOverScreen || !canvas) return;
     
+    if (typeof window.startBackgroundMusic === 'function') {
+        window.startBackgroundMusic();
+    }
     gameOverToCanvasFade(gameOverScreen, canvas);
     gameOverToCanvasFadeOut(gameOverScreen);
     gameOverToCanvasFadeIn(canvas);
