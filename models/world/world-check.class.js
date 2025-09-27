@@ -2,6 +2,18 @@
  * Handles all check/logic methods for the World class.
  */
 class WorldCheck {
+
+    /**
+     * Checks if the Endboss X-position sound (e.g. counter.mp3 from x >= 3000) should be played or faded out.
+     */
+    checkEndbossXPositionSound() {
+        if (this.world.level && this.world.level.enemies) {
+            const endboss = this.world.level.enemies.find(e => e instanceof Endboss);
+            if (endboss && endboss.sounds && typeof endboss.sounds.playXPositionSound === 'function') {
+                endboss.sounds.playXPositionSound(endboss);
+            }
+        }
+    }
     /**
      * Creates a new WorldCheck instance for the given world.
      */
@@ -265,14 +277,14 @@ class WorldCheck {
             ? w.level.enemies.filter(e => e.constructor && e.constructor.name === 'EnemyTwo')
             : [];
         if (w.gameAlerts && typeof w.gameAlerts.triggerGameOver === 'function') {
-            w.gameAlerts.triggerGameOver(this._handleGameOverEnemyCleanup.bind(this, endboss, enemyTwos));
+            w.gameAlerts.triggerGameOver(this.handleGameOverEnemyCleanup.bind(this, endboss, enemyTwos));
         }
     }
 
     /**
      * Callback für Game-Over-Animation: Entfernt Endboss und EnemyTwo sauber.
      */
-    _handleGameOverEnemyCleanup(endboss, enemyTwos) {
+    handleGameOverEnemyCleanup(endboss, enemyTwos) {
         if (endboss && this.world.cleanup && typeof this.world.cleanup.stopAndRemoveEndboss === 'function') {
             this.world.cleanup.stopAndRemoveEndboss(endboss);
         }

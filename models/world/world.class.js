@@ -85,6 +85,7 @@ class World {
             this.check.checkLaserBeams();
             this.check.checkSuperShot();
             this.check.checkFirstEnemyDistance();
+            this.check.checkEndbossXPositionSound();
         }, 1000 / 60));
         
         this.gameIntervals.push(setInterval(() => {
