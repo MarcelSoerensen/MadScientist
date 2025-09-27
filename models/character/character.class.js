@@ -2,6 +2,14 @@
  * Represents the main character in the game world.
  */
 class Character extends CollidableObject {
+
+    /**
+     * Removes the character from the game (sets invisible and non-collidable).
+     */
+    removeCharacter() {
+        this.visible = false;
+        this.collidable = false;
+    }
     x = 0;
     y = 110;
     width = 250;

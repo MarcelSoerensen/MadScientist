@@ -37,6 +37,8 @@ class CollectibleHeart extends CollidableObject {
         return window.collisionManager.isCollision(charRect, heartRect);
     }
 
+    static activeSounds = [];
+
     /**
      * Starts the collecting animation for the heart.
      */
@@ -51,11 +53,25 @@ class CollectibleHeart extends CollidableObject {
             const heartSound = new Audio('sounds/heartbeat.mp3');
             heartSound.volume = 0.7;
             heartSound.play();
+            CollectibleHeart.activeSounds.push(heartSound);
             setTimeout(() => {
                 heartSound.pause();
                 heartSound.currentTime = 0;
+                const idx = CollectibleHeart.activeSounds.indexOf(heartSound);
+                if (idx !== -1) CollectibleHeart.activeSounds.splice(idx, 1);
             }, 500);
         } catch (e) {}
+    }
+
+    /**
+     * Stops all active collecting sounds immediately.
+     */
+    static stopAllCollectingSounds() {
+        CollectibleHeart.activeSounds.forEach(sound => {
+            sound.pause();
+            sound.currentTime = 0;
+        });
+        CollectibleHeart.activeSounds = [];
     }
 
     /**

@@ -2,11 +2,18 @@
  * Handles all check/logic methods for the World class.
  */
 class WorldCheck {
+    /**
+     * Creates a new WorldCheck instance for the given world.
+     */
+    constructor(world) {
+        this.world = world;
+    }
 
     /**
      * Checks if the Endboss X-position sound (e.g. counter.mp3 from x >= 3000) should be played or faded out.
      */
     checkEndbossXPositionSound() {
+        if (this.world.gameOver) return;
         if (this.world.level && this.world.level.enemies) {
             const endboss = this.world.level.enemies.find(e => e instanceof Endboss);
             if (endboss && endboss.sounds && typeof endboss.sounds.playXPositionSound === 'function') {
@@ -14,12 +21,7 @@ class WorldCheck {
             }
         }
     }
-    /**
-     * Creates a new WorldCheck instance for the given world.
-     */
-    constructor(world) {
-        this.world = world;
-    }
+    
 
     /**
      * Activates the first enemy when the character reaches a certain distance.
@@ -306,6 +308,12 @@ class WorldCheck {
                 w.keyboard.S = false;
                 w.keyboard.D = false;
                 w.keyboard.Y = false;
+            }
+            const endboss = (w.level && w.level.enemies)
+                ? w.level.enemies.find(e => e instanceof Endboss)
+                : null;
+            if (w.cleanup && typeof w.cleanup.stopAndRemoveEndboss === 'function' && endboss) {
+                w.cleanup.stopAndRemoveEndboss(endboss);
             }
             if (w.gameAlerts) {
                 if (typeof w.gameAlerts.triggerLevelComplete === 'function') {

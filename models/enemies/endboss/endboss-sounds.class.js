@@ -2,7 +2,6 @@
  * Handles all sound effects for the Endboss.
  */
 class EndbossSounds {
-
     /**
      * Plays and fades the Endboss proximity sound (counter.mp3) based on the character's X position.
      */
@@ -58,41 +57,13 @@ class EndbossSounds {
      */
     stopXPositionSound() {
         if (this.xPositionSoundAudio) {
-            Object.assign(this.xPositionSoundAudio, { volume: 0, currentTime: 0 });
-            this.xPositionSoundAudio.pause();
-            this.xPositionSoundPlaying = false;
+            try {
+                this.xPositionSoundAudio.pause();
+                this.xPositionSoundAudio.currentTime = 0;
+            } catch (e) {}
             this.xPositionSoundAudio = null;
         }
-    }
-
-    /**
-     * Stops all Endboss sounds including the X-position sound
-     */
-    stopAllEndbossSounds(endboss) {
-        if (endboss.isStepSoundPlaying && endboss.stepSoundAudio) {
-            try {
-                endboss.stepSoundAudio.pause();
-                endboss.stepSoundAudio.currentTime = 0.5;
-            } catch (e) {}
-            endboss.isStepSoundPlaying = false;
-            endboss.stepSoundAudio = null;
-        }
-        if (endboss.isStepSoundPlayingRight && endboss.stepSoundAudioRight) {
-            try {
-                endboss.stepSoundAudioRight.pause();
-                endboss.stepSoundAudioRight.currentTime = 0.5;
-            } catch (e) {}
-            endboss.isStepSoundPlayingRight = false;
-            endboss.stepSoundAudioRight = null;
-        }
-        if (endboss.hitSoundAudio) {
-            try {
-                endboss.hitSoundAudio.pause();
-                endboss.hitSoundAudio.currentTime = 0;
-            } catch (e) {}
-            endboss.hitSoundAudio = null;
-        }
-        this.stopXPositionSound();
+        this.xPositionSoundPlaying = false;
     }
 
     xPositionSoundPlaying = false;
@@ -220,7 +191,7 @@ class EndbossSounds {
     }
 
     /**
-     * Stops all Endboss sounds (steps, hit, etc.) immediately.
+     * Stops all Endboss sounds including the X-position sound
      */
     stopAllEndbossSounds(endboss) {
         if (endboss.isStepSoundPlaying && endboss.stepSoundAudio) {
@@ -246,6 +217,7 @@ class EndbossSounds {
             } catch (e) {}
             endboss.hitSoundAudio = null;
         }
+        this.stopXPositionSound();
     }
     
 }

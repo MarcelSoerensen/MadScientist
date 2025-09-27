@@ -13,16 +13,34 @@ class WorldCleanup {
      * Performs complete cleanup of the world by clearing all intervals and references.
      */
     cleanup() {
-    this.cleanupIntervals();
-    this.cleanupAnimations();
-    this.cleanupCharacter();
-    this.cleanupEnemies();
-    this.cleanupManagers();
-    this.cleanupCanvas();
-    if (this.world.throwableObjects) this.world.throwableObjects = [];
-    if (this.world.laserBeams) this.world.laserBeams = [];
-    if (this.world.enemies) this.world.enemies = [];
-    if (this.world.endboss) this.world.endboss = null;
+        this.cleanupIntervals();
+        this.cleanupAnimations();
+        this.cleanupCharacter();
+        this.cleanupEnemies();
+        this.cleanupManagers();
+        this.cleanupCanvas();
+        this.stopAllCollectibleSounds();
+        if (this.world.throwableObjects) this.world.throwableObjects = [];
+        if (this.world.laserBeams) this.world.laserBeams = [];
+        if (this.world.enemies) this.world.enemies = [];
+        if (this.world.endboss) this.world.endboss = null;
+    }
+
+    /**
+     * Stoppt alle laufenden Sammelgeräusche (Bomben, Energie-Bälle, Herzen).
+     */
+    stopAllCollectibleSounds() {
+        if (typeof window !== 'undefined') {
+            if (window.CollectibleBomb && typeof window.CollectibleBomb.stopAllCollectingSounds === 'function') {
+                window.CollectibleBomb.stopAllCollectingSounds();
+            }
+            if (window.EnergyBall && typeof window.EnergyBall.stopAllCollectingSounds === 'function') {
+                window.EnergyBall.stopAllCollectingSounds();
+            }
+            if (window.CollectibleHeart && typeof window.CollectibleHeart.stopAllCollectingSounds === 'function') {
+                window.CollectibleHeart.stopAllCollectingSounds();
+            }
+        }
     }
 
     /**
@@ -50,6 +68,9 @@ class WorldCleanup {
     cleanupCharacter() {
         if (this.world.character && this.world.character.handler && typeof this.world.character.handler.clearAllIntervals === 'function') {
             this.world.character.handler.clearAllIntervals();
+        }
+        if (this.world.character && typeof this.world.character.removeCharacter === 'function') {
+            this.world.character.removeCharacter();
         }
     }
 

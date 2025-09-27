@@ -93,14 +93,29 @@ class CharacterHandling {
     handleMovement(character) {
         let moveSpeed = character.speed;
         if (character.isAboveGround() && character.world.keyboard.UP) moveSpeed = character.speed * 1.5;
+
+        if (!character._enteredEndbossZone && character.x >= 2600) {
+            character._enteredEndbossZone = true;
+        }
+        let minX = (character._enteredEndbossZone) ? 2600 : 0;
+
         if (character.world.keyboard.RIGHT && character.x < 3250) {
-            character.moveRight(moveSpeed);
+            if (typeof character.moveRight === 'function') {
+                character.moveRight(moveSpeed);
+            } else {
+                character.x += moveSpeed;
+            }
             character.otherDirection = false;
         }
-        if (character.world.keyboard.LEFT && character.x > 0) {
-            character.moveLeft(moveSpeed);
+        if (character.world.keyboard.LEFT && character.x > minX) {
+            if (typeof character.moveLeft === 'function') {
+                character.moveLeft(moveSpeed);
+            } else {
+                character.x -= moveSpeed;
+            }
             character.otherDirection = true;
         }
+        if (character.x < minX) character.x = minX;
     }
 
     /**

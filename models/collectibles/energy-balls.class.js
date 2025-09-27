@@ -64,6 +64,7 @@ class EnergyBall extends CollidableObject {
         if (this.duration < 1) this.duration = 1;
     }
 
+    static activeSounds = [];
     /**
      * Plays the collecting sound effect.
      */
@@ -71,7 +72,20 @@ class EnergyBall extends CollidableObject {
         try {
             const collectedSound = new Audio('sounds/collected-energyball.mp3');
             collectedSound.play();
+            EnergyBall.activeSounds.push(collectedSound);
+            collectedSound.addEventListener('ended', () => {
+                const idx = EnergyBall.activeSounds.indexOf(collectedSound);
+                if (idx !== -1) EnergyBall.activeSounds.splice(idx, 1);
+            });
         } catch (e) {}
+    }
+
+    static stopAllCollectingSounds() {
+        EnergyBall.activeSounds.forEach(sound => {
+            sound.pause();
+            sound.currentTime = 0;
+        });
+        EnergyBall.activeSounds = [];
     }
 
     /**

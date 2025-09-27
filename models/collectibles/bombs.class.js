@@ -58,6 +58,7 @@ class CollectibleBomb extends CollidableObject {
         );
     }
 
+    static activeSounds = [];
     /**
      * Starts the collecting animation for the bomb.
      */
@@ -74,6 +75,11 @@ class CollectibleBomb extends CollidableObject {
         try {
             const collectedSound = new Audio('sounds/collected-bomb.mp3');
             collectedSound.play();
+            CollectibleBomb.activeSounds.push(collectedSound);
+            collectedSound.addEventListener('ended', () => {
+                const idx = CollectibleBomb.activeSounds.indexOf(collectedSound);
+                if (idx !== -1) CollectibleBomb.activeSounds.splice(idx, 1);
+            });
         } catch (e) {}
         const dx = this.targetX - this.startX;
         const dy = this.targetY - this.startY;
@@ -81,6 +87,14 @@ class CollectibleBomb extends CollidableObject {
         this.speed = 10;
         this.duration = this.distance / this.speed;
         if (this.duration < 1) this.duration = 1;
+    }
+
+    static stopAllCollectingSounds() {
+        CollectibleBomb.activeSounds.forEach(sound => {
+            sound.pause();
+            sound.currentTime = 0;
+        });
+        CollectibleBomb.activeSounds = [];
     }
 
     /**
