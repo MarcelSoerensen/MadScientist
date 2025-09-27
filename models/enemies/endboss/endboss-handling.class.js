@@ -197,7 +197,6 @@ class EndbossHandling {
                 clearInterval(endboss.deathAnimInterval);
             }
         }, 50);
-        setTimeout(() => endboss.startBlinking(), 2500);
         setTimeout(() => endboss.removeEnemy(), 4000);
     }
 

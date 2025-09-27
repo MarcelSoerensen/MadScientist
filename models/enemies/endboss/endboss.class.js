@@ -144,13 +144,4 @@ class Endboss extends CollidableObject {
         ctx.strokeRect(stickX - (stickWidth - 2 - 60), stickY, stickWidth, stickHeight);
         ctx.restore();
     }
-
-    /**
-     * Starts the blinking effect for the Endboss (visibility toggle).
-     */
-    startBlinking() {
-        this.blinkInterval = setInterval(() => {
-            this.visible = !this.visible;
-        }, 200);
-    }
 }
