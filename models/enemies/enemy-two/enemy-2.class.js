@@ -59,13 +59,33 @@ class EnemyTwo extends CollidableObject {
     }
 
     /**
-     * Removes the enemy from the game
+     * Removes the enemy from the game (sets invisible and non-collidable, clears intervals).
      */
     removeEnemy() {
         this.visible = false;
+        this.collidable = false;
+        if (this.moveInterval) {
+            clearInterval(this.moveInterval);
+            this.moveInterval = null;
+        }
+        if (this.animInterval) {
+            clearInterval(this.animInterval);
+            this.animInterval = null;
+        }
+        if (this.deathAnimInterval) {
+            clearInterval(this.deathAnimInterval);
+            this.deathAnimInterval = null;
+        }
         if (this.blinkInterval) {
             clearInterval(this.blinkInterval);
             this.blinkInterval = null;
+        }
+        if (this.checkProximityInterval) {
+            clearInterval(this.checkProximityInterval);
+            this.checkProximityInterval = null;
+        }
+        if (typeof this.animationStarted !== 'undefined') {
+            this.animationStarted = false;
         }
     }
 }

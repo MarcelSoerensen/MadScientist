@@ -34,7 +34,7 @@ function restartGame() {
  */
 function cleanup() {
     if (world) {
-        world.cleanup();
+        world.performCleanup();
         world = null;
     }
 

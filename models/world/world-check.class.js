@@ -251,27 +251,35 @@ class WorldCheck {
      */
     checkGameOverByEnemy() {
         const w = this.world;
-        if (!w.gameOver) {
-            w.gameOver = true;
-            if (w.keyboard) {
-                w.keyboard.S = false;
-                w.keyboard.D = false;
-                w.keyboard.Y = false;
-            }
-            let endboss = null;
-            if (w.level && w.level.enemies) {
-                endboss = w.level.enemies.find(e => e instanceof Endboss);
-                if (endboss && endboss.sounds && typeof endboss.sounds.stopAllEndbossSounds === 'function') {
-                    endboss.sounds.stopAllEndbossSounds(endboss);
-                }
-            }
-            if (w.gameAlerts && typeof w.gameAlerts.triggerGameOver === 'function') {
-                w.gameAlerts.triggerGameOver(() => {
-                    if (endboss && typeof endboss.removeEnemy === 'function') {
-                        endboss.removeEnemy();
-                    }
-                });
-            }
+        if (w.gameOver) return;
+        w.gameOver = true;
+        if (w.keyboard) {
+            w.keyboard.S = false;
+            w.keyboard.D = false;
+            w.keyboard.Y = false;
+        }
+        const endboss = (w.level && w.level.enemies)
+            ? w.level.enemies.find(e => e instanceof Endboss)
+            : null;
+        const enemyTwos = (w.level && w.level.enemies)
+            ? w.level.enemies.filter(e => e.constructor && e.constructor.name === 'EnemyTwo')
+            : [];
+        if (w.gameAlerts && typeof w.gameAlerts.triggerGameOver === 'function') {
+            w.gameAlerts.triggerGameOver(this._handleGameOverEnemyCleanup.bind(this, endboss, enemyTwos));
+        }
+    }
+
+    /**
+     * Callback für Game-Over-Animation: Entfernt Endboss und EnemyTwo sauber.
+     */
+    _handleGameOverEnemyCleanup(endboss, enemyTwos) {
+        if (endboss && this.world.cleanup && typeof this.world.cleanup.stopAndRemoveEndboss === 'function') {
+            this.world.cleanup.stopAndRemoveEndboss(endboss);
+        }
+        if (this.world.cleanup && typeof this.world.cleanup.stopAndRemoveEnemyTwo === 'function') {
+            enemyTwos.forEach(enemy => {
+                this.world.cleanup.stopAndRemoveEnemyTwo(enemy);
+            });
         }
     }
 

@@ -81,10 +81,8 @@ class GameAlerts {
             if (typeof window.showGameOverScreen === 'function') {
                 window.showGameOverScreen();
             }
-            }, 2500); 
-            setTimeout(() => {
-                if (callback) setTimeout(callback, 1000);
-            }, 2500);
+            if (callback) setTimeout(callback, 1000);
+        }, 2500);
     }
 
     /**

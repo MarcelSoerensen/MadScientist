@@ -155,4 +155,28 @@ class WorldCleanup {
             this.world.ctx.clearRect(0, 0, this.world.canvas.width, this.world.canvas.height);
         }
     }
+
+    /**
+     * Stops all Endboss sounds and removes the Endboss from the game.
+     */
+    stopAndRemoveEndboss(endboss) {
+        if (endboss && endboss.sounds && typeof endboss.sounds.stopAllEndbossSounds === 'function') {
+            endboss.sounds.stopAllEndbossSounds(endboss);
+        }
+        if (typeof endboss.removeEnemy === 'function') {
+            endboss.removeEnemy();
+        }
+    }
+
+    /**
+     * Stops all EnemyTwo sounds and removes EnemyTwo from the game.
+     */
+    stopAndRemoveEnemyTwo(enemy) {
+        if (enemy.sounds && typeof enemy.sounds.stopAllEnemyTwoSounds === 'function') {
+            enemy.sounds.stopAllEnemyTwoSounds(enemy);
+        }
+        if (typeof enemy.removeEnemy === 'function') {
+            enemy.removeEnemy();
+        }
+    }
 }

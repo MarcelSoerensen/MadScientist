@@ -49,7 +49,7 @@ class World {
         }
         this.check = new WorldCheck(this);
         this.worldDraw = new WorldDraw(this);
-        this.cleaner = new WorldCleanup(this);
+    this.cleanup = new WorldCleanup(this);
         this.worldDraw.draw();
         this.run();
     }
@@ -95,8 +95,8 @@ class World {
     /**
      * Cleans up the world by clearing all intervals and references.
      */
-    cleanup() {
-        this.cleaner.cleanup();
+    performCleanup() {
+        this.cleanup.cleanup();
     }
 
     /**

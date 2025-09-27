@@ -69,6 +69,27 @@ class EnemyTwoSounds {
 		this.proximitySoundPlaying = false;
 	}
 
+	/**
+	 * Immediately stops all EnemyTwo sounds (proximity, death, etc.)
+	 */
+	stopAllEnemyTwoSounds(enemy) {
+		if (this.proximitySoundAudio) {
+			try {
+				this.proximitySoundAudio.pause();
+				this.proximitySoundAudio.currentTime = 0;
+			} catch (e) {}
+			this.proximitySoundPlaying = false;
+			this.proximitySoundAudio = null;
+		}
+		if (enemy && enemy.deathSoundAudio) {
+			try {
+				enemy.deathSoundAudio.pause();
+				enemy.deathSoundAudio.currentTime = 0;
+			} catch (e) {}
+			enemy.deathSoundAudio = null;
+		}
+	}
+
 	proximitySoundPlaying = false;
 	proximitySoundAudio = null;
 }
