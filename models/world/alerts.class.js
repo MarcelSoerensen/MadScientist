@@ -71,14 +71,20 @@ class GameAlerts {
      * Triggers the Game Over alert and shows the game over screen after the alert.
      */
     triggerGameOver() {
+        let callback = null;
+        if (arguments.length > 0 && typeof arguments[0] === 'function') {
+            callback = arguments[0];
+        }
         this.showAlert('gameOver', 'Game Over');
         this.playSound('gameOver');
-        
         setTimeout(() => {
             if (typeof window.showGameOverScreen === 'function') {
                 window.showGameOverScreen();
             }
-        }, 2500); 
+            }, 2500); 
+            setTimeout(() => {
+                if (callback) setTimeout(callback, 1000);
+            }, 2500);
     }
 
     /**

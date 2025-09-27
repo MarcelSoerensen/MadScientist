@@ -32,6 +32,22 @@ class EndbossSounds {
             endboss.stepSoundAudio = null;
         }
     }
+
+    /**
+     * Plays the hit/stick sound for the Endboss.
+     */
+    hitStickSound(endboss, options = {}) {
+        try {
+            if (endboss.hitSoundAudio && typeof endboss.hitSoundAudio.pause === 'function') {
+                endboss.hitSoundAudio.pause();
+            }
+            endboss.hitSoundAudio = new Audio('sounds/endboss-hit.mp3');
+            endboss.hitSoundAudio.volume = options.volume ?? 0.25;
+            if (options.playbackRate) endboss.hitSoundAudio.playbackRate = options.playbackRate;
+            endboss.hitSoundAudio.play();
+        } catch (e) {}
+    }
+
     
 
     /**
@@ -107,4 +123,34 @@ class EndbossSounds {
             }, fadeInterval);
         } catch (e) {}
     }
+
+    /**
+     * Stops all Endboss sounds (steps, hit, etc.) immediately.
+     */
+    stopAllEndbossSounds(endboss) {
+        if (endboss.isStepSoundPlaying && endboss.stepSoundAudio) {
+            try {
+                endboss.stepSoundAudio.pause();
+                endboss.stepSoundAudio.currentTime = 0.5;
+            } catch (e) {}
+            endboss.isStepSoundPlaying = false;
+            endboss.stepSoundAudio = null;
+        }
+        if (endboss.isStepSoundPlayingRight && endboss.stepSoundAudioRight) {
+            try {
+                endboss.stepSoundAudioRight.pause();
+                endboss.stepSoundAudioRight.currentTime = 0.5;
+            } catch (e) {}
+            endboss.isStepSoundPlayingRight = false;
+            endboss.stepSoundAudioRight = null;
+        }
+        if (endboss.hitSoundAudio) {
+            try {
+                endboss.hitSoundAudio.pause();
+                endboss.hitSoundAudio.currentTime = 0;
+            } catch (e) {}
+            endboss.hitSoundAudio = null;
+        }
+    }
+    
 }

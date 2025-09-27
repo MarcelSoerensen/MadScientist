@@ -103,6 +103,11 @@ class Endboss extends CollidableObject {
             clearInterval(this.blinkInterval);
             this.blinkInterval = null;
         }
+        if (this.checkProximityInterval) {
+            clearInterval(this.checkProximityInterval);
+            this.checkProximityInterval = null;
+        }
+        this.animationStarted = false;
     }
 
     /**

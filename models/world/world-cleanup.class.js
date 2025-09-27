@@ -13,12 +13,16 @@ class WorldCleanup {
      * Performs complete cleanup of the world by clearing all intervals and references.
      */
     cleanup() {
-        this.cleanupIntervals();
-        this.cleanupAnimations();
-        this.cleanupCharacter();
-        this.cleanupEnemies();
-        this.cleanupManagers();
-        this.cleanupCanvas();
+    this.cleanupIntervals();
+    this.cleanupAnimations();
+    this.cleanupCharacter();
+    this.cleanupEnemies();
+    this.cleanupManagers();
+    this.cleanupCanvas();
+    if (this.world.throwableObjects) this.world.throwableObjects = [];
+    if (this.world.laserBeams) this.world.laserBeams = [];
+    if (this.world.enemies) this.world.enemies = [];
+    if (this.world.endboss) this.world.endboss = null;
     }
 
     /**

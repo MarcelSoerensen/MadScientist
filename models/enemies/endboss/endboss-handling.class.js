@@ -88,11 +88,7 @@ class EndbossHandling {
     handleHitSound(endboss) {
         if (endboss.throwAnimationPlaying) return;
         setTimeout(() => {
-            try {
-                const bombSound = new Audio('sounds/endboss-hit.mp3');
-                bombSound.volume = 0.25;
-                bombSound.play();
-            } catch (e) {}
+            endboss.sounds.hitStickSound(endboss);
         }, 500);
     }
 

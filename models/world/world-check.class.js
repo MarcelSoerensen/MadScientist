@@ -258,8 +258,19 @@ class WorldCheck {
                 w.keyboard.D = false;
                 w.keyboard.Y = false;
             }
+            let endboss = null;
+            if (w.level && w.level.enemies) {
+                endboss = w.level.enemies.find(e => e instanceof Endboss);
+                if (endboss && endboss.sounds && typeof endboss.sounds.stopAllEndbossSounds === 'function') {
+                    endboss.sounds.stopAllEndbossSounds(endboss);
+                }
+            }
             if (w.gameAlerts && typeof w.gameAlerts.triggerGameOver === 'function') {
-                w.gameAlerts.triggerGameOver();
+                w.gameAlerts.triggerGameOver(() => {
+                    if (endboss && typeof endboss.removeEnemy === 'function') {
+                        endboss.removeEnemy();
+                    }
+                });
             }
         }
     }

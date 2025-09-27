@@ -84,12 +84,7 @@ class EndbossAnimations {
 		endboss.img = endboss.imageCache[this.IMAGES_HIT[endboss.hitFrame % this.IMAGES_HIT.length]];
 		endboss.hitFrame++;
 		if (endboss.hitFrame === 1) {
-			try {
-				const hitStickSound = new Audio('sounds/endboss-hit.mp3');
-				hitStickSound.volume = 0.25;
-				hitStickSound.playbackRate = 1.35;
-				hitStickSound.play();
-			} catch (e) {}
+			endboss.sounds.hitStickSound(endboss, { volume: 0.25, playbackRate: 1.35 });
 		}
 	}
 
