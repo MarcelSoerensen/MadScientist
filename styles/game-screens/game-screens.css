@@ -250,7 +250,9 @@
         margin-bottom: 4vw;
     }
 
-    #story_textbox p {
+    #story_textbox p,
+    #game_over_textbox p,
+    #win_textbox p {
         font-size: clamp(0.8em, 2.5vh, 1.3em);
     }
 
@@ -259,7 +261,9 @@
     }
 
     #story_textbox,
-    #control_textbox{
+    #control_textbox,
+    #game_over_textbox,
+    #win_textbox {
         top: -8%;   
     }
 
