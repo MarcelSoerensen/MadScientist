@@ -36,9 +36,9 @@ class MobileOrientationManager {
      * Updates orientation and device type, shows or hides controls accordingly.
      */
     updateOrientation() {
-        const isMobileWidth = window.innerWidth < 720;
-        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        this.isMobile = isMobileDevice || isMobileWidth;
+    const isMobileWidth = window.innerWidth < 720;
+    const isTouch = window.matchMedia('(pointer: coarse)').matches;
+    this.isMobile = isTouch;
         this.isPortrait = window.innerHeight > window.innerWidth;
         if (this.isMobile) {
             this.repositionControls();
