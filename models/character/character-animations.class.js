@@ -56,6 +56,10 @@ class CharacterAnimations {
      * Animates the upward movement of the jump.
      */
     animateJumpUp(character, imageArray) {
+        if (character.lastAnimation === 'hurt') {
+            setTimeout(() => this.animateJumpUp(character, imageArray), this.JUMP_DELAYS[character.jumpFrame] || 60);
+            return;
+        }
         character.img = character.imageCache[imageArray[character.jumpFrame]];
         character.jumpOffsetY = -(character.jumpFrame / character.totalJumpFrames) * character.maxJumpHeight;
         let delay = this.JUMP_DELAYS[character.jumpFrame] || 60;
@@ -72,6 +76,10 @@ class CharacterAnimations {
      * Holds the character at the top of the jump if conditions are met.
      */
     holdJumpOnTop(character, imageArray) {
+        if (character.lastAnimation === 'hurt') {
+            setTimeout(() => this.holdJumpOnTop(character, imageArray), 20);
+            return;
+        }
         const maxJumpDistance = 150;
         const distance = Math.abs(character.x - character.startJumpX);
         const isMoving = character.world.keyboard.RIGHT || character.world.keyboard.LEFT;
@@ -87,6 +95,10 @@ class CharacterAnimations {
      * Animates the downward movement of the jump.
      */
     animateJumpDown(character, imageArray) {
+        if (character.lastAnimation === 'hurt') {
+            setTimeout(() => this.animateJumpDown(character, imageArray), this.JUMP_DELAYS_DOWN[imageArray.length - 1 - character.jumpFrame] || 60);
+            return;
+        }
         let delay = this.JUMP_DELAYS_DOWN[imageArray.length - 1 - character.jumpFrame] || 60;
         character.img = character.imageCache[imageArray[character.jumpFrame]];
         character.jumpOffsetY = -(character.jumpFrame / character.totalJumpFrames) * character.maxJumpHeight;

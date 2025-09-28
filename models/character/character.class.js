@@ -41,7 +41,58 @@ class Character extends CollidableObject {
         this.loadImages(this.anim.IMAGES_THROW_BOMB);
         this.x = 0;
         this.isAboveGroundActive = false;
+        this.isInvulnerable = false;
+        this.invulnerableTimeout = null;
         this.animateCharacter();
+    }
+    /**
+     * Handles the enemy hit logic (animation, sound, knockback).
+     */
+    onEnemyHit(enemy) {
+        if (this.isInvulnerable || this.deathAnimationPlayed) return;
+        this.isInvulnerable = true;
+        const knockback = 80;
+        if (enemy && (enemy.constructor?.name === 'Endboss' || enemy.isEndboss)) {
+            this.x -= knockback;
+        } else if (enemy && enemy.x < this.x) {
+            this.x += knockback;
+        } else {
+            this.x -= knockback;
+        }
+        if (!this.sounds) this.sounds = new CharacterSounds();
+        this.sounds.hurtSound(this, this.world);
+        this.animHurtOnce();
+        this.energy -= 5;
+        if (this.energy < 0) this.energy = 0;
+        if (this.world && this.world.statusBar) {
+            this.world.statusBar.setPercentage(this.energy);
+        }
+        if (this.invulnerableTimeout) clearTimeout(this.invulnerableTimeout);
+        this.invulnerableTimeout = setTimeout(() => {
+            this.isInvulnerable = false;
+        }, 500);
+    }
+
+    /**
+     * Plays the hurt animation once without interrupting other animations.
+     */
+    animHurtOnce() {
+        if (this.lastAnimation === 'hurt') return;
+        this.lastAnimation = 'hurt';
+        let frame = 0;
+        const images = this.anim.IMAGES_HURT;
+        const delays = new Array(images.length).fill(30);
+        const animateHurtFrame = () => {
+            if (frame < images.length) {
+                this.img = this.imageCache[images[frame]];
+                let delay = delays[frame];
+                frame++;
+                setTimeout(animateHurtFrame, delay);
+            } else {
+                this.lastAnimation = '';
+            }
+        };
+        animateHurtFrame();
     }
 
     /**
@@ -58,9 +109,20 @@ class Character extends CollidableObject {
      * Triggers the jump animation.
      */
     playJumpAnimation() {
+        if (this.lastAnimation === 'hurt') return;
         if (!this.isAboveGround()) return;
         this.startJumpX = this.x;
         this.anim.jumpAnimation(this);
+    }
+
+    /**
+     * Checks if the character is above ground.
+     */
+    isAboveGround() {
+        if (typeof super.isAboveGround === 'function') {
+            return super.isAboveGround();
+        }
+        return false;
     }
 
     /**

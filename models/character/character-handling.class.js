@@ -91,6 +91,7 @@ class CharacterHandling {
      * Handles character movement (left/right).
      */
     handleMovement(character) {
+        if (character.lastAnimation === 'hurt') return;
         let moveSpeed = character.speed;
         if (character.isAboveGround() && character.world.keyboard.UP) moveSpeed = character.speed * 1.5;
 
@@ -135,6 +136,7 @@ class CharacterHandling {
      * Handles jump animation trigger.
      */
     handleJumpAnimation(character) {
+        if (character.lastAnimation === 'hurt') return;
         if (character.world.keyboard.UP && !character.isAboveGround()) {
             character.isAboveGroundActive = true;
             character.currentImage = 0;
@@ -146,7 +148,8 @@ class CharacterHandling {
      * Handles idle animation.
      */
     handleIdleAnimation(character) {
-    if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && !(character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
+        if (character.lastAnimation === 'hurt') return;
+        if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && !(character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
             character.playAnimation(character.anim.IMAGES_IDLE);
             character.lastAnimation = 'idle';
         }
@@ -156,7 +159,9 @@ class CharacterHandling {
      * Handles walking animation.
      */
     handleWalkingAnimation(character) {
-    if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && (character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
+        if (character.lastAnimation === 'hurt') return;
+        if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && (character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
+            // Nur laufen, wenn nicht in Hurt
             character.playAnimation(character.anim.IMAGES_WALKING);
             character.lastAnimation = 'walk';
         }

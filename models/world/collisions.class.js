@@ -40,10 +40,7 @@ class CollisionManager {
             if (!enemy.collidable) return;
             let collided = world.character.isColliding(enemy);
             if (collided) {
-                if (!world.character.sounds) world.character.sounds = new CharacterSounds();
-                world.character.sounds.hurtSound(world.character, world);
-                world.character.hit();
-                world.statusBar.setPercentage(world.character.energy);
+                world.character.onEnemyHit(enemy);
             }
         });
     }
