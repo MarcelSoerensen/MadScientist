@@ -161,7 +161,6 @@ class CharacterHandling {
     handleWalkingAnimation(character) {
         if (character.lastAnimation === 'hurt') return;
         if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && (character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
-            // Nur laufen, wenn nicht in Hurt
             character.playAnimation(character.anim.IMAGES_WALKING);
             character.lastAnimation = 'walk';
         }
@@ -185,8 +184,11 @@ class CharacterHandling {
      * Handles death animation.
      */
     handleDeathAnimation(character) {
-        if (typeof character.energy === 'number' && character.energy <= 0 && !character.deathAnimationPlayed) {
+        if (typeof character.energy === 'number' && character.energy <= 0 && !character.deathAnimationPlayed && !character.isAnimationLocked) {
             if (!character.world?.gameOver) {
+                character.isAnimationLocked = true;
+                character.deathAnimationPlayed = true;
+                character.lastAnimation = 'dead';
                 character.playDeathAnimation();
             }
         }

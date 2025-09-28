@@ -66,10 +66,15 @@ class Character extends CollidableObject {
         const knockback = (enemy && enemy.x < this.x) ? 80 : -80;
         this.x += knockback;
         this.sounds ??= new CharacterSounds();
-        this.sounds.hurtSound(this, this.world);
-        this.animHurtOnce();
         this.energy = Math.max(0, this.energy - 10);
         this.world?.statusBar?.setPercentage(this.energy);
+        if (this.energy === 0) {
+            this.sounds.deathSound(this);
+            this.playDeathAnimation();
+            return;
+        }
+        this.sounds.hurtSound(this, this.world);
+        this.animHurtOnce();
         if (this.invulnerableTimeout) clearTimeout(this.invulnerableTimeout);
         this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, 500);
     }
@@ -82,10 +87,15 @@ class Character extends CollidableObject {
         this.isInvulnerable = true;
         this.x -= 80;
         this.sounds ??= new CharacterSounds();
-        this.sounds.hurtSound(this, this.world);
-        this.animHurtOnce();
         this.energy = Math.max(0, this.energy - 15);
         this.world?.statusBar?.setPercentage(this.energy);
+        if (this.energy === 0) {
+            this.sounds.deathSound(this);
+            this.playDeathAnimation();
+            return;
+        }
+        this.sounds.hurtSound(this, this.world);
+        this.animHurtOnce();
         if (this.invulnerableTimeout) clearTimeout(this.invulnerableTimeout);
         this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, 500);
     }
@@ -94,7 +104,8 @@ class Character extends CollidableObject {
      * Plays the hurt animation once without interrupting other animations.
      */
     animHurtOnce() {
-        if (this.lastAnimation === 'hurt') return;
+        if (this.isAnimationLocked) return;
+        this.isAnimationLocked = true;
         this.lastAnimation = 'hurt';
         let frame = 0;
         const images = this.anim.IMAGES_HURT;
@@ -107,6 +118,7 @@ class Character extends CollidableObject {
                 setTimeout(animateHurtFrame, delay);
             } else {
                 this.lastAnimation = '';
+                this.isAnimationLocked = false;
             }
         };
         animateHurtFrame();
@@ -146,11 +158,14 @@ class Character extends CollidableObject {
      * Triggers the death animation and sound.
      */
     playDeathAnimation() {
-    if (this.deathAnimationPlayed) return;
-    this.deathAnimationPlayed = true;
-    if (!this.sounds) this.sounds = new CharacterSounds();
-    this.sounds.deathSound(this);
-    this.anim.deathAnimation(this);
+        if (this._deathAnimationStarted) return;
+        this._deathAnimationStarted = true;
+        if (!this.sounds) this.sounds = new CharacterSounds();
+        this.sounds.stopStepSound(this);
+        this.sounds.deathSound(this);
+        this.anim.deathAnimation(this, () => {
+            this.isAnimationLocked = false;
+        });
     }
 
     /**

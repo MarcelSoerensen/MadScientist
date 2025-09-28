@@ -132,20 +132,21 @@ class CharacterAnimations {
     /**
      * Plays the death animation for the character.
      */
-    deathAnimation(character) {
-            let frame = 0;
-            const delays = new Array(this.IMAGES_DEAD.length).fill(30);
-            const animateDeathFrame = () => {
-                if (frame < this.IMAGES_DEAD.length) {
-                    character.img = character.imageCache[this.IMAGES_DEAD[frame]];
-                    let delay = delays[frame];
-                    frame++;
-                    setTimeout(animateDeathFrame, delay);
-                } else {
-                    character.lastAnimation = 'dead';
-                }
-            };
-            animateDeathFrame();
+    deathAnimation(character, onComplete) {
+        character.lastAnimation = 'dead';
+        let frame = 0;
+        const delays = new Array(this.IMAGES_DEAD.length).fill(30);
+        const animateDeathFrame = () => {
+            if (frame < this.IMAGES_DEAD.length) {
+                character.img = character.imageCache[this.IMAGES_DEAD[frame]];
+                let delay = delays[frame];
+                frame++;
+                setTimeout(animateDeathFrame, delay);
+            } else if (typeof onComplete === 'function') {
+                onComplete();
+            }
+        };
+        animateDeathFrame();
         }
 
     /**
