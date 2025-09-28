@@ -2,6 +2,7 @@
  * Represents the first type of enemy character
  */
 class EnemyOne extends CollidableObject {
+    sounds = new EnemyOneSounds();
     lastHitTime = 0;
     laserHitCount = 0;
     isDeadAnimationPlaying = false;
