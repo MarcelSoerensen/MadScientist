@@ -56,7 +56,7 @@ class SuperShotBar extends DrawableObject {
         const superShots = Math.floor(this.collectedCount / this.maxBalls);
         if (superShots > 0) {
             ctx.save();
-            ctx.font = 'bold 18px "Comic Sans MS", "Comic Sans", cursive, sans-serif';
+            ctx.font = 'bold 18px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif';
             ctx.textAlign = 'left';
             const textX = this.x + this.width - 21;
             const textY = this.y + (this.height ? this.height / 2 + 6 : 37);
