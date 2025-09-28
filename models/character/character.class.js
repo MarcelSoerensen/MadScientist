@@ -2,14 +2,6 @@
  * Represents the main character in the game world.
  */
 class Character extends CollidableObject {
-
-    /**
-     * Removes the character from the game (sets invisible and non-collidable).
-     */
-    removeCharacter() {
-        this.visible = false;
-        this.collidable = false;
-    }
     x = 0;
     y = 110;
     width = 250;
@@ -62,7 +54,6 @@ class Character extends CollidableObject {
         this.handler.animateCharacter(this);
     }
 
-
     /**
      * Triggers the jump animation.
      */
@@ -76,9 +67,11 @@ class Character extends CollidableObject {
      * Triggers the death animation and sound.
      */
     playDeathAnimation() {
-        if (!this.sounds) this.sounds = new CharacterSounds();
-        this.sounds.deathSound(this);
-        this.anim.deathAnimation(this);
+    if (this.deathAnimationPlayed) return;
+    this.deathAnimationPlayed = true;
+    if (!this.sounds) this.sounds = new CharacterSounds();
+    this.sounds.deathSound(this);
+    this.anim.deathAnimation(this);
     }
 
     /**
@@ -106,5 +99,13 @@ class Character extends CollidableObject {
         let width = this.width - ((this.offset?.left || 0) + (this.offset?.right || 0));
         let height = this.height - ((this.offset?.top || 0) + (this.offset?.bottom || 0));
         return { x, y, width, height };
+    }
+
+    /**
+     * Removes the character from the game (sets invisible and non-collidable).
+     */
+    removeCharacter() {
+        this.visible = false;
+        this.collidable = false;
     }
 }

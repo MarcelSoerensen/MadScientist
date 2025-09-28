@@ -135,7 +135,7 @@ class EndbossHandling {
         let now = Date.now();
         if (!endboss.lastHitSoundTime || now - endboss.lastHitSoundTime > 1000) {
             try {
-                const hitSound = new Audio('sounds/endboss-collided.mp3');
+                const hitSound = SoundCacheManager.getAudio('sounds/endboss-collided.mp3');
                 hitSound.volume = 0.7;
                 hitSound.play();
                 endboss.lastHitSoundTime = now;

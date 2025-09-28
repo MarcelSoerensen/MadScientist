@@ -8,15 +8,12 @@ class EnemyOneSounds {
     collisionSoundCreation(enemy, force) {
         const now = Date.now();
         if (!enemy.lastHitSoundTime || now - enemy.lastHitSoundTime > 1000) {
-            if (typeof window !== 'undefined') {
-                if (!window.enemy1CollidedSound) {
-                    window.enemy1CollidedSound = new Audio('sounds/enemy1-collided.mp3');
-                    window.enemy1CollidedSound.volume = 1.0;
-                }
-                window.enemy1CollidedSound.currentTime = 0;
-                window.enemy1CollidedSound.volume = 1.0;
-                window.enemy1CollidedSound.play();
-            }
+            try {
+                const sound = SoundCacheManager.getAudio('sounds/enemy1-collided.mp3');
+                sound.currentTime = 0;
+                sound.volume = 1.0;
+                sound.play();
+            } catch (e) {}
             enemy.lastHitSoundTime = now;
         }
     }
@@ -25,14 +22,11 @@ class EnemyOneSounds {
      * Plays the death sound for EnemyOne
      */
     deathSoundCreation(enemy) {
-        if (typeof window !== 'undefined') {
-            if (!window.enemy1DeathSound) {
-                window.enemy1DeathSound = new Audio('sounds/enemy1-death.mp3');
-                window.enemy1DeathSound.volume = 1.0;
-            }
-            window.enemy1DeathSound.currentTime = 0;
-            window.enemy1DeathSound.volume = 1.0;
-            window.enemy1DeathSound.play();
-        }
+        try {
+            const sound = SoundCacheManager.getAudio('sounds/enemy1-death.mp3');
+            sound.currentTime = 0;
+            sound.volume = 1.0;
+            sound.play();
+        } catch (e) {}
     }
 }

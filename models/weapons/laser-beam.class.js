@@ -2,35 +2,18 @@
  * Represents a laser beam projectile that can be shot by the character
  */
 class LaserBeam extends CollidableObject {
-    offset = {
-        top: 5,
-        left: 10,
-        right: 10,
-        bottom: 5
-    };
-    speedX = 15;
-    damage = 25;
-    animationInterval = null;
-    positionInterval = null;
-    character = null;
-    offsetX = 190;
-    offsetY = 205;
-    /** 
-     *  Array of laser beam animation image paths 
-    */
-    IMAGES_LASER_BEAM = [
-        'img/Projectile/Laser/skeleton-animation_0.png',
-        'img/Projectile/Laser/skeleton-animation_1.png',
-        'img/Projectile/Laser/skeleton-animation_2.png',
-        'img/Projectile/Laser/skeleton-animation_3.png',
-        'img/Projectile/Laser/skeleton-animation_4.png',
-    ];
-
     /**
-     * Creates a new LaserBeam instance
-    */
-    constructor(x, y, otherDirection = false, character = null) {
+     * Creates a new LaserBeam instance.
+     */
+    constructor(x, y, otherDirection = false, character = null, offsetX, offsetY) {
         super().loadImage('img/Projectile/Laser/skeleton-animation_0.png');
+        this.IMAGES_LASER_BEAM = [
+            'img/Projectile/Laser/skeleton-animation_0.png',
+            'img/Projectile/Laser/skeleton-animation_1.png',
+            'img/Projectile/Laser/skeleton-animation_2.png',
+            'img/Projectile/Laser/skeleton-animation_3.png',
+            'img/Projectile/Laser/skeleton-animation_4.png',
+        ];
         this.loadImages(this.IMAGES_LASER_BEAM);
         this.x = x;
         this.y = y;
@@ -38,23 +21,106 @@ class LaserBeam extends CollidableObject {
         this.width = 80;
         this.otherDirection = otherDirection;
         this.character = character;
-        if (arguments.length >= 6) {
-            this.offsetX = arguments[4] !== undefined ? arguments[4] : 220;
-            this.offsetY = arguments[5] !== undefined ? arguments[5] : 205;
-        }
-    this.animateLaserBeam();
+        this.offset = { top: 5, left: 10, right: 10, bottom: 5 };
+        this.speedX = 15;
+        this.damage = 25;
+        this.animationInterval = null;
+        this.positionInterval = null;
+        this.offsetX = offsetX !== undefined ? offsetX : 190;
+        this.offsetY = offsetY !== undefined ? offsetY : 205;
+        this.animateLaserBeam();
         this.followCharacter();
+    }
+
+    /**
+     * Creates a normal LaserBeam and plays the sound (like previous createNormal, but with World logic)
+     */
+        static createLaserBeam(world) {
+            let offsetY = 205;
+            let offsetX = world.character.otherDirection ? -20 : 190;
+            let laser = new LaserBeam(
+                world.character.x + offsetX,
+                world.character.y + offsetY,
+                world.character.otherDirection,
+                world.character,
+                offsetX,
+                offsetY
+            );
+            laser.shoot();
+            return laser;
+        }
+
+    /**
+     * Activates the LaserBeam: adds it, subtracts energy, starts animation and removes after 500ms
+     */
+        static activateLaserBeam(world, laser) {
+            world.laserBeams.push(laser);
+            world.energyBallManager.collectedCount = Math.max(0, world.energyBallManager.collectedCount - 1);
+            setTimeout(() => {
+                world.laserBeams.forEach(l => l.stopAnimation());
+                world.laserBeams = [];
+                world.laserActive = false;
+            }, 500);
+        }
+
+    /**
+     * Creates a normal laser and plays the sound
+     */
+    static createNormal(x, y, otherDirection, character, offsetX, offsetY) {
+        const laser = new LaserBeam(x, y, otherDirection, character, offsetX, offsetY);
+        laser.playLaserSound();
+        return laser;
+    }
+
+    /**
+     * Creates a SuperShot laser (double size) and plays the SuperShot sound
+     */
+    static createSuperShot(x, y, otherDirection, character, offsetX, offsetY) {
+        const laser = new LaserBeam(x, y, otherDirection, character, offsetX, offsetY);
+        laser.width *= 2;
+        laser.height *= 2;
+        laser.isSuperShot = true;
+        laser.playSuperShotSound();
+        return laser;
+    }
+
+    /** 
+     * Plays the laser shooting sound
+     */
+    playLaserSound() {
+        try {
+            const laserSound = SoundCacheManager.getAudio('sounds/laser-shot.mp3');
+            laserSound.volume = 0.5;
+            laserSound.load();
+            laserSound.play().catch((err) => {
+                if (window && window.console) console.warn('Laser-Sound konnte nicht abgespielt werden:', err);
+            });
+        } catch (e) {
+            if (window && window.console) console.warn('Laser-Sound Fehler:', e);
+        }
+    }
+
+    /** 
+     * Plays the SuperShot shooting sound
+     */
+    playSuperShotSound() {
+        try {
+            const shotSound = SoundCacheManager.getAudio('sounds/superlaser-shot.mp3');
+            shotSound.volume = 0.5;
+            shotSound.load();
+            shotSound.play().catch((err) => {
+                if (window && window.console) console.warn('SuperShot-Sound konnte nicht abgespielt werden:', err);
+            });
+        } catch (e) {
+            if (window && window.console) console.warn('SuperShot-Sound Fehler:', e);
+        }
     }
 
     /**
      * Initiates the shooting movement for the laser beam
      */
     shoot() {
-        try {
-            const laserSound = new Audio('sounds/laser-shot.mp3');
-            laserSound.volume = 0.5;
-            laserSound.play();
-        } catch (e) {}
+        this.playLaserSound();
         setInterval(() => {
             if (this.otherDirection) {
                 this.x -= this.speedX;
@@ -85,7 +151,6 @@ class LaserBeam extends CollidableObject {
         }, 1000 / 120);
     }
 
-
     /**
      * Starts the laser beam animation
      */
@@ -108,7 +173,6 @@ class LaserBeam extends CollidableObject {
             this.positionInterval = null;
         }
     }
-
 
     /**
      * Draws the laser beam

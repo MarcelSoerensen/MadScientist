@@ -21,28 +21,25 @@ class WorldCheck {
             }
         }
     }
-    
 
     /**
      * Activates the first enemy when the character reaches a certain distance.
      */
     checkFirstEnemyDistance() {
-        if (this.world.level && this.world.level.enemies && this.world.level.enemies.length > 0) {
-            this.world.level.enemies.forEach(enemy => {
-                let activateAt = enemy._activateAt || 500;
-                if (enemy._waitingForCharacter && this.world.character.x >= activateAt) {
-                    enemy.visible = true;
-                    enemy._waitingForCharacter = false;
-                    if (!enemy.moveInterval && !enemy.animInterval) {
-                        if (enemy instanceof EnemyOne && enemy.handler && typeof enemy.handler.animateEnemyOne === 'function') {
-                            enemy.handler.animateEnemyOne(enemy);
-                        } else if (typeof enemy.animate === 'function') {
-                            enemy.animate();
-                        }
-                    }
+        const w = this.world;
+        (w.level?.enemies ?? []).forEach(enemy => {
+            const activateAt = enemy._activateAt || 500;
+            if (!enemy._waitingForCharacter || w.character.x < activateAt) return;
+            enemy.visible = true;
+            enemy._waitingForCharacter = false;
+            if (!enemy.moveInterval && !enemy.animInterval) {
+                if (enemy instanceof EnemyOne && enemy.handler?.animateEnemyOne) {
+                    enemy.handler.animateEnemyOne(enemy);
+                } else if (typeof enemy.animate === 'function') {
+                    enemy.animate();
                 }
-            });
-        }
+            }
+        });
     }
 
     /**
@@ -50,47 +47,20 @@ class WorldCheck {
      */
     checkSuperShot() {
         const w = this.world;
-        if (
-            w.keyboard.S &&
-            w.energyBallManager.collectedCount >= 5 &&
-            w.laserBeams.length === 0
-        ) {
-            const laser = this.createSuperShotLaser();
-            this.playSuperShotSound();
-            this.activateSuperShot(laser);
-        }
-    }
-
-    /**
-     * Creates the Laser object for the SuperShot.
-     */
-    createSuperShotLaser() {
-        const w = this.world;
-        let offsetY = 170;
-        let offsetX = w.character.otherDirection ? -94 : 187;
-        let laser = new LaserBeam(
-            w.character.x + offsetX,
-            w.character.y + offsetY,
-            w.character.otherDirection,
-            w.character,
-            offsetX,
-            offsetY
+        const ready = w.keyboard.S && w.energyBallManager.collectedCount >= 5 && w.laserBeams.length === 0;
+        if (!ready) return;
+        const offsetY = 170;
+        const offsetX = w.character.otherDirection ? -94 : 187;
+        this.activateSuperShot(
+            LaserBeam.createSuperShot(
+                w.character.x + offsetX,
+                w.character.y + offsetY,
+                w.character.otherDirection,
+                w.character,
+                offsetX,
+                offsetY
+            )
         );
-        laser.width *= 2;
-        laser.height *= 2;
-        laser.isSuperShot = true;
-        return laser;
-    }
-
-    /**
-     * Plays the sound effect for the SuperShot.
-     */
-    playSuperShotSound() {
-        try {
-            const shotSound = new Audio('sounds/superlaser-shot.mp3');
-            shotSound.volume = 0.5;
-            shotSound.play();
-        } catch (e) {}
     }
 
     /**
@@ -113,17 +83,14 @@ class WorldCheck {
      */
     checkThrowableObjects() {
         const w = this.world;
-        if (w.keyboard.D && !w.lastDKeyState && !w.character.throwAnimationPlaying && w.bombManager.collectedCount > 0) {
+        const pressed = w.keyboard.D && !w.lastDKeyState && !w.character.throwAnimationPlaying && w.bombManager.collectedCount > 0;
+        if (pressed) {
             w.character.playThrowBombAnimation();
             setTimeout(() => {
-                let bombX = w.character.otherDirection ? w.character.x + 100 : w.character.x + 160;
-                let bomb = ThrowableObjects.createThrowableObject(
-                    'bomb',
-                    bombX,
-                    w.character.y + 180,
-                    w.character.otherDirection
+                const bombX = w.character.x + (w.character.otherDirection ? 100 : 160);
+                w.throwableObjects.push(
+                    ThrowableObjects.createThrowableObject('bomb', bombX, w.character.y + 180, w.character.otherDirection)
                 );
-                w.throwableObjects.push(bomb);
                 w.bombManager.collectedCount = Math.max(0, w.bombManager.collectedCount - 1);
             }, 500);
         }
@@ -135,56 +102,19 @@ class WorldCheck {
      */
     checkLaserBeams() {
         const w = this.world;
-        if (!w.laserActive) {
-            if (w.keyboard.Y && !w.lastYKeyState && w.energyBallManager.collectedCount > 0 && w.laserBeams.length === 0) {
-                w.laserActive = true;
-                w.laserBeams.forEach(laser => {
-                    laser.stopAnimation();
-                });
-                w.laserBeams = [];
-                const laser = this.createLaserBeam();
-                this.activateLaserBeam(laser);
-            } else if (!w.keyboard.Y && w.lastYKeyState) {
-                w.laserBeams.forEach(laser => {
-                    laser.stopAnimation();
-                });
-                w.laserBeams = [];
-            }
-        }
-        w.lastYKeyState = w.keyboard.Y;
-    }
-
-    /**
-     * Creates the LaserBeam object for the normal shot.
-     */
-    createLaserBeam() {
-        const w = this.world;
-        let offsetY = 205;
-        let offsetX = w.character.otherDirection ? -20 : 190;
-        let laser = new LaserBeam(
-            w.character.x + offsetX,
-            w.character.y + offsetY,
-            w.character.otherDirection,
-            w.character,
-            offsetX,
-            offsetY
-        );
-        laser.shoot();
-        return laser;
-    }
-
-    /**
-     * Activates the LaserBeam: adds laser, subtracts energy, starts animation.
-     */
-    activateLaserBeam(laser) {
-        const w = this.world;
-        w.laserBeams.push(laser);
-        w.energyBallManager.collectedCount = Math.max(0, w.energyBallManager.collectedCount - 1);
-        setTimeout(() => {
+        if (w.laserActive) return w.lastYKeyState = w.keyboard.Y;
+        const pressed = w.keyboard.Y && !w.lastYKeyState && w.energyBallManager.collectedCount > 0 && w.laserBeams.length === 0;
+        const released = !w.keyboard.Y && w.lastYKeyState;
+        if (pressed || released) {
             w.laserBeams.forEach(l => l.stopAnimation());
             w.laserBeams = [];
-            w.laserActive = false;
-        }, 500);
+        }
+        if (pressed) {
+            w.laserActive = true;
+            const laser = LaserBeam.createLaserBeam(w);
+            LaserBeam.activateLaserBeam(w, laser);
+        }
+        w.lastYKeyState = w.keyboard.Y;
     }
 
     /**
@@ -249,7 +179,7 @@ class WorldCheck {
      */
     checkGameOver() {
         const w = this.world;
-        if (w.gameOver || (w.character.isDead && w.character.isDead())) {
+    if (w.gameOver || w.character.deathAnimationPlayed) {
             this.checkGameOverByEnemy();
             return true;
         }
@@ -267,24 +197,17 @@ class WorldCheck {
         const w = this.world;
         if (w.gameOver) return;
         w.gameOver = true;
-        if (w.keyboard) {
-            w.keyboard.S = false;
-            w.keyboard.D = false;
-            w.keyboard.Y = false;
+        if (w.cleanup && typeof w.cleanup.cleanupIntervals === 'function') {
+            w.cleanup.cleanupIntervals();
         }
-        const endboss = (w.level && w.level.enemies)
-            ? w.level.enemies.find(e => e instanceof Endboss)
-            : null;
-        const enemyTwos = (w.level && w.level.enemies)
-            ? w.level.enemies.filter(e => e.constructor && e.constructor.name === 'EnemyTwo')
-            : [];
-        if (w.gameAlerts && typeof w.gameAlerts.triggerGameOver === 'function') {
-            w.gameAlerts.triggerGameOver(this.handleGameOverEnemyCleanup.bind(this, endboss, enemyTwos));
-        }
+        if (w.keyboard) w.keyboard.S = w.keyboard.D = w.keyboard.Y = false;
+        const endboss = w.level?.enemies?.find(e => e instanceof Endboss);
+        const enemyTwos = w.level?.enemies?.filter(e => e.constructor?.name === 'EnemyTwo') || [];
+        w.gameAlerts?.triggerGameOver?.(this.handleGameOverEnemyCleanup.bind(this, endboss, enemyTwos));
     }
 
     /**
-     * Callback für Game-Over-Animation: Entfernt Endboss und EnemyTwo sauber.
+     * Cleans up enemies when the game is over.
      */
     handleGameOverEnemyCleanup(endboss, enemyTwos) {
         if (endboss && this.world.cleanup && typeof this.world.cleanup.stopAndRemoveEndboss === 'function') {
@@ -302,26 +225,17 @@ class WorldCheck {
      */
     checkGameOverByEndboss() {
         const w = this.world;
-        if (!w.gameOver) {
-            w.gameOver = true;
-            if (w.keyboard) {
-                w.keyboard.S = false;
-                w.keyboard.D = false;
-                w.keyboard.Y = false;
-            }
-            const endboss = (w.level && w.level.enemies)
-                ? w.level.enemies.find(e => e instanceof Endboss)
-                : null;
-            if (w.cleanup && typeof w.cleanup.stopAndRemoveEndboss === 'function' && endboss) {
-                w.cleanup.stopAndRemoveEndboss(endboss);
-            }
-            if (w.gameAlerts) {
-                if (typeof w.gameAlerts.triggerLevelComplete === 'function') {
-                    w.gameAlerts.triggerLevelComplete();
-                } else if (typeof w.gameAlerts.showAlert === 'function') {
-                    w.gameAlerts.showAlert('levelComplete', 'Level Complete');
-                }
-            }
+        if (w.gameOver) return;
+        w.gameOver = true;
+        w.cleanup?.cleanupIntervals?.();
+        const endboss = w.level?.enemies?.find(e => e instanceof Endboss);
+        endboss?.sounds?.stopXPositionSound?.();
+        endboss?.handler?.handleDeathAnimation?.(endboss);
+        if (w.character && typeof w.characterHandling?.handleLevelCompleteAnimation === 'function') {
+            w.characterHandling.handleLevelCompleteAnimation(w.character);
         }
+        if (w.character) w.character.energy = -1;
+        if (w.keyboard) w.keyboard.S = w.keyboard.D = w.keyboard.Y = false;
+        w.gameAlerts?.triggerLevelComplete?.() || w.gameAlerts?.showAlert?.('levelComplete', 'Level Complete');
     }
 }

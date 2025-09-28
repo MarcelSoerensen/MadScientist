@@ -6,12 +6,13 @@ class EnemyTwoSounds {
 	 * Plays the death sound for EnemyTwo
 	 */
 	deathSoundCreation(enemy) {
-		if (typeof window !== 'undefined') {
-			const sound = new Audio('sounds/enemy2-death.mp3');
+		try {
+			const sound = SoundCacheManager.getAudio('sounds/enemy2-death.mp3');
 			sound.volume = 0.7;
 			sound.playbackRate = 2.0;
 			sound.play();
-		}
+			enemy.deathSoundAudio = sound;
+		} catch (e) {}
 	}
 
 	/**
@@ -32,7 +33,7 @@ class EnemyTwoSounds {
 	 * Initializes and fades in the proximity sound
 	 */
 	initProximitySound() {
-		this.proximitySoundAudio = new Audio('sounds/enemy2.mp3');
+		this.proximitySoundAudio = SoundCacheManager.getAudio('sounds/enemy2.mp3');
 		Object.assign(this.proximitySoundAudio, { loop: true, volume: 0, playbackRate: 0.9 });
 		this.proximitySoundAudio.play();
 		this.proximitySoundPlaying = true;

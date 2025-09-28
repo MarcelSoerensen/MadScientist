@@ -35,7 +35,7 @@ class EnemyOneHandling {
 	 * Handles the hurt animation and status logic
 	 */
 	handleHurtAnimation(enemy, force = 1) {
-		enemy.collisionSoundCreation(force);
+	enemy.sounds?.collisionSoundCreation?.(enemy, force);
 		if (enemy.laserHitCount >= 3) return;
 		if (enemy.isElectricHurt) return;
 		this.handleHurtStatus(enemy, force);
@@ -76,7 +76,7 @@ class EnemyOneHandling {
 	 */
 	handleDeathAnimation(enemy) {
 		this.handleDeathStatus(enemy);
-		enemy.deathSoundCreation();
+	enemy.sounds?.deathSoundCreation?.(enemy);
 		let deathFrame = 0;
 		enemy.deathAnimInterval = setInterval(() => {
 			if (deathFrame < enemy.animations.IMAGES_DEATH.length) {

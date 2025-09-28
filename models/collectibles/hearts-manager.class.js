@@ -142,7 +142,7 @@ class HeartsManager extends DrawableObject {
         heart.bounceActive = true;
         if (!this.lastNoHeartSoundTime || Date.now() - this.lastNoHeartSoundTime > 1000) {
             try {
-                const noHeartSound = new Audio('sounds/no-heart.mp3');
+                const noHeartSound = SoundCacheManager.getAudio('sounds/no-heart.mp3');
                 noHeartSound.volume = 0.7;
                 noHeartSound.play();
                 setTimeout(() => {

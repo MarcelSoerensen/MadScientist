@@ -24,7 +24,7 @@ class EndbossSounds {
      * Initializes and fades in the X-position sound
      */
     initXPositionSound() {
-        this.xPositionSoundAudio = new Audio('sounds/counter.mp3');
+        this.xPositionSoundAudio = SoundCacheManager.getAudio('sounds/counter.mp3');
         Object.assign(this.xPositionSoundAudio, { loop: true, volume: 0, playbackRate: 1.2 });
         this.xPositionSoundAudio.play();
         this.xPositionSoundPlaying = true;
@@ -68,13 +68,14 @@ class EndbossSounds {
 
     xPositionSoundPlaying = false;
     xPositionSoundAudio = null;
+
     /**
      * Creates and plays the left step sound for the Endboss.
      */
     walkingLeftSoundCreation(endboss) {
         if (!endboss.isStepSoundPlaying) {
             try {
-                endboss.stepSoundAudio = new Audio('sounds/endboss-steps-left.mp3');
+                endboss.stepSoundAudio = SoundCacheManager.getAudio('sounds/endboss-steps-left.mp3');
                 endboss.stepSoundAudio.loop = true;
                 endboss.stepSoundAudio.volume = 0.4;
                 endboss.stepSoundAudio.playbackRate = 1.5;
@@ -107,14 +108,12 @@ class EndbossSounds {
             if (endboss.hitSoundAudio && typeof endboss.hitSoundAudio.pause === 'function') {
                 endboss.hitSoundAudio.pause();
             }
-            endboss.hitSoundAudio = new Audio('sounds/endboss-hit.mp3');
+            endboss.hitSoundAudio = SoundCacheManager.getAudio('sounds/endboss-hit.mp3');
             endboss.hitSoundAudio.volume = options.volume ?? 0.25;
             if (options.playbackRate) endboss.hitSoundAudio.playbackRate = options.playbackRate;
             endboss.hitSoundAudio.play();
         } catch (e) {}
     }
-
-    
 
     /**
      * Creates and plays the right step sound for the Endboss.
@@ -122,7 +121,7 @@ class EndbossSounds {
     walkingRightSoundCreation(endboss) {
         if (!endboss.isStepSoundPlayingRight) {
             try {
-                endboss.stepSoundAudioRight = new Audio('sounds/endboss-steps-right.mp3');
+                endboss.stepSoundAudioRight = SoundCacheManager.getAudio('sounds/endboss-steps-right.mp3');
                 endboss.stepSoundAudioRight.loop = true;
                 endboss.stepSoundAudioRight.volume = 0.15;
                 endboss.stepSoundAudioRight.playbackRate = 1.5;
@@ -174,7 +173,7 @@ class EndbossSounds {
      */
     endbossDeathSound() {
         try {
-            const deathSound = new Audio('sounds/endboss-death.mp3');
+            const deathSound = SoundCacheManager.getAudio('sounds/endboss-death.mp3');
             deathSound.volume = 0.4;
             deathSound.play();
             let fadeSteps = 10;

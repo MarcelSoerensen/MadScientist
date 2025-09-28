@@ -8,6 +8,7 @@ const LASER_FRAMES = [
     'img/Projectile/Laser/skeleton-animation_3.png',
     'img/Projectile/Laser/skeleton-animation_4.png',
 ];
+
 let laserFrame = 0;
 let laserInterval;
 
@@ -124,7 +125,9 @@ function animateCountdownNumber(numberSpan, count) {
     numberSpan.style.transform = 'scale(1)';
     void numberSpan.offsetWidth;
     numberSpan.style.transition = '';
-    new Audio('sounds/counter.mp3').play().catch(() => {});
+    try {
+        SoundCacheManager.getAudio('sounds/counter.mp3').play();
+    } catch (e) {}
     setTimeout(() => { numberSpan.style.opacity = 1; numberSpan.style.transform = 'scale(1)'; }, 10);
     setTimeout(() => numberSpan.style.transform = 'scale(2)', 200);
     setTimeout(() => numberSpan.style.opacity = 0, 900);
@@ -206,7 +209,7 @@ function animateLaserFrames(laserImg, frames, interval, onDone) {
  */
 function playLaserSound() {
     try {
-        new Audio('sounds/laser-shot.mp3').play();
+        SoundCacheManager.getAudio('sounds/laser-shot.mp3').play();
     } catch (e) {}
 }
 
@@ -257,7 +260,6 @@ function setBodyTitleVisible(visible) {
         bodyTitle.style.pointerEvents = visible ? 'auto' : 'none';
     }
 }
-
 
 /**
  * Initializes the start screen and related UI elements on DOMContentLoaded.
@@ -344,7 +346,7 @@ function resetGameCanvas(canvas) {
 function startBackgroundMusic() {
     if (typeof window === 'undefined') return;
     if (!window.backgroundMusic) {
-        window.backgroundMusic = new Audio('sounds/background-sound.mp3');
+        window.backgroundMusic = SoundCacheManager.getAudio('sounds/background-sound.mp3');
         window.backgroundMusic.loop = true;
         window.backgroundMusic.volume = 0.08;
     }

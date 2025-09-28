@@ -1,3 +1,7 @@
+/**
+ * GameAlerts: game alert management with animated overlays and sound effects.
+ */
+
 class GameAlerts {
     /**
      * Creates a new GameAlerts instance for managing animated game alerts.
@@ -12,54 +16,55 @@ class GameAlerts {
      * Plays the sound associated with a given alert type.
      */
     playSound(type) {
-            const sounds = {
-                superlaser: 'sounds/available-superlaser.mp3',
-                fullEnergy: 'sounds/full-energy.mp3',
-                levelComplete: 'sounds/endboss-death.mp3',
-                gameOver: 'sounds/character-death.mp3'
-            };
-            if (sounds[type]) {
-                const audio = new Audio(sounds[type]);
+        const sounds = {
+            superlaser: 'sounds/available-superlaser.mp3',
+            fullEnergy: 'sounds/full-energy.mp3',
+            gameOver: 'sounds/character-death.mp3'
+        };
+        if (sounds[type]) {
+            try {
+                const audio = SoundCacheManager.getAudio(sounds[type]);
                 audio.volume = 0.5;
                 audio.play();
+            } catch (err) {
+                if (window && window.console) console.warn('Sound konnte nicht abgespielt werden:', err);
             }
         }
+    }
 
     /**
-     * Shows an alert overlay with animation and sound.
+     * Shows a new alert overlay with animation and styling.
      */
     showAlert(type, text, options = {}) {
-            const style = this.getAlertStyle(type, options);
-            this.activeAlert = {
-                type,
-                text,
-                start: Date.now(),
-                duration: style.duration,
-                font: style.font,
-                scale: 1,
-                alpha: 1
-            };
-            this.playSound(type);
-            this.startAlertAnimation();
-        }
+        const style = this.getAlertStyle(type, options);
+        this.activeAlert = {
+            type,
+            text,
+            font: style.font,
+            x: this.canvas.width / 2,
+            y: this.canvas.height / 2,
+            scale: 1,
+            alpha: 1,
+            duration: style.duration,
+            start: Date.now()
+        };
+        this.playSound(type);
+        this.startAlertAnimation();
+    }
 
     /**
      * Triggers the Superlaser alert with the current number of available supershots.
      */
     triggerSuperlaser(superShots) {
         this.showAlert('superlaser', `Superlaser ${superShots}`);
-        this.playSound('superlaser');
     }
 
     /**
      * Triggers the Full Energy alert.
      */
     triggerFullEnergy() {
-        this.showAlert('fullEnergy', 'Volle Energie!');
-        this.playSound('fullEnergy');
+        this.showAlert('fullEnergy', 'Full Energy!');
     }
-
-
 
     /**
      * Triggers the Game Over alert and shows the game over screen after the alert.
@@ -87,25 +92,14 @@ class GameAlerts {
      * Returns the style object for a given alert type.
      */
     getAlertStyle(type, options = {}) {
-        const defaultStyles = {
-            superlaser: {
-                font: 'bold 50px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
-                duration: 1500
-            },
-            levelComplete: {
-                font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
-                duration: 2000
-            },
-            gameOver: {
-                font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
-                duration: 2500
-            },
-            fullEnergy: {
-                font: 'bold 50px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
-                duration: 1500
-            }
+        const baseFont = 'bold 50px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif';
+        const styles = {
+            superlaser:  { font: baseFont, duration: 1500 },
+            fullEnergy:  { font: baseFont, duration: 1500 },
+            levelComplete: { font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif', duration: 2000 },
+            gameOver:    { font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif', duration: 2500 }
         };
-        return { ...defaultStyles[type], ...options };
+        return { ...styles[type], ...options };
     }
 
     /**
@@ -128,50 +122,7 @@ class GameAlerts {
     }
 
     /**
-     * Shows a new alert overlay with animation and styling.
-     */
-    showAlert(type, text, options = {}) {
-        const style = this.getAlertStyle(type, options);
-        this.activeAlert = {
-            type,
-            text,
-            font: style.font,
-            x: this.canvas.width / 2,
-            y: this.canvas.height / 2,
-            scale: 1,
-            alpha: 1,
-            duration: style.duration,
-            start: Date.now()
-        };
-        this.startAlertAnimation();
-    }
-
-    /**
-     * Triggers the Full Energy alert with animation and sound.
-     */
-    triggerFullEnergy() {
-        this.showAlert('fullEnergy', 'Full Energy');
-        try {
-            const fullEnergySound = new Audio('sounds/full-energy.mp3');
-            fullEnergySound.volume = 0.5;
-            fullEnergySound.play();
-        } catch (e) {}
-    }
-
-    /**
-     * Triggers the Superlaser alert with animation and sound.
-     */
-    triggerSuperlaser(superShots) {
-        this.showAlert('superlaser', `Superlaser ${superShots}`);
-        try {
-            const availableSound = new Audio('sounds/available-superlaser.mp3');
-            availableSound.volume = 0.3;
-            availableSound.play();
-        } catch (e) {}
-    }
-
-    /**
-     * Triggers the Level Complete alert mit Musik-Stop, Animation und Sound, dann Win-Screen.
+     * Triggers the Level Complete alert with Musik-Stop, animation and Sound.
      */
     triggerLevelComplete() {
         if (typeof window !== 'undefined' && window.backgroundMusic) {
@@ -182,37 +133,12 @@ class GameAlerts {
             font: 'bold 60px "Comic Relief", "Comic Sans MS", "Comic Sans", cursive, sans-serif',
             duration: 2000
         });
-        this.playLevelCompleteSound();
         const scoreData = this.getScoreData();
         setTimeout(() => {
             if (typeof window.showWinScreen === 'function') {
                 window.showWinScreen(scoreData);
             }
         }, 2500);
-    }
-
-    /**
-     * Plays the level complete sound effect with fade out.
-     */
-    playLevelCompleteSound() {
-        try {
-            const levelCompleteSound = new Audio('sounds/endboss-death.mp3');
-            levelCompleteSound.volume = 0.5;
-            levelCompleteSound.play();
-            
-            const startVolume = 0.5;
-            const fadeStep = startVolume / (2000 / 50);
-            
-            const fadeInterval = setInterval(() => {
-                if (levelCompleteSound.volume > 0.01) {
-                    levelCompleteSound.volume = Math.max(0, levelCompleteSound.volume - fadeStep);
-                } else {
-                    levelCompleteSound.volume = 0;
-                    levelCompleteSound.pause();
-                    clearInterval(fadeInterval);
-                }
-            }, 50);
-        } catch (e) {}
     }
 
     /**

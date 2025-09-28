@@ -7,7 +7,7 @@ class CharacterHandling {
      */
     animateCharacter(character) {
         setInterval(() => {
-            if (character.isDead()) return;
+            if (character.deathAnimationPlayed) return;
             if (this.handleLevelCompleteAnimation(character)) return;
             this.handleMovement(character);
             this.handleCamera(character);
@@ -146,7 +146,7 @@ class CharacterHandling {
      * Handles idle animation.
      */
     handleIdleAnimation(character) {
-        if (!character.isDead() && !character.isAboveGround() && !character.throwAnimationPlaying && !(character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
+    if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && !(character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
             character.playAnimation(character.anim.IMAGES_IDLE);
             character.lastAnimation = 'idle';
         }
@@ -156,7 +156,7 @@ class CharacterHandling {
      * Handles walking animation.
      */
     handleWalkingAnimation(character) {
-        if (!character.isDead() && !character.isAboveGround() && !character.throwAnimationPlaying && (character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
+    if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && (character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
             character.playAnimation(character.anim.IMAGES_WALKING);
             character.lastAnimation = 'walk';
         }
@@ -180,9 +180,10 @@ class CharacterHandling {
      * Handles death animation.
      */
     handleDeathAnimation(character) {
-        if (character.isDead() && !character.deathAnimationPlayed) {
-            character.playDeathAnimation();
-            character.deathAnimationPlayed = true;
+        if (typeof character.energy === 'number' && character.energy <= 0 && !character.deathAnimationPlayed) {
+            if (!character.world?.gameOver) {
+                character.playDeathAnimation();
+            }
         }
     }
 

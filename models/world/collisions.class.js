@@ -1,4 +1,3 @@
-
 /**
  * Manages all collision detection and processing in the game world.
  */
@@ -36,6 +35,7 @@ class CollisionManager {
      * Checks collision between the character and all enemies.
      */
     checkEnemyCollision(world) {
+        if (world.gameOver || world.character.deathAnimationPlayed) return;
         world.level.enemies.forEach(enemy => {
             if (!enemy.collidable) return;
             let collided = world.character.isColliding(enemy);
@@ -52,26 +52,48 @@ class CollisionManager {
      * Checks collision between bombs and enemies.
      */
     checkBombCollision(world) {
+        const typeHandler = enemy =>
+            enemy instanceof Endboss ? this.handleBombEndboss :
+            enemy instanceof EnemyOne ? this.handleBombEnemyOne :
+            enemy instanceof EnemyTwo ? this.handleBombEnemyTwo :
+            this.handleBombGenericEnemy;
         world.level.enemies.forEach(enemy => {
             if (!enemy.collidable) return;
             const enemyRect = this.getEnemyRect(enemy);
             world.throwableObjects.forEach(bomb => {
-                if (bomb.isExploding) {
-                    const bombRect = bomb.getExplosionRect();
-                    if (this.isCollision(enemyRect, bombRect)) {
-                        if (enemy instanceof Endboss && enemy.handler) {
-                            enemy.handler.handleHurtAnimation(enemy, 5);
-                        } else if (enemy instanceof EnemyOne && enemy.handler && !enemy.isDeadAnimationPlaying) {
-                            enemy.handler.handleDeathAnimation(enemy);
-                        } else if (enemy instanceof EnemyTwo && enemy.handler && !enemy.isDeadAnimationPlaying) {
-                            enemy.handler.handleDeathAnimation(enemy);
-                        } else if (typeof enemy.handleDeathAnimation === 'function' && !enemy.isDeadAnimationPlaying) {
-                            enemy.handleDeathAnimation();
-                        }
-                    }
-                }
+                if (!bomb.isExploding) return;
+                const bombRect = bomb.getExplosionRect();
+                if (!this.isCollision(enemyRect, bombRect)) return;
+                typeHandler(enemy).call(this, enemy);
             });
         });
+    }
+
+    /**
+     * Handles the explosion of a bomb on the Endboss.
+     */
+    handleBombEndboss(enemy) {
+        if (enemy.handler) {
+            enemy.handler.handleHurtAnimation(enemy, 5);
+        }
+    }
+
+    /**
+     * Handles the explosion of a bomb on EnemyOne.
+     */
+    handleBombEnemyOne(enemy) {
+        if (enemy.handler && !enemy.isDeadAnimationPlaying) {
+            enemy.handler.handleDeathAnimation(enemy);
+        }
+    }
+
+    /**
+     * Handles the explosion of a bomb on EnemyTwo.
+     */
+    handleBombEnemyTwo(enemy) {
+        if (enemy.handler && !enemy.isDeadAnimationPlaying) {
+            enemy.handler.handleDeathAnimation(enemy);
+        }
     }
 
     /**

@@ -8,7 +8,7 @@ class CharacterSounds {
     stepSound(character) {
         if (!character.isStepSoundPlaying) {
             try {
-                character.stepSoundAudio = new Audio('sounds/character-steps.mp3');
+                character.stepSoundAudio = SoundCacheManager.getAudio('sounds/character-steps.mp3');
                 Object.assign(character.stepSoundAudio, {
                     loop: true,
                     volume: 0.3,
@@ -42,7 +42,7 @@ class CharacterSounds {
         const isJumping = character.isAboveGround();
         if (isJumping && !character.jumpSoundPlayed) {
             try {
-                const jumpSound = new Audio('sounds/character-jump.mp3');
+                const jumpSound = SoundCacheManager.getAudio('sounds/character-jump.mp3');
                 jumpSound.volume = 0.2;
                 jumpSound.play();
             } catch (e) {}
@@ -56,7 +56,7 @@ class CharacterSounds {
      */
     throwBombSound(character) {
         try {
-            const bombSound = new Audio('sounds/hit-bomb.mp3');
+            const bombSound = SoundCacheManager.getAudio('sounds/hit-bomb.mp3');
             bombSound.volume = 0.25;
             bombSound.play();
         } catch (e) {}
@@ -69,7 +69,7 @@ class CharacterSounds {
         const now = Date.now();
         if (!world.lastCollisionSoundTime || now - world.lastCollisionSoundTime > 500) {
             try {
-                const hurtSound = new Audio('sounds/character-hurt.mp3');
+                const hurtSound = SoundCacheManager.getAudio('sounds/character-hurt.mp3');
                 hurtSound.volume = 0.5;
                 hurtSound.play();
                 world.lastCollisionSoundTime = now;
@@ -82,7 +82,7 @@ class CharacterSounds {
      */
     deathSound(character) {
         try {
-            const deathSound = new Audio('sounds/character-death.mp3');
+            const deathSound = SoundCacheManager.getAudio('sounds/character-death.mp3');
             deathSound.volume = 0.7;
             deathSound.play();
         } catch (e) {}
