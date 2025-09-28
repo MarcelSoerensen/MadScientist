@@ -45,32 +45,49 @@ class Character extends CollidableObject {
         this.invulnerableTimeout = null;
         this.animateCharacter();
     }
+
     /**
-     * Handles the enemy hit logic (animation, sound, knockback).
+     * Handles the enemy collision logic (animation, sound, knockback).
      */
-    onEnemyHit(enemy) {
+    handleEnemyCollision(enemy) {
+        if (enemy && (enemy.constructor?.name === 'Endboss' || enemy.isEndboss)) {
+            this.endbossHit(enemy);
+        } else {
+            this.enemyHit(enemy);
+        }
+    }
+
+    /**
+     * Handles logic when the character is hit by a regular enemy.
+     */
+    enemyHit(enemy) {
         if (this.isInvulnerable || this.deathAnimationPlayed) return;
         this.isInvulnerable = true;
-        const knockback = 80;
-        if (enemy && (enemy.constructor?.name === 'Endboss' || enemy.isEndboss)) {
-            this.x -= knockback;
-        } else if (enemy && enemy.x < this.x) {
-            this.x += knockback;
-        } else {
-            this.x -= knockback;
-        }
-        if (!this.sounds) this.sounds = new CharacterSounds();
+        const knockback = (enemy && enemy.x < this.x) ? 80 : -80;
+        this.x += knockback;
+        this.sounds ??= new CharacterSounds();
         this.sounds.hurtSound(this, this.world);
         this.animHurtOnce();
-        this.energy -= 5;
-        if (this.energy < 0) this.energy = 0;
-        if (this.world && this.world.statusBar) {
-            this.world.statusBar.setPercentage(this.energy);
-        }
+        this.energy = Math.max(0, this.energy - 10);
+        this.world?.statusBar?.setPercentage(this.energy);
         if (this.invulnerableTimeout) clearTimeout(this.invulnerableTimeout);
-        this.invulnerableTimeout = setTimeout(() => {
-            this.isInvulnerable = false;
-        }, 500);
+        this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, 500);
+    }
+
+    /**
+     * Handles logic when the character is hit by the Endboss.
+     */
+    endbossHit(enemy) {
+        if (this.isInvulnerable || this.deathAnimationPlayed) return;
+        this.isInvulnerable = true;
+        this.x -= 80;
+        this.sounds ??= new CharacterSounds();
+        this.sounds.hurtSound(this, this.world);
+        this.animHurtOnce();
+        this.energy = Math.max(0, this.energy - 15);
+        this.world?.statusBar?.setPercentage(this.energy);
+        if (this.invulnerableTimeout) clearTimeout(this.invulnerableTimeout);
+        this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, 500);
     }
 
     /**

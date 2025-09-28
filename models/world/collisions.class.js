@@ -40,7 +40,7 @@ class CollisionManager {
             if (!enemy.collidable) return;
             let collided = world.character.isColliding(enemy);
             if (collided) {
-                world.character.onEnemyHit(enemy);
+                world.character.handleEnemyCollision(enemy);
             }
         });
     }
