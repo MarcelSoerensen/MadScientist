@@ -14,8 +14,7 @@ class EnergyBall extends CollidableObject {
         this.width = this.baseSize;
         this.height = this.baseSize;
         this.pulseUp = true;
-        this.img = new Image();
-        this.img.src = 'img/Projectile/Other/7.png';
+        this.img = ImageCacheManager.getImage('img/Projectile/Other/7.png');
         this.isCollecting = false;
         this.collectProgress = 0;
         this.startX = x;
@@ -70,7 +69,7 @@ class EnergyBall extends CollidableObject {
      */
     playCollectingSound() {
         try {
-            const collectedSound = new Audio('sounds/collected-energyball.mp3');
+            const collectedSound = SoundCacheManager.getAudio('sounds/collected-energyball.mp3');
             collectedSound.play();
             EnergyBall.activeSounds.push(collectedSound);
             collectedSound.addEventListener('ended', () => {

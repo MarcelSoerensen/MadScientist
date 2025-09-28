@@ -21,8 +21,7 @@ class BombsBar extends DrawableObject {
         this.collected = 0;
         this.radius = 9;
         this.spacing = 12;
-        this.bombImg = new Image();
-        this.bombImg.src = 'img/Projectile/Other/1.png';
+        this.bombImg = ImageCacheManager.getImage('img/Projectile/Other/1.png');
     }
 
     /**

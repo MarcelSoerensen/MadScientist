@@ -11,8 +11,7 @@ class CollectibleHeart extends CollidableObject {
         this.y = y;
         this.width = 32;
         this.height = 32;
-        this.img = new Image();
-        this.img.src = 'img/User Interfaces/HpICon.png';
+        this.img = ImageCacheManager.getImage('img/User Interfaces/HpICon.png');
         this.collected = false;
         this.baseSize = 32;
         this.pulse = 0;

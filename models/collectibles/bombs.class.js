@@ -11,8 +11,7 @@ class CollectibleBomb extends CollidableObject {
         this.y = y;
         this.width = 40;
         this.height = 40;
-        this.img = new Image();
-        this.img.src = 'img/Projectile/Other/1.png';
+        this.img = ImageCacheManager.getImage('img/Projectile/Other/1.png');
         this.originX = x;
         this.originY = y;
         this.isCollecting = false;
@@ -73,7 +72,7 @@ class CollectibleBomb extends CollidableObject {
         this.startWidth = 40;
         this.startHeight = 40;
         try {
-            const collectedSound = new Audio('sounds/collected-bomb.mp3');
+            const collectedSound = SoundCacheManager.getAudio('sounds/collected-bomb.mp3');
             collectedSound.play();
             CollectibleBomb.activeSounds.push(collectedSound);
             collectedSound.addEventListener('ended', () => {

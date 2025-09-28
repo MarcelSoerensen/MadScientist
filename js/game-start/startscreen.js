@@ -183,7 +183,7 @@ function resetLaserImg(laserImg, mode) {
     if (mode === 'story') laserImg.classList.add('laser-story-button');
     if (mode === 'controls') laserImg.classList.add('laser-controls-button');
     laserFrame = 0;
-    laserImg.src = LASER_FRAMES[0];
+    laserImg.src = ImageCacheManager.getImage(LASER_FRAMES[0]).src;
 }
 
 /**
@@ -193,7 +193,10 @@ function animateLaserFrames(laserImg, frames, interval, onDone) {
     let frameCount = 0;
     if (laserInterval) clearInterval(laserInterval);
     laserInterval = setInterval(() => {
-        laserImg.src = LASER_FRAMES[laserFrame];
+        const cachedSrc = ImageCacheManager.getImage(LASER_FRAMES[laserFrame]).src;
+        if (laserImg.src !== cachedSrc) {
+            laserImg.src = cachedSrc;
+        }
         void laserImg.offsetWidth;
         laserFrame = (laserFrame + 1) % LASER_FRAMES.length;
         frameCount++;
@@ -245,7 +248,11 @@ function animateStartScreenCharacter() {
     const charImg = document.querySelector('.start-screen-character img');
     if (!charImg) return;
     idleInterval = setInterval(() => {
-        charImg.src = `${idlePath}${idleFrame.toString().padStart(2, '0')}${idleExt}`;
+        const framePath = `${idlePath}${idleFrame.toString().padStart(2, '0')}${idleExt}`;
+        const cachedSrc = ImageCacheManager.getImage(framePath).src;
+        if (charImg.src !== cachedSrc) {
+            charImg.src = cachedSrc;
+        }
         idleFrame = (idleFrame + 1) % idleFrameCount;
     }, 80);
 }

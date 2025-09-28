@@ -14,8 +14,7 @@ class DrawableObject {
      * Loads a single image from the given path.
      */
     loadImage(imagePath) {
-        this.img = new Image();
-        this.img.src = imagePath;
+    this.img = ImageCacheManager.getImage(imagePath);
     }
 
     /**
@@ -52,10 +51,8 @@ class DrawableObject {
      * Loads multiple images and stores them in the image cache.
      */
     loadImages(array) {
-        array.forEach(imagePath => {
-          let img = new Image();
-          img.src = imagePath;
-          this.imageCache[imagePath] = img;
-        });
+                array.forEach(imagePath => {
+                    this.imageCache[imagePath] = ImageCacheManager.getImage(imagePath);
+                });
     }
 }

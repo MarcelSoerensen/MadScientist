@@ -76,7 +76,7 @@ class ThrowBomb extends ThrowableObjects {
      */
     playExplosionSound() {
         try {
-            const explosionSound = new Audio('sounds/explosion.mp3');
+            const explosionSound = SoundCacheManager.getAudio('sounds/explosion.mp3');
             explosionSound.play();
         } catch (e) {}
     }
