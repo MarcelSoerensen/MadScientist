@@ -3,6 +3,7 @@
  */
 class SoundCacheManager {
     static cache = {};
+    static muted = true; // Standard: alle Sounds aus
 
     /**
      * Returns a cached audio instance (always a NEW instance, but with cached source).
@@ -14,7 +15,18 @@ class SoundCacheManager {
         }
         const newAudio = new Audio();
         newAudio.src = this.cache[src].src;
+        newAudio.muted = this.muted;
         return newAudio;
+    }
+
+    /**
+     * Setzt globales Mute für alle neuen Sounds und laufende Instanzen
+     */
+    static setMuted(mute) {
+        this.muted = mute;
+        // Alle laufenden Audios muten/unmuten
+        const audios = document.querySelectorAll('audio');
+        audios.forEach(a => a.muted = mute);
     }
 }
 

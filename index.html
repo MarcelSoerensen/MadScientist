@@ -72,7 +72,7 @@
     <script src="js/game-start/controlscreen.js"></script>
     <script src="js/game-end/game-over.js"></script>
     <script src="js/game-end/game-win.js"></script>
-    
+    <script src="js/audio-toggle.js"></script>
 </head>
 <body>
 
@@ -95,6 +95,13 @@
                             <img src="img/Main Characters/Gun01/Idle/Idle_00.png" alt=""> 
                         </div>
                     </div>   
+                    <button id="audio-toggle-btn" class="audio-toggle-btn" aria-label="Audio an/aus">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M6 12v8h6l6 6V6l-6 6H6z" stroke="currentColor" stroke-width="2" fill="currentColor"/>
+                            <path id="audio-on-icon" d="M22 12a4 4 0 010 8" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path id="audio-off-icon" d="M4 28L28 4" stroke="rgba(0, 0, 0, 0.6)" stroke-width="2" fill="none" style="display:none;"/>
+                        </svg>
+                    </button>
                 </div>
         </div>
         <div id="countdown-overlay" class="d-none">
@@ -159,6 +166,5 @@
     </div>
         </div>
     </div>
-
 </body>
 </html>
