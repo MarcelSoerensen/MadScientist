@@ -104,9 +104,6 @@ function handleNextLevel() {
     const canvas = document.getElementById('canvas');
     if (!winScreen || !canvas) return;
     
-    if (typeof window.startBackgroundMusic === 'function') {
-        window.startBackgroundMusic();
-    }
     winToCanvasFade(winScreen, canvas);
     winToCanvasFadeOut(winScreen);
     winToCanvasFadeIn(canvas);

@@ -72,13 +72,33 @@
     <script src="js/game-start/controlscreen.js"></script>
     <script src="js/game-end/game-over.js"></script>
     <script src="js/game-end/game-win.js"></script>
-    <script src="js/audio-toggle.js"></script>
+    <script src="js/audio-button-manager.js"></script>
 </head>
 <body>
 
     <h1 class="body-title">Mad Scientist</h1>
     <div class="canvas-container">
         <canvas width="720" height="480" id="canvas"></canvas>
+        <div class="system-controls-container">
+            <button id="pause-btn" class="system-btn" aria-label="Pause">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect x="9" y="8" width="4" height="16" rx="2" fill="currentColor"/>
+                    <rect x="19" y="8" width="4" height="16" rx="2" fill="currentColor"/>
+                </svg>
+            </button>
+            <button id="back-btn" class="system-btn" aria-label="Zurück">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M20 8L12 16L20 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button id="system-audio-btn" class="audio-toggle-btn" aria-label="Audio an/aus">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M6 12v8h6l6 6V6l-6 6H6z" stroke="currentColor" stroke-width="2" fill="currentColor"/>
+                    <path id="system-audio-on-icon" d="M22 12a4 4 0 010 8" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path id="system-audio-off-icon" d="M4 28L28 4" stroke="currentColor" stroke-width="2" fill="none" style="display:none;"/>
+                </svg>
+            </button>
+        </div>
         <div id="start_screen">
                 <h1 class="start-screen-title">Mad Scientist</h1>
                 <div class="start-screen-btn-character-group">
@@ -95,11 +115,11 @@
                             <img src="img/Main Characters/Gun01/Idle/Idle_00.png" alt=""> 
                         </div>
                     </div>   
-                    <button id="audio-toggle-btn" class="audio-toggle-btn" aria-label="Audio an/aus">
+                    <button id="audio-toggle-btn" class="audio-toggle-btn position-absolute" aria-label="Audio an/aus">
                         <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                             <path d="M6 12v8h6l6 6V6l-6 6H6z" stroke="currentColor" stroke-width="2" fill="currentColor"/>
                             <path id="audio-on-icon" d="M22 12a4 4 0 010 8" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <path id="audio-off-icon" d="M4 28L28 4" stroke="rgba(0, 0, 0, 0.6)" stroke-width="2" fill="none" style="display:none;"/>
+                            <path id="audio-off-icon" d="M4 28L28 4" stroke="currentColor" stroke-width="2" fill="none" style="display:none;"/>
                         </svg>
                     </button>
                 </div>

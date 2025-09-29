@@ -22,7 +22,8 @@ class EndbossHandling {
         endboss.leftTargetX = endboss.startX - 200;
         endboss.animInterval = setInterval(() => {
             if (!endboss.animationStarted) return this.handleIdle(endboss);
-            if (endboss.laserHitCount >= 25 && !endboss.isElectricHurt) {
+            if (endboss.hurtCount >= 25 && !endboss.deathDone && !endboss.isElectricHurt) {
+                endboss.deathDone = true;
                 this.handleDeathSound(endboss);
                 this.handleDeathStatus(endboss);
                 return this.handleDeathAnimation(endboss);
@@ -121,11 +122,11 @@ class EndbossHandling {
      * Handles the hurt animation and status logic.
      */
     handleHurtAnimation(endboss, force = 1) {
-        this.handleHurtSound(endboss, force);
-        if (endboss.laserHitCount >= 25) return;
-        if (endboss.isElectricHurt) return;
-        this.handleHurtStatus(endboss, force);
-        this.handleHurtTimeout(endboss, force);
+    this.handleHurtSound(endboss, force);
+    if (endboss.hurtCount >= 25) return;
+    if (endboss.isElectricHurt) return;
+    this.handleHurtStatus(endboss, force);
+    this.handleHurtTimeout(endboss, force);
     }
 
     /**
@@ -154,10 +155,10 @@ class EndbossHandling {
         }
         if (force === 1 && (now - endboss.lastHitTime < 500)) return;
         if (force === 1) endboss.lastHitTime = now;
-        endboss.laserHitCount += force;
-        if (force === 5) endboss.lastSuperShotTime = now;
-        if (endboss.laserHitCount > 25) endboss.laserHitCount = 25;
-        endboss.isElectricHurt = true;
+    endboss.hurtCount += force;
+    if (force === 5) endboss.lastSuperShotTime = now;
+    if (endboss.hurtCount > 25) endboss.hurtCount = 25;
+    endboss.isElectricHurt = true;
     }
 
     /**
@@ -171,10 +172,8 @@ class EndbossHandling {
         endboss.electricHurtTimeout = setTimeout(() => {
             endboss.isElectricHurt = false;
             endboss.electricHurtTimeout = null;
-            if (endboss.laserHitCount === 25) {
-                this.handleDeathSound(endboss);
-                this.handleDeathStatus(endboss);
-                this.handleDeathAnimation(endboss);
+            if (endboss.hurtCount >= 25) {
+                return;
             }
         }, hurtDuration);
     }
@@ -200,7 +199,7 @@ class EndbossHandling {
      * Plays the death sound of the Endboss.
      */
     handleDeathSound(endboss) {
-    endboss.sounds.stopStepSounds(endboss);
+    endboss.sounds.stopAllEndbossSounds(endboss);
     endboss.sounds.endbossDeathSound();
     }
 

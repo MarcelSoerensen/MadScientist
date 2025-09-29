@@ -27,7 +27,8 @@
 .jump-btn,
 .move-btn,
 .weapon-btn,
-.audio-toggle-btn {
+.audio-toggle-btn,
+.system-btn {
     width: 2.75em;
     height: 2.75em;
     border-radius: 50%;
@@ -47,6 +48,30 @@
     animation: title-grow-fade 1.2s cubic-bezier(.7,-0.2,.3,1.2) 0.1s forwards;
 }
 
+.system-controls-container {
+    position: absolute;
+    top: 2vh;
+    right: 2vw;
+    display: flex;
+    gap: 1vw;
+    z-index: 99999;
+}
+
+.audio-toggle-btn,
+.system-btn {
+    right: 2vw;
+    bottom: 2vh;
+    width: 3.2em;
+    height: 3.2em;
+    color: rgba(255, 255, 255, 0.8);
+    outline: none;
+    box-shadow: none;
+}
+
+.position-absolute {
+    position: absolute;
+}
+
 body.mobile-portrait .mobile-controls-container,
 body.mobile-portrait .weapon-controls-container {
     bottom: 1vh !important;
@@ -55,7 +80,8 @@ body.mobile-portrait .weapon-controls-container {
 body.mobile-portrait .jump-btn,
 body.mobile-portrait .move-btn,
 body.mobile-portrait .weapon-btn,
-body.mobile-portrait .audio-toggle-btn {
+.audio-toggle-btn
+.system-btn {
     background: rgba(0, 0, 0, 0.5);
     border: 2px solid rgba(0, 0, 0, 0.3);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
@@ -64,7 +90,8 @@ body.mobile-portrait .audio-toggle-btn {
 body.mobile-portrait .jump-btn svg,
 body.mobile-portrait .move-btn svg,
 body.mobile-portrait .weapon-btn svg,
-body.mobile-portrait .audio-toggle-btn svg {
+.audio-toggle-btn svg
+.system-btn svg {
     stroke: rgba(240, 179, 83, 1);
 }
 
@@ -77,8 +104,10 @@ body.mobile-portrait .move-btn.pressed,
 body.mobile-portrait .weapon-btn:active,
 body.mobile-portrait .weapon-btn.using,
 body.mobile-portrait .weapon-btn.pressed,
-body.mobile-portrait .audio-toggle-btn:active,
-body.mobile-portrait .audio-toggle-btn.pressed {
+.audio-toggle-btn:active,
+.audio-toggle-btn.pressed,
+.system-btn:active,
+.system-btn.pressed {
     background: rgba(0, 0, 0, 0.3);
     scale: 0.95;
     border-color: rgba(0, 0, 0, 0.5);
@@ -95,15 +124,18 @@ body.mobile-portrait .move-btn.pressed svg,
 body.mobile-portrait .weapon-btn:active svg,
 body.mobile-portrait .weapon-btn.using svg,
 body.mobile-portrait .weapon-btn.pressed svg,
-body.mobile-portrait .audio-toggle-btn:active svg,
-body.mobile-portrait .audio-toggle-btn.pressed svg {
+.audio-toggle-btn:active svg,
+.audio-toggle-btn.pressed svg
+.system-btn:active svg,
+.system-btn.pressed svg {
     scale: 0.8;
 }
 
 body.mobile-landscape .jump-btn,
 body.mobile-landscape .move-btn,
 body.mobile-landscape .weapon-btn,
-body.mobile-landscape .audio-toggle-btn {
+.audio-toggle-btn,
+.system-btn {
     background: transparent;
     border: 2px solid rgba(255, 255, 255, 0.4);
     box-shadow: 0 4px 12px rgba(47, 104, 116, 0.4);
@@ -112,7 +144,8 @@ body.mobile-landscape .audio-toggle-btn {
 body.mobile-landscape .jump-btn svg,
 body.mobile-landscape .move-btn svg,
 body.mobile-landscape .weapon-btn svg,
-body.mobile-landscape .audio-toggle-btn svg {
+.audio-toggle-btn svg,
+.system-btn svg {
     stroke: rgba(255, 255, 255, 0.8);
 }
 
@@ -125,8 +158,10 @@ body.mobile-landscape .move-btn.pressed,
 body.mobile-landscape .weapon-btn:active,
 body.mobile-landscape .weapon-btn.using,
 body.mobile-landscape .weapon-btn.pressed,
-body.mobile-landscape .audio-toggle-btn:active,
-body.mobile-landscape .audio-toggle-btn.pressed {
+.audio-toggle-btn:active,
+.audio-toggle-btn.pressed,
+.system-btn:active,
+.system-btn.pressed {
     background: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.8);
     box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3),
@@ -143,8 +178,10 @@ body.mobile-landscape .move-btn.pressed svg,
 body-mobile-portrait .weapon-btn:active svg,
 body-mobile-portrait .weapon-btn.using svg,
 body.mobile-landscape .weapon-btn.pressed svg,
-body.mobile-landscape .audio-toggle-btn:active svg,
-body.mobile-landscape .audio-toggle-btn.pressed svg {
+.audio-toggle-btn:active svg,
+.audio-toggle-btn.pressed svg,
+.system-btn:active svg,
+.system-btn.pressed svg {
     scale: 0.8;
 }
 
@@ -224,33 +261,6 @@ body.mobile-portrait .weapon-btn.superlaser-ready {
 .weapon-btn.superlaser-ready.pressed svg {
     stroke: rgba(240, 179, 83, 1);
     filter: drop-shadow(0 0 6px rgba(240, 179, 83, 0.8));
-}
-
-.audio-toggle-btn {
-    position: absolute;
-    right: 2vw;
-    bottom: 2vh;
-    width: 3.2em;
-    height: 3.2em;
-    border-radius: 50%;
-    background: rgba(47, 104, 116, 0.8);
-    border: 2.5px solid #fff;
-    box-shadow: 0 4px 12px rgba(47, 104, 116, 0.4);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-}
-.audio-toggle-btn:active {
-    background: rgba(47, 104, 116, 1);
-    box-shadow: 0 2px 8px rgba(47, 104, 116, 0.6);
-}
-.audio-toggle-btn svg {
-    width: 2em;
-    height: 2em;
 }
 
 @keyframes superlaserGlowLandscape {

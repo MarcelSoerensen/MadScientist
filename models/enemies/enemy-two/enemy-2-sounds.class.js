@@ -21,53 +21,46 @@ class EnemyTwoSounds {
 	playProximitySound(enemy) {
 		if (!enemy.world?.character) return;
 		const dist = Math.abs(enemy.world.character.x - enemy.x);
+		const isMuted = window.SoundCacheManager ? SoundCacheManager.muted : false;
 		if (dist <= 350) {
-			if (!this.proximitySoundPlaying) this.initProximitySound();
-			if (dist > 250) this.fadeOutProximitySound(250, 350, dist);
-		} else if (this.proximitySoundPlaying && this.proximitySoundAudio) {
+			if (!this.proximitySoundAudio) {
+				this.proximitySoundAudio = new Audio('sounds/enemy2.mp3');
+				this.proximitySoundAudio.loop = true;
+				this.proximitySoundAudio.playbackRate = 0.9;
+				this.proximitySoundAudio.volume = isMuted ? 0 : 0.5;
+				this.proximitySoundAudio.play();
+			} else if (this.proximitySoundAudio.paused) {
+				this.proximitySoundAudio.currentTime = 0;
+				this.proximitySoundAudio.volume = isMuted ? 0 : 0.5;
+				this.proximitySoundAudio.play();
+			} else {
+				this.proximitySoundAudio.volume = isMuted ? 0 : 0.5;
+			}
+			if (!isMuted && dist > 250) this.fadeOutProximitySound(250, 350, dist);
+		} else if (this.proximitySoundAudio) {
 			this.stopProximitySound();
 		}
-	}
-
-	/**
-	 * Initializes and fades in the proximity sound
-	 */
-	initProximitySound() {
-		this.proximitySoundAudio = SoundCacheManager.getAudio('sounds/enemy2.mp3');
-		Object.assign(this.proximitySoundAudio, { loop: true, volume: 0, playbackRate: 0.9 });
-		this.proximitySoundAudio.play();
-		this.proximitySoundPlaying = true;
-		let fadeInterval = setInterval(() => {
-			if (!this.proximitySoundAudio) return;
-			this.proximitySoundAudio.volume = Math.min(0.5, this.proximitySoundAudio.volume + 0.01);
-			if (this.proximitySoundAudio.volume >= 0.5) clearInterval(fadeInterval);
-		}, 40);
 	}
 
 	/**
 	 * Fades out the proximity sound
 	 */
 	fadeOutProximitySound(start, end, dist) {
+		if (!this.proximitySoundAudio) return;
 		let targetVolume = 0.5 * (1 - (dist - start) / (end - start));
 		targetVolume = Math.max(0, Math.min(0.5, targetVolume));
-		let fadeOutInterval = setInterval(() => {
-			if (!this.proximitySoundAudio) return;
-			if (this.proximitySoundAudio.volume <= targetVolume + 0.01) {
-				this.proximitySoundAudio.volume = targetVolume;
-				clearInterval(fadeOutInterval);
-			} else {
-				this.proximitySoundAudio.volume -= 0.01;
-			}
-		}, 40);
+		this.proximitySoundAudio.volume = targetVolume;
 	}
 
 	/**
 	 * Stops the proximity sound
 	 */
 	stopProximitySound() {
-		Object.assign(this.proximitySoundAudio, { volume: 0, currentTime: 0 });
-		this.proximitySoundAudio.pause();
-		this.proximitySoundPlaying = false;
+		if (this.proximitySoundAudio) {
+			this.proximitySoundAudio.pause();
+			this.proximitySoundAudio.currentTime = 0;
+			this.proximitySoundAudio = null;
+		}
 	}
 
 	/**
@@ -79,7 +72,6 @@ class EnemyTwoSounds {
 				this.proximitySoundAudio.pause();
 				this.proximitySoundAudio.currentTime = 0;
 			} catch (e) {}
-			this.proximitySoundPlaying = false;
 			this.proximitySoundAudio = null;
 		}
 		if (enemy && enemy.deathSoundAudio) {
@@ -91,6 +83,5 @@ class EnemyTwoSounds {
 		}
 	}
 
-	proximitySoundPlaying = false;
 	proximitySoundAudio = null;
 }

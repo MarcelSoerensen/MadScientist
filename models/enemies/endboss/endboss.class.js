@@ -10,7 +10,7 @@ class Endboss extends CollidableObject {
     visible = true;
     collidable = true;
     character = null;
-    laserHitCount = 0;
+    hurtCount = 0;
     isDeadAnimationPlaying = false;
     isElectricHurt = false;
     electricHurtTimeout = null;

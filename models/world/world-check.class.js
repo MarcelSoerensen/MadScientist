@@ -229,7 +229,9 @@ class WorldCheck {
         w.gameOver = true;
         w.cleanup?.cleanupIntervals?.();
         const endboss = w.level?.enemies?.find(e => e instanceof Endboss);
-        endboss?.sounds?.stopXPositionSound?.();
+        if (endboss?.sounds?.stopAllEndbossSounds) {
+            endboss.sounds.stopAllEndbossSounds(endboss);
+        }
         endboss?.handler?.handleDeathAnimation?.(endboss);
         if (w.character && typeof w.characterHandling?.handleLevelCompleteAnimation === 'function') {
             w.characterHandling.handleLevelCompleteAnimation(w.character);

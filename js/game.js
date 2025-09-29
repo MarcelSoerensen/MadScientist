@@ -11,12 +11,25 @@ function init() {
     world.setWorldReferenceForEnemies();
 
     if (typeof window !== 'undefined') {
-        if (!window.backgroundMusic) {
-            window.backgroundMusic = SoundCacheManager.getAudio('sounds/background-sound.mp3');
-            window.backgroundMusic.loop = true;
-            window.backgroundMusic.volume = 0.08;
+    window.backgroundMusic = SoundCacheManager.getAudio('sounds/background-sound.mp3');
+    window.backgroundMusic.currentTime = 0;
+    window.backgroundMusic.muted = SoundCacheManager.muted;
+    window.backgroundMusic.volume = window.backgroundMusic.muted ? 0 : 0.08;
+    window.backgroundMusic.play().catch(()=>{});
+        if (!window._bgMusicMuteListenerAdded) {
+            window.addEventListener('audio-mute-changed', function(e) {
+                if (!window.backgroundMusic) return;
+                if (e.detail && e.detail.muted === false) {
+                    window.backgroundMusic.muted = false;
+                    window.backgroundMusic.volume = 0.08;
+                    window.backgroundMusic.play().catch(()=>{});
+                } else if (e.detail && e.detail.muted === true) {
+                    window.backgroundMusic.muted = true;
+                    window.backgroundMusic.volume = 0;
+                }
+            });
+            window._bgMusicMuteListenerAdded = true;
         }
-        window.backgroundMusic.currentTime = 0;
     }
 }
 
