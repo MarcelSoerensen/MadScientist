@@ -18,7 +18,9 @@ let laserInterval;
 function fadeToCanvas(canvas) {
     const startScreen = document.getElementById('start_screen');
     if (!startScreen) return;
-    
+
+
+
     startScreen.classList.remove('d-none');
     startScreen.style.opacity = '';
     void startScreen.offsetWidth;
@@ -36,6 +38,9 @@ function fadeOutStartScreen(startScreen) {
         startScreen.classList.remove('fade-out');
         startScreen.style.opacity = '';
         startScreen.removeEventListener('transitionend', handler);
+
+        const controls = document.querySelector('.system-controls-container');
+        if (controls) controls.classList.remove('d-none');
     };
     startScreen.addEventListener('transitionend', handler);
 }
