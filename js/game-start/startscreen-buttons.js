@@ -33,7 +33,9 @@ function setupPlayButton(playBtn, storyBtn, controlsBtn) {
         disableStartScreenButtons(playBtn, storyBtn, controlsBtn);
         animateLaser('play', function() {
             stopStartScreenLaser();
-            showAndFadeCountdown(handleGameStart, false);
+            showAndFadeCountdown(() => {
+                prepareGameStart(document.getElementById('canvas'));
+            }, false);
         });
     });
 }

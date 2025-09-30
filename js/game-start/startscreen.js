@@ -9,154 +9,16 @@ const LASER_FRAMES = [
     'img/Projectile/Laser/skeleton-animation_4.png',
 ];
 
-let laserFrame = 0;
+/**
+ * Global laser animation state variables.
+ */
+const idleFrameCount = 14;
+const idlePath = 'img/Main Characters/Gun01/Idle/Idle_';
+const idleExt = '.png';
+let idleFrame = 0;
+let idleInterval;
 let laserInterval;
-
-/**
- * Fades out the start screen and shows the canvas.
- */
-function fadeToCanvas(canvas) {
-    const startScreen = document.getElementById('start_screen');
-    if (!startScreen) return;
-
-
-
-    startScreen.classList.remove('d-none');
-    startScreen.style.opacity = '';
-    void startScreen.offsetWidth;
-    startScreen.classList.add('fade-out');
-    fadeOutStartScreen(startScreen);
-}
-
-/**
- * Handles the fade-out transition for the start screen (to canvas).
- */
-function fadeOutStartScreen(startScreen) {
-    const handler = event => {
-        if (event.propertyName !== 'filter') return;
-        startScreen.classList.add('d-none');
-        startScreen.classList.remove('fade-out');
-        startScreen.style.opacity = '';
-        startScreen.removeEventListener('transitionend', handler);
-
-        const controls = document.querySelector('.system-controls-container');
-        if (controls) controls.classList.remove('d-none');
-    };
-    startScreen.addEventListener('transitionend', handler);
-}
-
-/**
- * Shows and fades in the countdown overlay.
- */
-function showAndFadeCountdown(onCountdownEnd, showStoryScreen) {
-    const overlay = document.getElementById('countdown-overlay');
-    if (!overlay) return onCountdownEnd && onCountdownEnd();
-    overlay.classList.remove('d-none');
-    void overlay.offsetWidth;
-    overlay.classList.add('fade-in');
-    setTimeout(() => {
-        handleCountdownTransition(overlay, onCountdownEnd, showStoryScreen);
-    }, 400);
-}
-
-/**
- * Handles the transition after the countdown overlay.
- */
-function handleCountdownTransition(overlay, callback, showStoryScreen) {
-    showCountdownOverlay(() => {
-        if (showStoryScreen) {
-            showStoryScreen();
-        } else {
-            const canvas = document.getElementById('canvas');
-            fadeToCanvas(canvas);
-        }
-        fadeOutOverlay(overlay, callback);
-    });
-}
-
-/**
- * Shows and fades in the countdown overlay, then starts the countdown and handles the start screen fade-out.
- */
-function showCountdownOverlay(callback) {
-    const overlay = document.getElementById('countdown-overlay');
-    const numberSpan = document.getElementById('countdown-number');
-    if (!overlay || !numberSpan) return callback && callback();
-    overlay.classList.remove('d-none');
-    setTimeout(() => {
-        handleCountdownFadeOut(overlay, numberSpan, callback);
-    }, 0);
-}
-
-/**
- * Handles the fade-out of the start screen and runs the countdown.
- */
-function handleCountdownFadeOut(overlay, numberSpan, callback) {
-    const startScreen = document.getElementById('start_screen');
-    setTimeout(() => {
-        if (startScreen) {
-            startScreen.classList.remove('d-none');
-            startScreen.style.opacity = '';
-            void startScreen.offsetWidth;
-            startScreen.classList.add('fade-out');
-            setTimeout(() => {
-                startScreen.classList.add('d-none');
-                startScreen.classList.remove('fade-out');
-                startScreen.style.opacity = '';
-            }, 1000);
-        }
-    }, 2900);
-    runCountdown(numberSpan, 3, () => hideCountdownOverlay(overlay, callback));
-}
-
-/**
- * Runs the countdown sequence recursively.
- */
-function runCountdown(numberSpan, count, onDone) {
-    animateCountdownNumber(numberSpan, count);
-    if (count > 1) {
-        setTimeout(() => runCountdown(numberSpan, count - 1, onDone), 1200);
-    } else {
-        setTimeout(onDone, 1200);
-    }
-}
-
-/**
- * Animates the countdown number.
- */
-function animateCountdownNumber(numberSpan, count) {
-    numberSpan.textContent = count;
-    numberSpan.style.transition = 'none';
-    numberSpan.style.opacity = 0;
-    numberSpan.style.transform = 'scale(1)';
-    void numberSpan.offsetWidth;
-    numberSpan.style.transition = '';
-    try {
-        SoundCacheManager.getAudio('sounds/counter.mp3').play();
-    } catch (e) {}
-    setTimeout(() => { numberSpan.style.opacity = 1; numberSpan.style.transform = 'scale(1)'; }, 10);
-    setTimeout(() => numberSpan.style.transform = 'scale(2)', 200);
-    setTimeout(() => numberSpan.style.opacity = 0, 900);
-}
-
-/**
- * Hides the countdown overlay.
- */
-function hideCountdownOverlay(overlay, callback) {
-    overlay.classList.add('d-none');
-    if (callback) callback();
-}
-
-/**
- * Fades out the overlay with animation.
- */
-function fadeOutOverlay(overlay, callback) {
-    overlay.classList.add('fade-out');
-    setTimeout(() => {
-        overlay.classList.remove('fade-out');
-        overlay.classList.add('d-none');
-        if (callback) callback();
-    }, 700);
-}
+let laserFrame = 0;
 
 /**
  * Runs the full laser animation for the given mode.
@@ -239,13 +101,6 @@ function stopStartScreenLaser() {
     if (laserInterval) clearInterval(laserInterval);
 }
 
-
-const idleFrameCount = 14;
-const idlePath = 'img/Main Characters/Gun01/Idle/Idle_';
-const idleExt = '.png';
-let idleFrame = 0;
-let idleInterval;
-
 /**
  * Animates the start screen character idle loop.
  */
@@ -287,8 +142,6 @@ function initStartScreen() {
     if (storyScreen) storyScreen.style.display = 'none';
 }
 
-document.addEventListener('DOMContentLoaded', initStartScreen);
-
 /**
  * Updates the event listeners for the start and story screen buttons depending on which screen is visible.
  */
@@ -304,17 +157,6 @@ function updateScreenButtonListeners() {
 }
 
 /**
- * Handles the start of the game after the countdown.
- */
-function handleGameStart() {
-    const canvas = document.getElementById('canvas');
-        prepareGameStart(canvas);
-        showCanvas(canvas);
-        showBodyTitle();
-        removeCanvasFadeIn(canvas);
-}
-
-/**
  * Prepares the canvas and initializes the game for starting.
  */
 function prepareGameStart(canvas) {
@@ -322,9 +164,11 @@ function prepareGameStart(canvas) {
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         canvas.style.filter = 'brightness(0)';
         canvas.style.pointerEvents = 'none';
+        showCanvas(canvas);
+        showBodyTitle();
     }
-        startBackgroundMusic();
-        runGameInit();
+    startBackgroundMusic();
+    runGameInit();
 }
 
 /**
@@ -389,15 +233,10 @@ function showBodyTitle() {
 }
 
 /**
- * Removes the fade-in-canvas class from the canvas after a delay.
+ * Sets up the buttons on the start screen.
  */
-function removeCanvasFadeIn(canvas) {
-    setTimeout(() => {
-        if (canvas) {
-            canvas.classList.remove('fade-in-canvas');
-        }
-    }, 1000);
-}
+document.addEventListener('DOMContentLoaded', initStartScreen);
+
 
 
 

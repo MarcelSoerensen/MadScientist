@@ -10,60 +10,7 @@ function showStoryScreen() {
     const storyText = document.querySelector('#story_textbox p');
     if (storyText) resetAndStartStoryTextAnimation(storyText);
 
-    prepareStoryScreenTransition(startScreen, storyScreen);
-    handleStoryScreenTransition(startScreen, storyScreen);
-}
-
-/**
- * Prepares the transition classes and styles for showing the story screen and hiding the start screen.
- */
-function prepareStoryScreenTransition(startScreen, storyScreen) {
-    storyScreen.classList.remove('fade-in', 'fade-out', 'pre-fade');
-    startScreen.classList.remove('d-none', 'fade-in', 'fade-out', 'pre-fade');
-    storyScreen.classList.add('pre-fade');
-    startScreen.style.display = storyScreen.style.display = 'flex';
-    void storyScreen.offsetWidth;
-    storyScreen.classList.remove('pre-fade');
-    startScreen.classList.add('fade-out');
-}
-
-/**
- * Handles the two-phase transition from start screen to story screen (fade out, then fade in).
- */
-function handleStoryScreenTransition(startScreen, storyScreen) {
-    let phase = 0;
-    const handler = event => {
-        if (event.propertyName !== 'filter') return;
-        if (!phase++) {
-            startScreen.removeEventListener('transitionend', handler);
-            startScreen.classList.add('d-none');
-            startScreen.classList.remove('fade-out');
-            storyScreen.classList.remove('d-none');
-            storyScreen.classList.add('fade-in');
-            storyScreen.addEventListener('transitionend', handler);
-        } else {
-            storyScreen.classList.remove('fade-in');
-            storyScreen.removeEventListener('transitionend', handler);
-        }
-    };
-    startScreen.addEventListener('transitionend', handler);
-}
-
-window.showStoryScreen = showStoryScreen;
-
-/**
- * Handles the transition from the story screen back to the start screen.
- */
-function storyToStartScreen() {
-    const storyBtn = getStoryButton();
-    if (storyBtn) storyBtn.disabled = true;
-    const startScreen = document.getElementById('start_screen');
-    const storyScreen = document.getElementById('story_screen');
-    if (!startScreen || !storyScreen) return;
-    storyToStartFreeze();
-    storyToStartFade(startScreen, storyScreen);
-    storyToStartFadeIn(startScreen);
-    storyToStartFadeOut(storyScreen, storyBtn);
+    window.prepareAndTransitionToScreen(startScreen, storyScreen);
 }
 
 /**
@@ -79,63 +26,11 @@ function storyToStartFreeze() {
 }
 
 /**
- * Handles the fade transition classes for both start and story screens.
- */
-function storyToStartFade(startScreen, storyScreen) {
-    startScreen.classList.remove('d-none', 'fade-in', 'fade-out', 'pre-fade');
-    storyScreen.classList.remove('d-none', 'fade-in', 'fade-out', 'pre-fade');
-    startScreen.style.display = 'flex';
-    storyScreen.style.display = 'flex';
-    void storyScreen.offsetWidth;
-    startScreen.classList.add('fade-in');
-    storyScreen.classList.add('fade-out');
-}
-
-
-/**
- * Handles the fade-in transition for the start screen.
- */
-function storyToStartFadeIn(startScreen) {
-    function handler(e) {
-        if (e.propertyName === 'filter') {
-            startScreen.classList.remove('fade-in');
-            startScreen.style.display = '';
-            startScreen.removeEventListener('transitionend', handler);
-            if (typeof window.setupStartScreenButtons === 'function') window.setupStartScreenButtons();
-        }
-    }
-    startScreen.addEventListener('transitionend', handler);
-}
-
-/**
- * Handles the fade-out transition for the story screen.
- */
-function storyToStartFadeOut(storyScreen, storyBtn) {
-    function handler(e) {
-        if (e.propertyName === 'filter') {
-            storyScreen.classList.add('d-none');
-            storyScreen.classList.remove('fade-out');
-            storyScreen.style.display = '';
-            if (storyBtn) storyBtn.disabled = false;
-            storyScreen.removeEventListener('transitionend', handler);
-        }
-    }
-    storyScreen.addEventListener('transitionend', handler);
-}
-
-/**
  * Returns the 'Back' button element from the story screen.
  */
 function getButton(className, text) {
     return Array.from(document.getElementsByClassName(className))
         .find(btn => btn.textContent.trim().toLowerCase() === text.toLowerCase());
-}
-
-/**
- * Returns the 'Story' button element from the start screen.
- */
-function getStoryButton() {
-    return getButton('start-screen-btn', 'story');
 }
 
 /**
@@ -146,7 +41,10 @@ function setupBackButton() {
     if (oldBackBtn) {
         const newBackBtn = oldBackBtn.cloneNode(true);
         oldBackBtn.replaceWith(newBackBtn);
-        newBackBtn.addEventListener('click', storyToStartScreen);
+        newBackBtn.addEventListener('click', function() {
+            const storyScreen = document.getElementById('story_screen');
+            if (storyScreen) window.transitionToStartScreen(storyScreen);
+        });
     }
 }
 
@@ -234,3 +132,8 @@ window.addEventListener('DOMContentLoaded', () => {
     setupRepeatButton();
     setupBackButton();
 });
+
+/**
+ * Exposes the showStoryScreen function globally so it can be called from other scripts or HTML.
+ */
+window.showStoryScreen = showStoryScreen;

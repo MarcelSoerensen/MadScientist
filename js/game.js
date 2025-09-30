@@ -1,5 +1,8 @@
 let canvas;
 let world;
+if (typeof window !== 'undefined') {
+    window.world = world;
+}
 let keyboard = new Keyboard(); 
 
 /**
@@ -8,29 +11,38 @@ let keyboard = new Keyboard();
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
-    world.setWorldReferenceForEnemies();
-
     if (typeof window !== 'undefined') {
-    window.backgroundMusic = SoundCacheManager.getAudio('sounds/background-sound.mp3');
-    window.backgroundMusic.currentTime = 0;
-    window.backgroundMusic.muted = SoundCacheManager.muted;
-    window.backgroundMusic.volume = window.backgroundMusic.muted ? 0 : 0.08;
-    window.backgroundMusic.play().catch(()=>{});
-        if (!window._bgMusicMuteListenerAdded) {
-            window.addEventListener('audio-mute-changed', function(e) {
-                if (!window.backgroundMusic) return;
-                if (e.detail && e.detail.muted === false) {
-                    window.backgroundMusic.muted = false;
-                    window.backgroundMusic.volume = 0.08;
-                    window.backgroundMusic.play().catch(()=>{});
-                } else if (e.detail && e.detail.muted === true) {
-                    window.backgroundMusic.muted = true;
-                    window.backgroundMusic.volume = 0;
-                }
-            });
-            window._bgMusicMuteListenerAdded = true;
-        }
+        window.world = world;
+        world.setWorldReferenceForEnemies();
+        initBackgroundMusic();
     }
+}
+
+/**
+ * Initializes and plays the background music, and sets up a listener for mute changes.
+ */
+function initBackgroundMusic() {
+    const bgMusic = window.backgroundMusic = SoundCacheManager.getAudio('sounds/background-sound.mp3');
+    bgMusic.currentTime = 0;
+    bgMusic.muted = SoundCacheManager.muted;
+    bgMusic.volume = bgMusic.muted ? 0 : 0.08;
+    bgMusic.play().catch(()=>{});
+    addMuteListener();
+}
+
+/**
+ * Adds a listener for changes to the audio mute state.
+ */
+function addMuteListener() {
+    if (window._bgMusicMuteListenerAdded) return;
+    window.addEventListener('audio-mute-changed', e => {
+        if (!window.backgroundMusic) return;
+        const muted = e.detail && e.detail.muted;
+        window.backgroundMusic.muted = !!muted;
+        window.backgroundMusic.volume = muted ? 0 : 0.08;
+        if (!muted) window.backgroundMusic.play().catch(()=>{});
+    });
+    window._bgMusicMuteListenerAdded = true;
 }
 
 /**
@@ -50,12 +62,10 @@ function cleanup() {
         world.performCleanup();
         world = null;
     }
-
     if (canvas) {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-    
     window.endbossDefeated = false;
     if (window.enemySpawnPositions) {
         window.enemySpawnPositions = [];
