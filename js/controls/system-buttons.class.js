@@ -11,7 +11,9 @@ class SystemButtonManager {
             document.getElementById('game_over_screen'),
             document.getElementById('win_screen'),
             document.getElementById('story_screen'),
-            document.getElementById('control_screen')
+            document.getElementById('control_screen'),
+            document.getElementById('legal_notice_screen'), // hinzufügen
+            document.getElementById('credits_screen')       // hinzufügen
         ].filter(el => el && !el.classList.contains('d-none'));
     }
 

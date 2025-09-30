@@ -21,7 +21,9 @@
 #story_screen,
 #control_screen,
 #game_over_screen,
-#win_screen {
+#win_screen,
+#legal_notice_screen,
+#credits_screen {
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -46,7 +48,9 @@
 #story_screen > *,
 #control_screen > *,
 #game_over_screen > *,
-#win_screen > * {
+#win_screen > *,
+#legal_notice_screen > *,
+#credits_screen > * {
     position: relative;
     z-index: 2;
 }
@@ -54,7 +58,9 @@
 #story_screen::before,
 #control_screen::before,
 #game_over_screen::before,
-#win_screen::before {
+#win_screen::before,
+#legal_notice_screen::before,
+#credits_screen::before {
     filter: drop-shadow(8px 0 24px rgba(0,0,0,1));
     content: '';
     position: absolute;
@@ -73,7 +79,9 @@
 .story-screen-title,
 .control-screen-title,
 .game-over-screen-title,
-.win-screen-title {
+.win-screen-title,
+.legal-notice-title,
+.credits-title {
     top: -0.3em;
     color: rgb(240, 179, 83);
     font-size: clamp(1.5em, 8vw, 3.5em);
@@ -97,7 +105,9 @@
 #story_textbox,
 #control_textbox,
 #game_over_textbox,
-#win_textbox {
+#win_textbox,
+#legal_notice_textbox,
+#credits_textbox {
     width: 55%;
     height: 55%;
     top: -1.8em;
@@ -115,7 +125,9 @@
 
 #control_textbox,
 #game_over_textbox,
-#win_textbox {
+#win_textbox,
+#legal_notice_textbox,
+#credits_textbox {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -198,18 +210,39 @@
 }
 
 #game_over_textbox p,
-#win_textbox p {
+#win_textbox p,
+#legal_notice_textbox p,
+#credits_textbox p {
     text-align: center;
     font-size: 1.2em;
     line-height: 1.4em;
     margin: 0;
 }
 
+#credits_textbox a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    pointer-events: auto;
+    cursor: pointer !important;
+    transition: all 150ms;
+}
+
+#credits_textbox a:hover {
+    color: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
+#credits_textbox a:active {
+    color: rgba(255, 255, 255, 0.8);
+}
+
 #start_screen.pre-fade,
 #story_screen.pre-fade,
 #control_screen.pre-fade,
 #game_over_screen.pre-fade,
-#win_screen.pre-fade {
+#win_screen.pre-fade,
+#legal_notice_screen.pre-fade,
+#credits_screen.pre-fade {
     filter: brightness(0);
     pointer-events: none;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
@@ -219,7 +252,9 @@
 #story_screen.fade-in,
 #control_screen.fade-in,
 #game_over_screen.fade-in,
-#win_screen.fade-in {
+#win_screen.fade-in,
+#legal_notice_screen.fade-in,
+#credits_screen.fade-in {
     filter: brightness(1);
     pointer-events: auto;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
@@ -229,7 +264,9 @@
 #story_screen.fade-out,
 #control_screen.fade-out,
 #game_over_screen.fade-out,
-#win_screen.fade-out {
+#win_screen.fade-out,
+#legal_notice_screen.fade-out,
+#credits_screen.fade-out {
     filter: brightness(0);
     pointer-events: none;
     transition: filter 1s cubic-bezier(.7,-0.2,.3,1.2);
@@ -245,14 +282,18 @@
     .story-screen-title,
     .control-screen-title,
     .game-over-screen-title,
-    .win-screen-title {
+    .win-screen-title,
+    .legal-notice-screen-title,
+    .credits-screen-title {
         font-size: 8vw;
         margin-bottom: 4vw;
     }
 
     #story_textbox p,
     #game_over_textbox p,
-    #win_textbox p {
+    #win_textbox p,
+    #legal_notice_textbox p,
+    #credits_textbox p {
         font-size: clamp(0.8em, 2.5vh, 1.3em);
     }
 
@@ -263,7 +304,9 @@
     #story_textbox,
     #control_textbox,
     #game_over_textbox,
-    #win_textbox {
+    #win_textbox,
+    #legal_notice_textbox,
+    #credits_textbox {
         top: -8%;   
     }
 

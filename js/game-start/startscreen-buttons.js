@@ -13,7 +13,67 @@ function setupStartScreenButtons() {
     setupPlayButton(playBtn, storyBtn, controlsBtn);
     setupStoryButton(storyBtn, playBtn, controlsBtn);
     setupControlsButton(controlsBtn, playBtn, storyBtn);
+
+    const legalNoticeLink = document.getElementById('legal-notice-link');
+    const creditsLink = document.getElementById('credits-link');
+    if (legalNoticeLink) {
+        legalNoticeLink.onclick = function(e) {
+            e.preventDefault();
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            window.prepareAndTransitionToScreen(
+                document.getElementById('start_screen'),
+                document.getElementById('legal_notice_screen')
+            );
+        };
+    }
+    if (creditsLink) {
+        creditsLink.onclick = function(e) {
+            e.preventDefault();
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            window.prepareAndTransitionToScreen(
+                document.getElementById('start_screen'),
+                document.getElementById('credits_screen')
+            );
+        };
+    }
 }
+
+/**
+ * Sets up the back button on the legal-notice screen.
+ */
+function setupLegalNoticeBackButton() {
+    const legalNoticeBackBtn = document.querySelector('#legal_notice_screen .legal-notice-btn');
+    if (legalNoticeBackBtn) {
+        legalNoticeBackBtn.onclick = function() {
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            window.prepareAndTransitionToScreen(
+                document.getElementById('legal_notice_screen'),
+                document.getElementById('start_screen')
+            );
+        };
+    }
+}
+
+/**
+ * Sets up the back button on the credits screen.
+ */
+function setupCreditsBackButton() {
+    const creditsBackBtn = document.querySelector('#credits_screen .credits-btn');
+    if (creditsBackBtn) {
+        creditsBackBtn.onclick = function() {
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            window.prepareAndTransitionToScreen(
+                document.getElementById('credits_screen'),
+                document.getElementById('start_screen')
+            );
+        };
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupLegalNoticeBackButton();
+    setupCreditsBackButton();
+});
 
 /**
  * Disables all start screen buttons to prevent multiple clicks and race conditions.

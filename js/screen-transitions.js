@@ -35,6 +35,9 @@ function handleScreenTransition(fromScreen, toScreen) {
 
 window.handleScreenTransition = handleScreenTransition;
 
+/**
+ * Transitions from the start screen to the canvas.
+ */
 function transitionFromStartScreenToCanvas(startScreen, canvas) {
     if (!startScreen || !canvas) return;
     startScreen.style.filter = 'brightness(0)';
@@ -48,7 +51,6 @@ function transitionFromStartScreenToCanvas(startScreen, canvas) {
         }
     });
 }
-
 
 window.transitionFromStartScreenToCanvas = transitionFromStartScreenToCanvas;
 

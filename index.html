@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="styles/buttons/game-screens-buttons.css">
     <link rel="stylesheet" href="styles/buttons/control-buttons.css">
     <link rel="stylesheet" href="styles/buttons/fullscreen-button.css">
+    <link rel="stylesheet" href="styles/game-screens/startscreen-links.css">
     
     <link rel="icon" href="img/Collision_Fx/Fx01/skeleton-Fx1_9.png" type="image/x-icon">
 
@@ -125,6 +126,11 @@
                             <path id="audio-off-icon" d="M4 28L28 4" stroke="currentColor" stroke-width="2" fill="none" style="display:none;"/>
                         </svg>
                     </button>
+                    <div class="start-screen-links">
+                        <a href="#" id="legal-notice-link" class="start-screen-link">Legal Notice</a>
+                        <span class="start-screen-link-separator">&nbsp;|&nbsp;</span>
+                        <a href="#" id="credits-link" class="start-screen-link">Credits</a>
+                    </div>
                 </div>
         </div>
         <div id="countdown-overlay" class="d-none">
@@ -174,6 +180,36 @@
         <div class="game-over-screen-buttons">
             <button class="game-over-screen-btn">Retry</button>
             <button class="game-over-screen-btn">Menu</button>
+        </div>
+    </div>
+
+    <div id="legal_notice_screen" class="d-none">
+        <h1 class="legal-notice-title">Legal Notice</h1>
+    <div class="legal-notice-textbox" id="legal_notice_textbox">
+            <p>
+                Responsible for content:<br><br>
+                Marcel Sørensen<br>
+                Email: marcel.soerensen@icloud.com<br><br>
+                Student project, submission.
+            </p>
+        </div>
+        <div class="legal-notice-screen-buttons">
+            <button class="legal-notice-btn">Back</button>
+        </div>
+    </div>
+
+    <div id="credits_screen" class="d-none">
+        <h1 class="credits-title">Credits</h1>
+    <div class="credits-textbox" id="credits_textbox">
+            <p>
+                Fonts:&nbsp;  <a href="https://fonts.google.com" target="_blank" rel="noopener">fonts.google.com</a><br>
+                Art:&nbsp; <a href="https://craftpix.net" target="_blank" rel="noopener">craftpix.net</a><br>
+                Sounds:&nbsp; <a href="https://freesound.org" target="_blank" rel="noopener">Freesound.org</a><br><br>
+                Thanks to all contributors!
+            </p>
+        </div>
+        <div class="credits-screen-buttons">
+            <button class="credits-btn">Back</button>
         </div>
     </div>
 
