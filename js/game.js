@@ -96,6 +96,7 @@ function resetKeyboard() {
  * Event listener for keydown. Sets the corresponding keyboard flags.
  */
 window.addEventListener('keydown', (event) => {
+    if (window.isPaused) return;
     if (world && world.gameOver) {
         if (['d', 'y', 's'].includes(event.key)) return;
     }
@@ -123,7 +124,6 @@ window.addEventListener('keydown', (event) => {
     if (event.key === 's') {
         keyboard.S = true;
     }
-
 });
 
 /**

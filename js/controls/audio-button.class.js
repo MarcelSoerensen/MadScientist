@@ -1,0 +1,106 @@
+/**
+ * AudioButtonManager: Steuert die Audio-Button-Funktion als Klasse.
+ */
+class AudioButtonManager {
+    static configs = [
+        {
+            btnId: 'audio-toggle-btn',
+            onId: 'audio-on-icon',
+            offId: 'audio-off-icon'
+        },
+        {
+            btnId: 'system-audio-btn',
+            onId: 'system-audio-on-icon',
+            offId: 'system-audio-off-icon'
+        }
+    ];
+    static muted = (typeof window.isAudioMuted !== 'undefined') ? window.isAudioMuted : (window.SoundCacheManager ? SoundCacheManager.muted : true);
+    static unlocked = false;
+
+    /**
+     * Sets the visibility of audio icons based on the current mute state.
+     */
+    static setIcons() {
+        AudioButtonManager.configs.forEach(cfg => {
+            const btn = document.getElementById(cfg.btnId);
+            if (!btn) return;
+            const onIcon = btn.querySelector('#' + cfg.onId);
+            const offIcon = btn.querySelector('#' + cfg.offId);
+            if (!onIcon || !offIcon) return;
+            if (AudioButtonManager.muted) {
+                onIcon.style.display = 'none';
+                offIcon.style.display = '';
+            } else {
+                onIcon.style.display = '';
+                offIcon.style.display = 'none';
+            }
+        });
+    }
+    
+    /**
+     * Sets the global mute state for all audio elements.
+     */
+    static setMutedAll(newMuted) {
+        AudioButtonManager.muted = newMuted;
+        window.isAudioMuted = AudioButtonManager.muted;
+        AudioButtonManager.setIcons();
+        if (window.SoundCacheManager?.setMuted) {
+            SoundCacheManager.setMuted(AudioButtonManager.muted);
+        }
+        const bgMusic = window.backgroundMusic;
+        if (document.getElementById('canvas')?.classList.contains('canvas-visible') && bgMusic) {
+            bgMusic.muted = AudioButtonManager.muted;
+            bgMusic.volume = AudioButtonManager.muted ? 0 : 0.08;
+            if (!AudioButtonManager.muted) {
+                bgMusic.play().catch(()=>{});
+            }
+        }
+    }
+
+    /**
+     * Unlocks the audio playback.
+    */
+    static unlockAudio() {
+        if (AudioButtonManager.unlocked) return;
+        try {
+            const audio = window.SoundCacheManager
+                ? SoundCacheManager.getAudio('sounds/laser-shot.mp3')
+                : new Audio('sounds/laser-shot.mp3');
+            audio.volume = 0;
+            audio.play().catch(()=>{});
+        } catch (e) {}
+        AudioButtonManager.unlocked = true;
+        if (typeof window.CustomEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('audio-unlocked'));
+        }
+    }
+
+    /**
+     * Adds event listeners for audio button clicks and mute state changes.
+     */
+
+    static addListeners() {
+        AudioButtonManager.configs.forEach(cfg => {
+            document.getElementById(cfg.btnId)?.addEventListener('click', e => {
+                e.preventDefault();
+                AudioButtonManager.unlockAudio();
+                AudioButtonManager.setMutedAll(!AudioButtonManager.muted);
+                window.dispatchEvent?.(new CustomEvent('audio-mute-changed', { detail: { muted: AudioButtonManager.muted } }));
+            });
+        });
+        window.addEventListener('audio-mute-changed', e => {
+            if (e?.detail?.muted !== undefined) AudioButtonManager.setMutedAll(e.detail.muted);
+        });
+    }
+
+    /**
+     * Initializes the AudioButtonManager by setting icons and adding listeners.
+     */
+    static init() {
+        AudioButtonManager.setIcons();
+        AudioButtonManager.addListeners();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', AudioButtonManager.init);
+window.AudioButtonManager = AudioButtonManager;
