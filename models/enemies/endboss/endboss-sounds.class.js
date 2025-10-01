@@ -103,10 +103,12 @@ class EndbossSounds {
     walkingLeftSoundCreation(endboss) {
         const isMuted = window.SoundCacheManager ? SoundCacheManager.muted : false;
         if (!endboss.stepSoundAudio) {
-            endboss.stepSoundAudio = new Audio('sounds/endboss-steps-left.mp3');
-            endboss.stepSoundAudio.loop = true;
+            endboss.stepSoundAudio = SoundCacheManager.getAudio('sounds/endboss-steps-left.mp3');
             endboss.stepSoundAudio.playbackRate = 1.5;
             endboss.stepSoundAudio.currentTime = 0.5;
+            if (window.activeSounds && !window.activeSounds.includes(endboss.stepSoundAudio)) {
+                window.activeSounds.push(endboss.stepSoundAudio);
+            }
         }
         endboss.stepSoundAudio.volume = isMuted ? 0 : 0.4;
         if (endboss.stepSoundAudio.paused) {
@@ -140,6 +142,9 @@ class EndbossSounds {
             endboss.hitSoundAudio = SoundCacheManager.getAudio('sounds/endboss-hit.mp3');
             endboss.hitSoundAudio.volume = options.volume ?? 0.25;
             if (options.playbackRate) endboss.hitSoundAudio.playbackRate = options.playbackRate;
+            if (window.activeSounds && !window.activeSounds.includes(endboss.hitSoundAudio)) {
+                window.activeSounds.push(endboss.hitSoundAudio);
+            }
             endboss.hitSoundAudio.play();
         } catch (e) {}
     }
@@ -150,10 +155,12 @@ class EndbossSounds {
     walkingRightSoundCreation(endboss) {
         const isMuted = window.SoundCacheManager ? SoundCacheManager.muted : false;
         if (!endboss.stepSoundAudioRight) {
-            endboss.stepSoundAudioRight = new Audio('sounds/endboss-steps-right.mp3');
-            endboss.stepSoundAudioRight.loop = true;
+            endboss.stepSoundAudioRight = SoundCacheManager.getAudio('sounds/endboss-steps-right.mp3');
             endboss.stepSoundAudioRight.playbackRate = 1.5;
             endboss.stepSoundAudioRight.currentTime = 0.5;
+            if (window.activeSounds && !window.activeSounds.includes(endboss.stepSoundAudioRight)) {
+                window.activeSounds.push(endboss.stepSoundAudioRight);
+            }
         }
         endboss.stepSoundAudioRight.volume = isMuted ? 0 : 0.15;
         if (endboss.stepSoundAudioRight.paused) {

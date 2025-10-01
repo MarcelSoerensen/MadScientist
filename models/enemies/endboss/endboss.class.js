@@ -2,6 +2,9 @@
  * Represents the Endboss enemy in the game world, including movement, animation, sound, and collision logic.
  */
 class Endboss extends CollidableObject {
+    /**
+     * The X position where the Endboss starts in the game world.
+     */
     x = (1952 * 2 - 900);
     y = -60;
     width = 600;
@@ -20,7 +23,7 @@ class Endboss extends CollidableObject {
     isStepSoundPlayingRight = false;
     stepSoundAudio = null;
     isStepSoundPlaying = false;
-
+    
     /**
      * Initializes the Endboss and its dependencies.
      */
@@ -148,5 +151,22 @@ class Endboss extends CollidableObject {
         ctx.lineWidth = 2;
         ctx.strokeRect(stickX - (stickWidth - 2 - 60), stickY, stickWidth, stickHeight);
         ctx.restore();
+    }
+
+    /**
+     * Stops all relevant intervals and timers for Endboss
+     */
+    clearIntervals() {
+        ['animInterval', 'deathAnimInterval', 'blinkInterval', 'checkProximityInterval'].forEach(interval => {
+            if (this[interval]) {
+                clearInterval(this[interval]);
+                this[interval] = null;
+            }
+        });
+        if (this.electricHurtTimeout) {
+            clearTimeout(this.electricHurtTimeout);
+            this.electricHurtTimeout = null;
+        }
+        this.animationStarted = false;
     }
 }

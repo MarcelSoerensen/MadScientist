@@ -2,6 +2,9 @@
  * Represents the first type of enemy character
  */
 class EnemyOne extends CollidableObject {
+    /**
+     * Sound manager for EnemyOne
+     */
     sounds = new EnemyOneSounds();
     lastHitTime = 0;
     laserHitCount = 0;
@@ -12,7 +15,11 @@ class EnemyOne extends CollidableObject {
         right: 115,
         bottom: 80
     };
-    
+
+    /**
+     * Animation manager for EnemyOne
+     *
+     */
     animations = new EnemyOneAnimations();
     handler = new EnemyOneHandling();
     isElectricHurt = false;
@@ -71,13 +78,16 @@ class EnemyOne extends CollidableObject {
     calculateEnemyOnePosition(minX, maxX) {
         let x;
         let tries = 0;
+        const characterX = window.character?.x || 0;
+        const minDistance = 850;
         do {
             x = minX + Math.random() * (maxX - minX);
             x += (Math.random() - 0.5) * 120;
             x = Math.max(minX, Math.min(maxX, x));
             tries++;
         } while (
-            window.enemySpawnPositions.some(pos => Math.abs(pos - x) < 80)
+            (window.enemySpawnPositions.some(pos => Math.abs(pos - x) < 80)
+            || Math.abs(x - characterX) < minDistance)
             && tries < 20
         );
         return x;
@@ -91,6 +101,23 @@ class EnemyOne extends CollidableObject {
             this.visible = !this.visible;
         }, 200);
     }
+
+    /**
+     * Stops all relevant intervals and timers for EnemyOne
+     */
+    clearIntervals() {
+        ['moveInterval', 'animInterval', 'deathAnimInterval', 'blinkInterval'].forEach(interval => {
+            if (this[interval]) {
+                clearInterval(this[interval]);
+                this[interval] = null;
+            }
+        });
+        if (this.electricHurtTimeout) {
+            clearTimeout(this.electricHurtTimeout);
+            this.electricHurtTimeout = null;
+        }
+    }
+
 
     /**
      * Removes the enemy and stops blinking.

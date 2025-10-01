@@ -87,8 +87,13 @@
     <div class="system-controls-container d-none">
             <button id="pause-btn" class="system-btn" aria-label="Pause">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <rect x="9" y="8" width="4" height="16" rx="2" fill="currentColor"/>
-                    <rect x="19" y="8" width="4" height="16" rx="2" fill="currentColor"/>
+                    <g id="pause-icon">
+                        <rect x="9" y="8" width="4" height="16" fill="currentColor"/>
+                        <rect x="19" y="8" width="4" height="16" fill="currentColor"/>
+                    </g>
+                    <g id="play-icon" style="display:none;">
+                        <polygon points="10,8 26,16 10,24" fill="currentColor"/>
+                    </g>
                 </svg>
             </button>
             <button id="back-btn" class="system-btn" aria-label="Zurück">

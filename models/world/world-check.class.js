@@ -27,6 +27,7 @@ class WorldCheck {
      */
     checkFirstEnemyDistance() {
         const w = this.world;
+        if (window.isPaused || (window.PauseButtonManager && window.PauseButtonManager.isPaused)) return;
         (w.level?.enemies ?? []).forEach(enemy => {
             const activateAt = enemy._activateAt || 500;
             if (!enemy._waitingForCharacter || w.character.x < activateAt) return;

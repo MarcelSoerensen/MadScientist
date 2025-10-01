@@ -2,6 +2,8 @@
  * Handles endboss logic (Animation, State, Status etc.)
  */
 class EndbossHandling {
+    
+    
     /**
      * Starts all endboss animation intervals.
      */
@@ -13,6 +15,14 @@ class EndbossHandling {
      * Initializes and starts the main animation interval for the endboss.
      */
     startEndbossAnimationIntervals(endboss) {
+        if (endboss.animInterval) {
+            clearInterval(endboss.animInterval);
+            endboss.animInterval = null;
+        }
+        if (endboss.deathAnimInterval) {
+            clearInterval(endboss.deathAnimInterval);
+            endboss.deathAnimInterval = null;
+        }
         endboss.deathFrame = 0;
         endboss.deathDone = false;
         endboss.animTimer = 0;
@@ -215,5 +225,37 @@ class EndbossHandling {
             clearInterval(endboss.animInterval);
             endboss.animInterval = null;
         }
+    }
+
+    /**
+     * Stops all endboss animation intervals.
+     */
+    stopEndbossIntervals(endboss) {
+        if (endboss.animInterval) {
+            clearInterval(endboss.animInterval);
+            endboss.animInterval = null;
+        }
+        if (endboss.deathAnimInterval) {
+            clearInterval(endboss.deathAnimInterval);
+            endboss.deathAnimInterval = null;
+        }
+    }
+
+    /**
+     * Resumes the main animation interval for the endboss without resetting states.
+     */
+    resumeEndbossAnimationIntervals(endboss) {
+        this.stopEndbossIntervals(endboss);
+        endboss.animInterval = setInterval(() => {
+            if (!endboss.animationStarted) return this.handleIdle(endboss);
+            if (endboss.hurtCount >= 25 && !endboss.deathDone && !endboss.isElectricHurt) {
+                endboss.deathDone = true;
+                this.handleDeathSound(endboss);
+                this.handleDeathStatus(endboss);
+                return this.handleDeathAnimation(endboss);
+            }
+            if (endboss.isElectricHurt) return endboss.anim.electricHurtAnimation(endboss);
+            this.handleAnimState(endboss);
+        }, 50);
     }
 }

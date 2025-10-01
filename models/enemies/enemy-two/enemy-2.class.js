@@ -14,10 +14,14 @@ class EnemyTwo extends CollidableObject {
         right: 115,
         bottom: 80
     };
+
+    /**
+     * Animation manager for EnemyTwo
+     */
     animations = new EnemyTwoAnimations();
     handler = new EnemyTwoHandling();
     sounds = new EnemyTwoSounds();
-
+    
     /**
      * Creates a new EnemyTwo instance
      */
@@ -55,6 +59,21 @@ class EnemyTwo extends CollidableObject {
         } else if (this.y >= 150) {
             this.y = 150;
             this.verticalDirection = -1;
+        }
+    }
+
+    /**
+     * Stops all relevant intervals and timers for EnemyTwo
+     */
+    clearIntervals() {
+        ['moveInterval', 'animInterval', 'deathAnimInterval', 'blinkInterval', 'checkProximityInterval'].forEach(interval => {
+            if (this[interval]) {
+                clearInterval(this[interval]);
+                this[interval] = null;
+            }
+        });
+        if (typeof this.animationStarted !== 'undefined') {
+            this.animationStarted = false;
         }
     }
 
