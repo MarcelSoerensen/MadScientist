@@ -106,8 +106,12 @@ class PauseButtonManager {
     static pauseEndboss() {
         if (window.world?.level?.enemies) {
             window.world.level.enemies.forEach(enemy => {
-                if (enemy?.constructor?.name === 'Endboss' && typeof enemy.clearIntervals === 'function') {
-                    enemy.clearIntervals();
+                if (enemy?.constructor?.name === 'Endboss') {
+                    if (enemy.handler?.stopEndbossIntervals) {
+                        enemy.handler.stopEndbossIntervals(enemy);
+                    } else if (typeof enemy.clearIntervals === 'function') {
+                        enemy.clearIntervals();
+                    }
                 }
             });
         }
