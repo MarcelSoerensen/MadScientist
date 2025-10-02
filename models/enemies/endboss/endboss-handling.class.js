@@ -2,8 +2,6 @@
  * Handles endboss logic (Animation, State, Status etc.)
  */
 class EndbossHandling {
-    
-    
     /**
      * Starts all endboss animation intervals.
      */
@@ -23,6 +21,9 @@ class EndbossHandling {
             clearInterval(endboss.deathAnimInterval);
             endboss.deathAnimInterval = null;
         }
+        if (endboss.deathDone || endboss.isDeadAnimationPlaying) {
+            return;
+        }
         endboss.deathFrame = 0;
         endboss.deathDone = false;
         endboss.animTimer = 0;
@@ -31,6 +32,7 @@ class EndbossHandling {
         endboss.startX = endboss.x;
         endboss.leftTargetX = endboss.startX - 200;
         endboss.animInterval = setInterval(() => {
+            if (endboss.deathDone || endboss.isDeadAnimationPlaying) return; // keine weiteren Zustände
             if (!endboss.animationStarted) return this.handleIdle(endboss);
             if (endboss.hurtCount >= 25 && !endboss.deathDone && !endboss.isElectricHurt) {
                 endboss.deathDone = true;
@@ -47,6 +49,7 @@ class EndbossHandling {
      * Handles the current animation state of the endboss.
      */
     handleAnimState(endboss) {
+        if (endboss.deathDone || endboss.isDeadAnimationPlaying) return;
         switch (endboss.animState) {
             case 'idle': this.handleIdle(endboss); break;
             case 'walkingLeft': this.handleWalkingLeft(endboss); break;
@@ -132,6 +135,7 @@ class EndbossHandling {
      * Handles the hurt animation and status logic.
      */
     handleHurtAnimation(endboss, force = 1) {
+    if (endboss.deathDone || endboss.isDeadAnimationPlaying) return;
     this.handleHurtSound(endboss, force);
     if (endboss.hurtCount >= 25) return;
     if (endboss.isElectricHurt) return;
@@ -193,6 +197,8 @@ class EndbossHandling {
      */
     handleDeathAnimation(endboss) {
         let deathFrame = 0;
+        if (endboss.deathAnimInterval || endboss._deathAnimationStarted) return;
+        endboss._deathAnimationStarted = true;
         endboss.deathAnimInterval = setInterval(() => {
             if (deathFrame < endboss.anim.IMAGES_DEATH.length) {
                 endboss.img = endboss.imageCache[endboss.anim.IMAGES_DEATH[deathFrame]];
@@ -200,6 +206,7 @@ class EndbossHandling {
             } else {
                 endboss.img = endboss.imageCache[endboss.anim.IMAGES_DEATH[endboss.anim.IMAGES_DEATH.length - 1]];
                 clearInterval(endboss.deathAnimInterval);
+                endboss.deathAnimInterval = null;
             }
         }, 50);
         setTimeout(() => endboss.removeEnemy(), 4000);
@@ -219,12 +226,10 @@ class EndbossHandling {
     handleDeathStatus(endboss) {
         endboss.collidable = false;
         endboss.isDeadAnimationPlaying = true;
+        endboss.animState = 'dead';
         endboss.currentImage = 0;
         window.endbossDefeated = true;
-        if (endboss.animInterval) {
-            clearInterval(endboss.animInterval);
-            endboss.animInterval = null;
-        }
+        this.stopEndbossIntervals(endboss);
     }
 
     /**
@@ -239,6 +244,10 @@ class EndbossHandling {
             clearInterval(endboss.deathAnimInterval);
             endboss.deathAnimInterval = null;
         }
+        if (endboss.checkProximityInterval) {
+            clearInterval(endboss.checkProximityInterval);
+            endboss.checkProximityInterval = null;
+        }
     }
 
     /**
@@ -246,7 +255,9 @@ class EndbossHandling {
      */
     resumeEndbossAnimationIntervals(endboss) {
         this.stopEndbossIntervals(endboss);
+        if (endboss.deathDone || endboss.isDeadAnimationPlaying) return; // nach Tod nicht fortsetzen
         endboss.animInterval = setInterval(() => {
+            if (endboss.deathDone || endboss.isDeadAnimationPlaying) return;
             if (!endboss.animationStarted) return this.handleIdle(endboss);
             if (endboss.hurtCount >= 25 && !endboss.deathDone && !endboss.isElectricHurt) {
                 endboss.deathDone = true;

@@ -37,16 +37,7 @@ class Endboss extends CollidableObject {
         this.loadImages(this.anim.IMAGES_DEATH);
         this.loadImages(this.anim.IMAGES_HIT);
         this.handler = new EndbossHandling();
-        this.checkProximityInterval = setInterval(() => {
-            if (this.character && !this.animationStarted) {
-                const dist = Math.abs(this.x - this.character.x);
-                if (dist <= 500) {
-                    this.animationStarted = true;
-                    this.handler.animateEndboss(this);
-                    clearInterval(this.checkProximityInterval);
-                }
-            }
-        }, 100);
+        this.startProximityCheck();
     }
 
     /**
@@ -111,6 +102,28 @@ class Endboss extends CollidableObject {
             this.checkProximityInterval = null;
         }
         this.animationStarted = false;
+        this.deathDone = true;
+        this.isDeadAnimationPlaying = false;
+        this._deathAnimationStarted = false;
+    }
+
+    /**
+     * (Re)starts the proximity check to trigger the endboss animation once the character is close enough.
+     */
+    startProximityCheck() {
+        if (this.animationStarted) return;
+        if (this.checkProximityInterval) return;
+        this.checkProximityInterval = setInterval(() => {
+            if (this.character && !this.animationStarted) {
+                const dist = Math.abs(this.x - this.character.x);
+                if (dist <= 500) {
+                    this.animationStarted = true;
+                    this.handler.animateEndboss(this);
+                    clearInterval(this.checkProximityInterval);
+                    this.checkProximityInterval = null;
+                }
+            }
+        }, 100);
     }
 
     /**
@@ -167,6 +180,5 @@ class Endboss extends CollidableObject {
             clearTimeout(this.electricHurtTimeout);
             this.electricHurtTimeout = null;
         }
-        this.animationStarted = false;
     }
 }

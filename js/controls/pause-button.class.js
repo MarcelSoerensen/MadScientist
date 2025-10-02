@@ -171,7 +171,9 @@ class PauseButtonManager {
         if (window.world?.level?.enemies) {
             window.world.level.enemies.forEach(enemy => {
                 if (enemy?.constructor?.name === 'Endboss' && !enemy.deathDone) {
-                    if (enemy.handler?.resumeEndbossAnimationIntervals) {
+                    if (!enemy.animationStarted) {
+                        if (typeof enemy.startProximityCheck === 'function') enemy.startProximityCheck();
+                    } else if (enemy.handler?.resumeEndbossAnimationIntervals) {
                         enemy.handler.resumeEndbossAnimationIntervals(enemy);
                     }
                 }

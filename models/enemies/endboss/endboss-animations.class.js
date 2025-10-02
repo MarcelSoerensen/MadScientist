@@ -6,6 +6,7 @@ class EndbossAnimations {
 	 * Plays the idle animation for the Endboss.
 	 */
 	idleAnimation(endboss) {
+		if (endboss.deathDone || endboss.isDeadAnimationPlaying) return;
 		if (endboss.isStepSoundPlayingRight && endboss.stepSoundAudioRight) {
 			try {
 				endboss.stepSoundAudioRight.pause();
@@ -41,6 +42,7 @@ class EndbossAnimations {
 	 * Executes the walking-left animation for the Endboss.
 	 */
 	walkingLeftMovement(endboss, leftTargetX) {
+		if (endboss.deathDone || endboss.isDeadAnimationPlaying) return;
 		endboss.playAnimation(this.IMAGES_WALKING);
 		if (endboss.x > leftTargetX) {
 			endboss.moveLeft(Math.min(4, endboss.x - leftTargetX));
@@ -51,6 +53,7 @@ class EndbossAnimations {
 	 * Executes the walking-right animation for the Endboss.
 	 */
 	walkingRightMovement(endboss, startX) {
+		if (endboss.deathDone || endboss.isDeadAnimationPlaying) return;
 		endboss.playAnimation(this.IMAGES_WALKING);
 		if (endboss.x < startX) {
 			endboss.moveRight(Math.min(4, startX - endboss.x));
@@ -81,6 +84,7 @@ class EndbossAnimations {
 	 * Plays the hit animation for the Endboss.
 	 */
 	hitAnimation(endboss, animTimer) {
+		if (endboss.deathDone || endboss.isDeadAnimationPlaying) return;
 		endboss.img = endboss.imageCache[this.IMAGES_HIT[endboss.hitFrame % this.IMAGES_HIT.length]];
 		endboss.hitFrame++;
 		if (endboss.hitFrame === 1) {
@@ -112,6 +116,7 @@ class EndbossAnimations {
 	 * Plays the electric hurt animation for the Endboss.
 	 */
 	electricHurtAnimation(endboss) {
+		if (endboss.deathDone || endboss.isDeadAnimationPlaying) return;
 		endboss.playAnimation(this.IMAGES_GET_ELECTRIC);
 	}
 
