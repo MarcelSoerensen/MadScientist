@@ -46,6 +46,7 @@ class CharacterAnimations {
      * Starts the jump animation for the character.
      */
     jumpAnimation(character) {
+        if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
         character.jumpFrame = 0;
         character.maxJumpHeight = 100;
         character.totalJumpFrames = this.IMAGES_JUMPING.length;
@@ -56,6 +57,7 @@ class CharacterAnimations {
      * Animates the upward movement of the jump.
      */
     animateJumpUp(character, imageArray) {
+        if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
         if (character.lastAnimation === 'hurt') {
             setTimeout(() => this.animateJumpUp(character, imageArray), this.JUMP_DELAYS[character.jumpFrame] || 60);
             return;
@@ -76,6 +78,7 @@ class CharacterAnimations {
      * Holds the character at the top of the jump if conditions are met.
      */
     holdJumpOnTop(character, imageArray) {
+        if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
         if (character.lastAnimation === 'hurt') {
             setTimeout(() => this.holdJumpOnTop(character, imageArray), 20);
             return;
@@ -95,6 +98,7 @@ class CharacterAnimations {
      * Animates the downward movement of the jump.
      */
     animateJumpDown(character, imageArray) {
+        if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
         if (character.lastAnimation === 'hurt') {
             setTimeout(() => this.animateJumpDown(character, imageArray), this.JUMP_DELAYS_DOWN[imageArray.length - 1 - character.jumpFrame] || 60);
             return;
@@ -266,6 +270,7 @@ class CharacterAnimations {
      * Frame delays for the jump up animation.
      */
     JUMP_DELAYS = [10, 15, 25, 35, 55, 70, 85, 55, 22, 15];
+    
     /**
      * Frame delays for the jump down animation (reversed).
      */

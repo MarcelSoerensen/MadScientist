@@ -138,7 +138,7 @@ class Character extends CollidableObject {
      * Triggers the jump animation.
      */
     playJumpAnimation() {
-        if (this.lastAnimation === 'hurt') return;
+        if (this.lastAnimation === 'hurt' || this.lastAnimation === 'dead' || this.deathAnimationPlayed) return;
         if (!this.isAboveGround()) return;
         this.startJumpX = this.x;
         this.anim.jumpAnimation(this);
@@ -163,6 +163,8 @@ class Character extends CollidableObject {
         if (!this.sounds) this.sounds = new CharacterSounds();
         this.sounds.stopStepSound(this);
         this.sounds.deathSound(this);
+        this.isAboveGroundActive = false;
+        this.jumpOffsetY = 0;
         this.anim.deathAnimation(this, () => {
             this.isAnimationLocked = false;
         });

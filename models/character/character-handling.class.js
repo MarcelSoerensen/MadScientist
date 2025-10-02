@@ -91,7 +91,7 @@ class CharacterHandling {
      * Handles character movement (left/right).
      */
     handleMovement(character) {
-        if (character.lastAnimation === 'hurt') return;
+        if (character.lastAnimation === 'hurt' || character.lastAnimation === 'dead') return;
         let moveSpeed = character.speed;
         if (character.isAboveGround() && character.world.keyboard.UP) moveSpeed = character.speed * 1.5;
 
@@ -136,7 +136,7 @@ class CharacterHandling {
      * Handles jump animation trigger.
      */
     handleJumpAnimation(character) {
-        if (character.lastAnimation === 'hurt') return;
+        if (character.lastAnimation === 'hurt' || character.lastAnimation === 'dead') return;
         if (character.world.keyboard.UP && !character.isAboveGround()) {
             character.isAboveGroundActive = true;
             character.currentImage = 0;
@@ -148,7 +148,7 @@ class CharacterHandling {
      * Handles idle animation.
      */
     handleIdleAnimation(character) {
-        if (character.lastAnimation === 'hurt') return;
+        if (character.lastAnimation === 'hurt' || character.lastAnimation === 'dead') return;
         if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && !(character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
             character.playAnimation(character.anim.IMAGES_IDLE);
             character.lastAnimation = 'idle';
@@ -159,7 +159,7 @@ class CharacterHandling {
      * Handles walking animation.
      */
     handleWalkingAnimation(character) {
-        if (character.lastAnimation === 'hurt') return;
+        if (character.lastAnimation === 'hurt' || character.lastAnimation === 'dead') return;
         if (!character.deathAnimationPlayed && !character.isAboveGround() && !character.throwAnimationPlaying && (character.world.keyboard.RIGHT || character.world.keyboard.LEFT)) {
             character.playAnimation(character.anim.IMAGES_WALKING);
             character.lastAnimation = 'walk';
@@ -198,6 +198,7 @@ class CharacterHandling {
      * Handles hurt animation.
      */
     handleHurtAnimation(character) {
+        if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
         if (character.isHurt()) {
             character.playAnimation(character.anim.IMAGES_HURT);
         }
