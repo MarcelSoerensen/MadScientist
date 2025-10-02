@@ -61,6 +61,8 @@ class PauseButtonManager {
             const btn = document.getElementById(cfg.btnId);
             if (btn) btn.setAttribute('disabled', 'disabled');
         });
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) backBtn.setAttribute('disabled', 'disabled');
         window.isPaused = true;
         PauseButtonManager.prevAudioWasOn = !AudioButtonManager.muted;
         if (PauseButtonManager.prevAudioWasOn) {
@@ -128,6 +130,8 @@ class PauseButtonManager {
             const btn = document.getElementById(cfg.btnId);
             if (btn) btn.removeAttribute('disabled');
         });
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) backBtn.removeAttribute('disabled');
         window.isPaused = false;
         if (PauseButtonManager.prevAudioWasOn) {
             AudioButtonManager.setMutedAll(false);

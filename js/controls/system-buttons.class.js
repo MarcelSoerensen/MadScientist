@@ -99,6 +99,7 @@ class SystemButtonManager {
      * Handles the logic for returning to the start screen via the Back button.
      */
     static handleBackToStart() {
+        if (window.PauseButtonManager?.isPaused) return;
         SystemButtonManager.cleanupGameState();
         ['game_over_screen','win_screen','control_screen','story_screen','countdown-overlay','orientation-overlay']
             .forEach(id => document.getElementById(id)?.classList.add('d-none'));

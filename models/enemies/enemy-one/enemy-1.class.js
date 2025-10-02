@@ -79,7 +79,7 @@ class EnemyOne extends CollidableObject {
         let x;
         let tries = 0;
         const characterX = window.character?.x || 0;
-        const minDistance = 850;
+        const minDistance = 1000;
         do {
             x = minX + Math.random() * (maxX - minX);
             x += (Math.random() - 0.5) * 120;
