@@ -12,8 +12,9 @@ class SystemButtonManager {
             document.getElementById('win_screen'),
             document.getElementById('story_screen'),
             document.getElementById('control_screen'),
-            document.getElementById('legal_notice_screen'), // hinzufügen
-            document.getElementById('credits_screen')       // hinzufügen
+            document.getElementById('legal_notice_screen'),
+            document.getElementById('credits_screen'),
+            document.getElementById('orientation-overlay')
         ].filter(el => el && !el.classList.contains('d-none'));
     }
 
@@ -99,7 +100,7 @@ class SystemButtonManager {
      */
     static handleBackToStart() {
         SystemButtonManager.cleanupGameState();
-        ['game_over_screen','win_screen','control_screen','story_screen','countdown-overlay']
+        ['game_over_screen','win_screen','control_screen','story_screen','countdown-overlay','orientation-overlay']
             .forEach(id => document.getElementById(id)?.classList.add('d-none'));
         const canvas = document.getElementById('canvas');
         const startScreen = document.getElementById('start_screen');

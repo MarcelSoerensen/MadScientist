@@ -44,6 +44,7 @@ class MobileOrientationManager {
             this.repositionControls();
         } else {
             this.hideControls();
+            this.hideOrientationOverlay();
         }
     }
 
@@ -55,15 +56,24 @@ class MobileOrientationManager {
         let weaponContainer = document.querySelector('.weapon-controls-container');
         if (!this.isMobile) {
             this.hideControls();
+            this.hideOrientationOverlay();
             return;
         }
         if (this.isPortrait) {
-            this.setPortraitLayout(mobileContainer, weaponContainer);
+            if (window.innerWidth > 480) {
+                this.setPortraitLayout(mobileContainer, weaponContainer);
+                this.setControlsVisibility(true);
+                this.hideOrientationOverlay();
+            } else {
+                this.showOrientationOverlay();
+                this.hideControls();
+                return;
+            }
         } else {
             this.setLandscapeLayout(mobileContainer, weaponContainer);
+            this.setControlsVisibility(true);
+            this.hideOrientationOverlay();
         }
-        mobileContainer.style.display = 'flex';
-        weaponContainer.style.display = 'flex';
     }
 
     /**
@@ -80,24 +90,16 @@ class MobileOrientationManager {
         if (canvas) {
             const canvasRect = canvas.getBoundingClientRect();
             const canvasBottom = canvasRect.bottom + window.scrollY;
-            mobileContainer.style.left = '';
-            mobileContainer.style.right = '';
-            mobileContainer.style.transform = '';
-            weaponContainer.style.left = '';
-            weaponContainer.style.right = '';
-            weaponContainer.style.transform = '';
-            mobileContainer.style.position = 'absolute';
+            const canvasLeft = canvasRect.left + window.scrollX;
+            const canvasRight = canvasRect.right + window.scrollX;
+            const halfCanvasWidth = Math.max(0, Math.floor(canvasRect.width / 2) - 10);
             mobileContainer.style.top = `${canvasBottom + 10}px`;
-            mobileContainer.style.left = '10px';
-            mobileContainer.style.flexDirection = 'row';
-            mobileContainer.style.gap = '0.3em';
-            mobileContainer.style.zIndex = '99999';
-            weaponContainer.style.position = 'absolute';
+            mobileContainer.style.left = `${canvasLeft}px`;
+            mobileContainer.style.maxWidth = `${halfCanvasWidth}px`;
             weaponContainer.style.top = `${canvasBottom + 10}px`;
-            weaponContainer.style.right = '10px';
-            weaponContainer.style.flexDirection = 'row';
-            weaponContainer.style.gap = '0.3em';
-            weaponContainer.style.zIndex = '99999';
+            const rightOffset = Math.max(0, window.innerWidth - canvasRight);
+            weaponContainer.style.right = `${rightOffset}px`;
+            weaponContainer.style.maxWidth = `${halfCanvasWidth}px`;
         }
         document.body.classList.add('mobile-portrait');
         document.body.classList.remove('mobile-landscape');
@@ -116,28 +118,11 @@ class MobileOrientationManager {
                 canvas.parentElement.appendChild(weaponContainer);
             }
         }
-        mobileContainer.style.left = '';
-        mobileContainer.style.right = '';
-        mobileContainer.style.transform = '';
-        mobileContainer.style.top = '';
-        mobileContainer.style.bottom = '';
-        weaponContainer.style.left = '';
-        weaponContainer.style.right = '';
-        weaponContainer.style.transform = '';
-        weaponContainer.style.top = '';
-        weaponContainer.style.bottom = '';
-        mobileContainer.style.position = 'absolute';
-        mobileContainer.style.bottom = '2vh';
-        mobileContainer.style.left = '2vw';
-        mobileContainer.style.flexDirection = 'row';
-        mobileContainer.style.gap = '1vw';
-        mobileContainer.style.zIndex = '99999';
-        weaponContainer.style.position = 'absolute';
-        weaponContainer.style.bottom = '2vh';
-        weaponContainer.style.right = '2vw';
-        weaponContainer.style.flexDirection = 'row';
-        weaponContainer.style.gap = '1vw';
-        weaponContainer.style.zIndex = '99999';
+        ['top','left','right','maxWidth'].forEach(prop => {
+            if (mobileContainer && mobileContainer.style[prop] !== undefined) mobileContainer.style[prop] = '';
+            if (weaponContainer && weaponContainer.style[prop] !== undefined) weaponContainer.style[prop] = '';
+        });
+
         document.body.classList.add('mobile-landscape');
         document.body.classList.remove('mobile-portrait');
     }
@@ -149,10 +134,48 @@ class MobileOrientationManager {
         const mobileContainer = document.querySelector('.mobile-controls-container');
         const weaponContainer = document.querySelector('.weapon-controls-container');
         if (mobileContainer && weaponContainer) {
-            mobileContainer.style.display = 'none';
-            weaponContainer.style.display = 'none';
+            this.setControlsVisibility(false);
             document.body.classList.remove('mobile-portrait', 'mobile-landscape');
         }
+    }
+
+    /**
+     * Toggle visibility classes on control containers to use CSS for display handling.
+     */
+    setControlsVisibility(visible) {
+        const mobileContainer = document.querySelector('.mobile-controls-container');
+        const weaponContainer = document.querySelector('.weapon-controls-container');
+        const add = (el, cls) => el && el.classList.add(cls);
+        const remove = (el, cls) => el && el.classList.remove(cls);
+        if (visible) {
+            remove(mobileContainer, 'controls-hidden');
+            add(mobileContainer, 'controls-visible');
+            remove(weaponContainer, 'controls-hidden');
+            add(weaponContainer, 'controls-visible');
+        } else {
+            remove(mobileContainer, 'controls-visible');
+            add(mobileContainer, 'controls-hidden');
+            remove(weaponContainer, 'controls-visible');
+            add(weaponContainer, 'controls-hidden');
+        }
+    }
+
+    /**
+     * Show the phone portrait rotate overlay.
+     */
+    showOrientationOverlay() {
+        const overlay = document.getElementById('orientation-overlay');
+        if (overlay) overlay.classList.remove('d-none');
+        try { if (typeof SystemButtonManager !== 'undefined') SystemButtonManager.updateSystemButtonsVisibility(); } catch {}
+    }
+
+    /**
+     * Hide the phone portrait rotate overlay.
+     */
+    hideOrientationOverlay() {
+        const overlay = document.getElementById('orientation-overlay');
+        if (overlay) overlay.classList.add('d-none');
+        try { if (typeof SystemButtonManager !== 'undefined') SystemButtonManager.updateSystemButtonsVisibility(); } catch {}
     }
 }
 

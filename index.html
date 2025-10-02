@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles/game-screens/game-screens.css">
     <link rel="stylesheet" href="styles/game-screens/startscreen-character.css">
     <link rel="stylesheet" href="styles/game-screens/countdown-overlay.css">
+    <link rel="stylesheet" href="styles/game-screens/orientation-overlay.css">
     <link rel="stylesheet" href="styles/buttons/game-screens-buttons.css">
     <link rel="stylesheet" href="styles/buttons/control-buttons.css">
     <link rel="stylesheet" href="styles/buttons/fullscreen-button.css">
@@ -142,6 +143,11 @@
         <div id="countdown-overlay" class="d-none">
             <div class="countdown-blur-bg"></div>
             <span id="countdown-number"></span>
+        </div>
+
+        <div id="orientation-overlay" class="d-none" aria-hidden="true">
+            <div class="orientation-blur-bg"></div>
+            <div class="orientation-message">Turn display</div>
         </div>
 
     <div id="story_screen" class="d-none" tabindex="-1">
