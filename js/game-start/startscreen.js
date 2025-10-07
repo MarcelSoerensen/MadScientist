@@ -56,20 +56,16 @@ function resetLaserImg(laserImg, mode) {
 /**
  * Animates the laser image frame by frame.
  */
-function animateLaserFrames(laserImg, frames, interval, onDone) {
-    let frameCount = 0;
+function animateLaserFrames(img, frames, interval, done) {
     if (laserInterval) clearInterval(laserInterval);
+    let i = 0;
     laserInterval = setInterval(() => {
-        const cachedSrc = ImageCacheManager.getImage(LASER_FRAMES[laserFrame]).src;
-        if (laserImg.src !== cachedSrc) {
-            laserImg.src = cachedSrc;
-        }
-        void laserImg.offsetWidth;
+        img.src = ImageCacheManager.getImage(LASER_FRAMES[laserFrame]).src;
+        void img.offsetWidth;
         laserFrame = (laserFrame + 1) % LASER_FRAMES.length;
-        frameCount++;
-        if (frameCount >= frames) {
+        if (++i >= frames) {
             clearInterval(laserInterval);
-            if (typeof onDone === 'function') onDone();
+            if (done) done();
         }
     }, interval);
 }
@@ -202,9 +198,9 @@ function resetGameCanvas(canvas) {
 function startBackgroundMusic() {
     if (typeof window === 'undefined') return;
     if (!window.backgroundMusic) {
-        window.backgroundMusic = SoundCacheManager.getAudio('sounds/background-sound.mp3');
-        window.backgroundMusic.loop = true;
-        window.backgroundMusic.volume = 0.08;
+        window.backgroundMusic = SoundCacheManager.getBackgroundMusic();
+        window.backgroundMusic.loop = true; // redundanter safeguard
+        window.backgroundMusic.volume = window.backgroundMusic.muted ? 0 : 0.08;
     }
     window.backgroundMusic.currentTime = 0;
     window.backgroundMusic.play().catch(() => {});

@@ -3,34 +3,40 @@
  */
 class SoundCacheManager {
     static cache = {};
-    static muted = true; // Standard: alle Sounds aus
+    static muted = true;
+    static BACKGROUND_SRC = 'sounds/background-sound.mp3';
 
     /**
      * Returns a cached audio instance (always a NEW instance, but with cached source).
      */
-    static getAudio(src) {
-        if (src === 'sounds/background-sound.mp3') {
-            if (!this.cache['backgroundMusicSingleton']) {
-                const audio = new Audio(src);
-                audio.loop = true;
-                audio.muted = this.muted;
-                audio.volume = this.muted ? 0 : 0.08;
-                this.cache['backgroundMusicSingleton'] = audio;
-            }
-            return this.cache['backgroundMusicSingleton'];
+    static getBackgroundMusic() {
+        if (!this.cache.backgroundMusicSingleton) {
+            const audio = new Audio(this.BACKGROUND_SRC);
+            audio.loop = true;
+            audio.muted = this.muted;
+            audio.volume = this.muted ? 0 : 0.08;
+            this.cache.backgroundMusicSingleton = audio;
         }
-        if (!this.cache[src]) {
-            const audio = new Audio(src);
-            this.cache[src] = audio;
-        }
-        const newAudio = new Audio();
-        newAudio.src = this.cache[src].src;
-        newAudio.muted = this.muted;
-        return newAudio;
+        return this.cache.backgroundMusicSingleton;
     }
 
-    /**
-     * Setzt globales Mute für alle neuen Sounds und laufende Instanzen
+    /** 
+     * Returns a cached audio instance (always a NEW instance, but with cached source).
+     */
+    static getAudio(src) {
+        if (src === this.BACKGROUND_SRC) {
+            return this.getBackgroundMusic();
+        }
+        if (!this.cache[src]) {
+            this.cache[src] = new Audio(src);
+        }
+        const instance = new Audio(this.cache[src].src);
+        instance.muted = this.muted;
+        return instance;
+    }
+
+    /** 
+     * Sets the global mute state for all new sounds and currently playing instances.
      */
     static setMuted(mute) {
         this.muted = mute;

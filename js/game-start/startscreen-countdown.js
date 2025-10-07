@@ -46,17 +46,16 @@ function showCountdownOverlay(callback) {
 function handleCountdownFadeOut(overlay, numberSpan, callback) {
     const startScreen = document.getElementById('start_screen');
     setTimeout(() => {
-        if (startScreen) {
-            startScreen.classList.remove('d-none');
+        if (!startScreen) return;
+        startScreen.classList.remove('d-none', 'fade-out');
+        startScreen.style.opacity = '';
+        void startScreen.offsetWidth;
+        startScreen.classList.add('fade-out');
+        setTimeout(() => {
+            startScreen.classList.add('d-none');
+            startScreen.classList.remove('fade-out');
             startScreen.style.opacity = '';
-            void startScreen.offsetWidth;
-            startScreen.classList.add('fade-out');
-            setTimeout(() => {
-                startScreen.classList.add('d-none');
-                startScreen.classList.remove('fade-out');
-                startScreen.style.opacity = '';
-            }, 2000);
-        }
+        }, 2000);
     }, 2900);
     runCountdown(numberSpan, 3, () => hideCountdownOverlay(overlay, callback));
 }

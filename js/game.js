@@ -51,7 +51,7 @@ function init() {
  * Initializes and plays the background music, and sets up a listener for mute changes.
  */
 function initBackgroundMusic() {
-    const bgMusic = window.backgroundMusic = SoundCacheManager.getAudio('sounds/background-sound.mp3');
+    const bgMusic = window.backgroundMusic = SoundCacheManager.getBackgroundMusic();
     bgMusic.currentTime = 0;
     bgMusic.muted = SoundCacheManager.muted;
     bgMusic.volume = bgMusic.muted ? 0 : 0.08;

@@ -83,22 +83,35 @@ function getCurrentStoryTextPercent(storyText) {
 /**
  * Animates the story text smoothly from its current Y position down to the start position.
  */
+const storyScrollState = { el: null, from: 0, to: 0, duration: 0, start: 0, onDone: null };
 function animateStoryTextDown(storyText, fromPercent, toPercent, duration, onDone) {
-    let start = null;
-    function animateDown(ts) {
-        if (!start) start = ts;
-        const elapsed = ts - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const newPercent = fromPercent + (toPercent - fromPercent) * progress;
-        storyText.style.transform = `translateY(${newPercent}%)`;
-        if (progress < 1) {
-            requestAnimationFrame(animateDown);
-        } else {
-            if (typeof onDone === 'function') onDone();
-        }
-    }
+    if (!storyText) return;
     storyText.style.animation = 'none';
-    requestAnimationFrame(animateDown);
+    storyScrollState.el = storyText;
+    storyScrollState.from = fromPercent;
+    storyScrollState.to = toPercent;
+    storyScrollState.duration = duration;
+    storyScrollState.start = performance.now();
+    storyScrollState.onDone = typeof onDone === 'function' ? onDone : null;
+    requestAnimationFrame(animateStoryTextDownFrame);
+}
+
+/**
+ *  Animation frame handler for animating the story text down.
+ */
+function animateStoryTextDownFrame(ts) {
+    const s = storyScrollState;
+    if (!s.el) return;
+    const progress = Math.min((ts - s.start) / s.duration, 1);
+    const newPercent = s.from + (s.to - s.from) * progress;
+    s.el.style.transform = `translateY(${newPercent}%)`;
+    if (progress < 1) {
+        requestAnimationFrame(animateStoryTextDownFrame);
+    } else {
+        const cb = s.onDone;
+        s.el = null;
+        if (cb) cb();
+    }
 }
 
 /**

@@ -2,39 +2,46 @@
  * Sets up the start screen button event listeners.
  */
 function setupStartScreenButtons() {
-    const buttons = Array.from(document.querySelectorAll('.start-screen-btn-group button'));
+    const { storyBtn, controlsBtn, playBtn } = resetStartScreenButtons();
+    setupPlayButton(playBtn, storyBtn, controlsBtn);
+    setupStoryButton(storyBtn, playBtn, controlsBtn);
+    setupControlsButton(controlsBtn, playBtn, storyBtn);    setupLegalAndCreditLinks();
+    setupLegalAndCreditLinks();
+}
+
+/**
+ * Resets the start screen buttons to their initial state.
+ */
+function resetStartScreenButtons() {
+    const selector = '.start-screen-btn-group button';
+    const buttons = Array.from(document.querySelectorAll(selector));
     buttons.forEach(btn => {
         const clone = btn.cloneNode(true);
         btn.replaceWith(clone);
         clone.disabled = false;
     });
-    const freshButtons = Array.from(document.querySelectorAll('.start-screen-btn-group button'));
-    const [storyBtn, controlsBtn, playBtn] = freshButtons;
-    setupPlayButton(playBtn, storyBtn, controlsBtn);
-    setupStoryButton(storyBtn, playBtn, controlsBtn);
-    setupControlsButton(controlsBtn, playBtn, storyBtn);
+    const fresh = Array.from(document.querySelectorAll(selector));
+    const [storyBtn, controlsBtn, playBtn] = fresh;
+    return { storyBtn, controlsBtn, playBtn };
+}
 
+
+/**
+ * Sets up the primary start screen buttons with their event listeners.
+ */
+function setupLegalAndCreditLinks() {
+    const startScreen = document.getElementById('start_screen');
     const legalNoticeLink = document.getElementById('legal-notice-link');
     const creditsLink = document.getElementById('credits-link');
+    const go = (targetId) => {
+        if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+        window.prepareAndTransitionToScreen(startScreen, document.getElementById(targetId));
+    };
     if (legalNoticeLink) {
-        legalNoticeLink.onclick = function(e) {
-            e.preventDefault();
-            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
-            window.prepareAndTransitionToScreen(
-                document.getElementById('start_screen'),
-                document.getElementById('legal_notice_screen')
-            );
-        };
+        legalNoticeLink.onclick = (e) => { e.preventDefault(); go('legal_notice_screen'); };
     }
     if (creditsLink) {
-        creditsLink.onclick = function(e) {
-            e.preventDefault();
-            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
-            window.prepareAndTransitionToScreen(
-                document.getElementById('start_screen'),
-                document.getElementById('credits_screen')
-            );
-        };
+        creditsLink.onclick = (e) => { e.preventDefault(); go('credits_screen'); };
     }
 }
 
@@ -69,6 +76,7 @@ function setupCreditsBackButton() {
         };
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', function() {
     setupLegalNoticeBackButton();
