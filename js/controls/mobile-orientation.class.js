@@ -43,8 +43,13 @@ class MobileOrientationManager {
         if (this.isMobile) {
             this.repositionControls();
         } else {
-            this.hideControls();
-            this.hideOrientationOverlay();
+            if (this.isPortrait && window.innerWidth <= 480) {
+                this.hideControls();
+                this.showOrientationOverlay();
+            } else {
+                this.hideControls();
+                this.hideOrientationOverlay();
+            }
         }
     }
 
@@ -57,6 +62,10 @@ class MobileOrientationManager {
         if (!this.isMobile) {
             this.hideControls();
             this.hideOrientationOverlay();
+            return;
+        }
+        if (window.PauseButtonManager?.isPaused || window.isPaused) {
+            this.hideControls();
             return;
         }
         if (this.isPortrait) {

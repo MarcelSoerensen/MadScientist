@@ -4,6 +4,7 @@
 class PauseButtonManager {
     static isPaused = false;
     static prevAudioWasOn = null;
+    static prevMobileControlsVisible = null;
 
     /**
      * Initialize the pause button and its event listener
@@ -71,6 +72,16 @@ class PauseButtonManager {
         if (window.character && typeof window.character.setIdle === 'function') {
             window.character.setIdle();
         }
+        // Mobile Controls: merken und ausblenden
+        try {
+            const mobileContainer = document.querySelector('.mobile-controls-container');
+            const weaponContainer = document.querySelector('.weapon-controls-container');
+            const anyVisible = mobileContainer?.classList.contains('controls-visible') || weaponContainer?.classList.contains('controls-visible');
+            PauseButtonManager.prevMobileControlsVisible = anyVisible;
+            if (anyVisible && window.mobileOrientationManager) {
+                window.mobileOrientationManager.setControlsVisibility(false);
+            }
+        } catch {}
     }
 
     /**
@@ -136,6 +147,11 @@ class PauseButtonManager {
         if (PauseButtonManager.prevAudioWasOn) {
             AudioButtonManager.setMutedAll(false);
         }
+        try {
+            if (PauseButtonManager.prevMobileControlsVisible && window.mobileOrientationManager) {
+                window.mobileOrientationManager.updateOrientation();
+            }
+        } catch {}
     }
 
     /**
@@ -144,8 +160,8 @@ class PauseButtonManager {
     static resumeEnemyOne() {
         if (window.world?.level?.enemies) {
             window.world.level.enemies.forEach(enemy => {
-                if (enemy?.constructor?.name === 'EnemyOne') {
-                    if (enemy.handler?.startEnemyOneAnimationIntervals) {
+                if (enemy?.constructor?.name === 'EnemyOne' && !enemy.deathDone) {
+                    if (!enemy.animationStarted && enemy.handler?.startEnemyOneAnimationIntervals) {
                         enemy.handler.startEnemyOneAnimationIntervals(enemy);
                     }
                 }
@@ -159,8 +175,8 @@ class PauseButtonManager {
     static resumeEnemyTwo() {
         if (window.world?.level?.enemies) {
             window.world.level.enemies.forEach(enemy => {
-                if (enemy?.constructor?.name === 'EnemyTwo') {
-                    if (enemy.handler?.startEnemyTwoAnimationIntervals) {
+                if (enemy?.constructor?.name === 'EnemyTwo' && !enemy.deathDone) {
+                    if (!enemy.animationStarted && enemy.handler?.startEnemyTwoAnimationIntervals) {
                         enemy.handler.startEnemyTwoAnimationIntervals(enemy);
                     }
                 }

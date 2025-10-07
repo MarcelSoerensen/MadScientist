@@ -31,6 +31,21 @@ class WorldCheck {
         (w.level?.enemies ?? []).forEach(enemy => {
             const activateAt = enemy._activateAt || 500;
             if (!enemy._waitingForCharacter || w.character.x < activateAt) return;
+            if (enemy instanceof EnemyOne) {
+                const minViewportDistance = 650; 
+                const canvasWidth = w.canvas?.width || 720;
+                const cameraLeft = charX - canvasWidth * 0.5; 
+                const cameraRight = charX + canvasWidth * 0.5;
+                const tooClose = Math.abs(enemy.x - charX) < minViewportDistance || (enemy.x > cameraLeft && enemy.x < cameraRight);
+                if (tooClose && enemy.getEnemyOneSpawnRange && enemy.calculateEnemyOnePosition) {
+                    const { minX, maxX } = enemy.getEnemyOneSpawnRange(enemy._activateAt);
+                    let newX = enemy.calculateEnemyOnePosition(minX, maxX);
+                    if (Math.abs(newX - charX) < minViewportDistance) {
+                        newX = charX + minViewportDistance + 100; 
+                    }
+                    enemy.x = newX;
+                }
+            }
             enemy.visible = true;
             enemy._waitingForCharacter = false;
             if (!enemy.moveInterval && !enemy.animInterval) {

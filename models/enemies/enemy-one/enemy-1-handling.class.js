@@ -13,6 +13,8 @@ class EnemyOneHandling {
 	 * Initializes and starts the main animation interval for EnemyOne (analogous to Endboss)
 	 */
 	startEnemyOneAnimationIntervals(enemy) {
+		if (enemy.animationStarted) return;
+		enemy.animationStarted = true;
 		enemy.moveInterval = setInterval(() => {
 			enemy.moveLeft();
 		}, 1000 / 60);
@@ -106,6 +108,7 @@ class EnemyOneHandling {
 			clearInterval(enemy.animInterval);
 			enemy.animInterval = null;
 		}
+		enemy.animationStarted = false;
 	}
 
     /**

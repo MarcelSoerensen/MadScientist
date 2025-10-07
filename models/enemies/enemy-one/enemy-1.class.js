@@ -116,6 +116,9 @@ class EnemyOne extends CollidableObject {
             clearTimeout(this.electricHurtTimeout);
             this.electricHurtTimeout = null;
         }
+        if (typeof this.animationStarted !== 'undefined') {
+            this.animationStarted = false;
+        }
     }
 
 
@@ -127,6 +130,9 @@ class EnemyOne extends CollidableObject {
         if (this.blinkInterval) {
             clearInterval(this.blinkInterval);
             this.blinkInterval = null;
+        }
+        if (typeof this.animationStarted !== 'undefined') {
+            this.animationStarted = false;
         }
     }
 }

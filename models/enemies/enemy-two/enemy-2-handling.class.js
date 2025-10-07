@@ -13,6 +13,8 @@ class EnemyTwoHandling {
      * Initializes and starts the main animation intervals for EnemyTwo
      */
     startEnemyTwoAnimationIntervals(enemy) {
+        if (enemy.animationStarted) return; 
+        enemy.animationStarted = true;
         enemy.moveInterval = setInterval(() => {
             enemy.moveVertically();
         }, 1000 / 60);
@@ -122,6 +124,7 @@ class EnemyTwoHandling {
             clearInterval(enemy.animInterval);
             enemy.animInterval = null;
         }
+        enemy.animationStarted = false;
     }
 
 }
