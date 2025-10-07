@@ -80,7 +80,7 @@ class WorldDraw {
     drawStatusBar() {
         if (this.world.statusBar) {
             this.world.addToMap(this.world.statusBar);
-            this.world.statusBar.drawHPBar(this.world.ctx);
+            this.world.statusBar.draw(this.world.ctx);
         }
     }
 

@@ -37,33 +37,46 @@ class StatusBar extends DrawableObject {
     /**
      * Draws the HP bar as a trapezoid with gradient fill on the given canvas context.
      */
-    drawHPBar(ctx) {
-        if (this.percentage > 0) {
-            ctx.save();
-            const clipStartX = this.x + 47;
-            const clipWidth = this.currentHPWidth;
-            const widthRatio = clipWidth / 148;
-            ctx.beginPath();
-            ctx.moveTo(clipStartX, this.y + 4);
-            ctx.lineTo(clipStartX + clipWidth, this.y + 4);
-            ctx.lineTo(clipStartX + clipWidth - (3 * widthRatio), this.y + 22);
-            ctx.lineTo(clipStartX, this.y + 28);
-            ctx.closePath();
-            ctx.clip();
-            ctx.beginPath();
-            ctx.moveTo(this.x + 46, this.y + 6.9);
-            ctx.lineTo(this.x + 195, this.y + 4);
-            ctx.lineTo(this.x + 192, this.y + 22);
-            ctx.lineTo(this.x + 49, this.y + 22);
-            ctx.closePath();
-            const gradient = ctx.createLinearGradient(0, this.y + 6, 0, this.y + 22);
-            gradient.addColorStop(0, 'rgb(117, 197, 27)');
-            gradient.addColorStop(0.4, 'rgb(117, 197, 27)');
-            gradient.addColorStop(0.6, 'rgb(103, 178, 27)');
-            gradient.addColorStop(1, 'rgb(103, 178, 27)');
-            ctx.fillStyle = gradient;
-            ctx.fill();
-            ctx.restore();
-        }
+    draw(ctx) {
+        if (this.percentage <= 0) return;
+        ctx.save();
+        this.drawHealthOutline(ctx);
+    this.drawHealthFill(ctx);
+        ctx.restore();
+    }
+
+    /**
+     * Draws the health outline (clipping shape) on the given canvas context.
+     */
+    drawHealthOutline(ctx) {
+        const clipStartX = this.x + 47;
+        const clipWidth = this.currentHPWidth;
+        const widthRatio = clipWidth / 148;
+        ctx.beginPath();
+        ctx.moveTo(clipStartX, this.y + 4);
+        ctx.lineTo(clipStartX + clipWidth, this.y + 4);
+        ctx.lineTo(clipStartX + clipWidth - (3 * widthRatio), this.y + 22);
+        ctx.lineTo(clipStartX, this.y + 28);
+        ctx.closePath();
+        ctx.clip();
+    }
+
+    /**
+     * Fills the health bar with a green gradient on the given canvas context.
+     */
+    drawHealthFill(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(this.x + 46, this.y + 6.9);
+        ctx.lineTo(this.x + 195, this.y + 4);
+        ctx.lineTo(this.x + 192, this.y + 22);
+        ctx.lineTo(this.x + 49, this.y + 22);
+        ctx.closePath();
+        const g = ctx.createLinearGradient(0, this.y + 6, 0, this.y + 22);
+        g.addColorStop(0, 'rgb(117, 197, 27)');
+        g.addColorStop(0.4, 'rgb(117, 197, 27)');
+        g.addColorStop(0.6, 'rgb(103, 178, 27)');
+        g.addColorStop(1, 'rgb(103, 178, 27)');
+        ctx.fillStyle = g;
+        ctx.fill();
     }
 }

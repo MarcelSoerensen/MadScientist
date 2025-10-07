@@ -38,25 +38,35 @@ class BombsBar extends DrawableObject {
         for (let i = 0; i < this.maxBombs; i++) {
             const cx = this.x + i * (this.radius * 2 + this.spacing);
             const cy = this.y;
-            if (i < this.collected) {
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(cx, cy, this.radius, 0, 2 * Math.PI);
-                ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                ctx.fill();
-                ctx.globalAlpha = 1;
-                const imgRadius = this.radius * 0.8;
-                ctx.drawImage(this.bombImg, cx - imgRadius, cy - imgRadius, imgRadius * 2, imgRadius * 2);
-                ctx.restore();
-            } else {
-                ctx.save();
-                ctx.globalAlpha = 0.7;
-                ctx.beginPath();
-                ctx.arc(cx, cy, this.radius, 0, 2 * Math.PI);
-                ctx.fillStyle = 'gray';
-                ctx.fill();
-                ctx.restore();
-            }
+            i < this.collected ? this.drawCollectedBomb(ctx, cx, cy) : this.drawEmptyBomb(ctx, cx, cy);
         }
+    }
+
+    /**
+     * Draws a collected bomb slot (background glow + bomb image).
+     */
+    drawCollectedBomb(ctx, cx, cy) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, this.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        const imgRadius = this.radius * 0.8;
+        ctx.drawImage(this.bombImg, cx - imgRadius, cy - imgRadius, imgRadius * 2, imgRadius * 2);
+        ctx.restore();
+    }
+
+    /**
+     * Draws an empty (uncollected) bomb slot.
+     */
+    drawEmptyBomb(ctx, cx, cy) {
+        ctx.save();
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath();
+        ctx.arc(cx, cy, this.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = 'gray';
+        ctx.fill();
+        ctx.restore();
     }
 }
