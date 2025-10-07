@@ -33,21 +33,20 @@ class MovableObject extends DrawableObject {
      * Applies gravity animation with custom delays.
      */
     applyGravityForAnimation(images, delays, onDone) {
-        let frame = 0;
-        let self = this;
-
-        function animateFrame() {
-            self.img = self.imageCache[images[frame]];
-            let delay = delays[frame] || 60;
-            frame++;
-            if (frame < images.length) {
-                setTimeout(animateFrame, delay);
-            } else {
-                if (onDone) onDone();
-            }
+        if (!Array.isArray(images) || images.length === 0) {
+            if (onDone) onDone();
+            return;
         }
-
-        animateFrame();
+        const baseDelays = Array.isArray(delays) ? delays : [];
+        let elapsed = 0;
+        images.forEach((imgPath, index) => {
+            const delay = baseDelays[index] || 60;
+            setTimeout(() => {
+                this.img = this.imageCache[imgPath];
+                if (index === images.length - 1 && onDone) onDone();
+            }, elapsed);
+            elapsed += delay;
+        });
     }
 
     /**

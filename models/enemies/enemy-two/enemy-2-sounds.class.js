@@ -19,27 +19,38 @@ class EnemyTwoSounds {
 	 * Plays the proximity sound for EnemyTwo
 	 */
 	playProximitySound(enemy) {
-		if (!enemy.world?.character) return;
+		if (!enemy?.world?.character) return;
 		const dist = Math.abs(enemy.world.character.x - enemy.x);
+		if (dist > 350) return this.stopProximitySound();
 		const isMuted = window.SoundCacheManager ? SoundCacheManager.muted : false;
-		if (dist <= 350) {
-			if (!this.proximitySoundAudio) {
-				this.proximitySoundAudio = new Audio('sounds/enemy2.mp3');
-				this.proximitySoundAudio.loop = true;
-				this.proximitySoundAudio.playbackRate = 0.9;
-				this.proximitySoundAudio.volume = isMuted ? 0 : 0.5;
-				this.proximitySoundAudio.play();
-			} else if (this.proximitySoundAudio.paused) {
-				this.proximitySoundAudio.currentTime = 0;
-				this.proximitySoundAudio.volume = isMuted ? 0 : 0.5;
-				this.proximitySoundAudio.play();
-			} else {
-				this.proximitySoundAudio.volume = isMuted ? 0 : 0.5;
-			}
-			if (!isMuted && dist > 250) this.fadeOutProximitySound(250, 350, dist);
-		} else if (this.proximitySoundAudio) {
-			this.stopProximitySound();
+		const audio = this.prepareProximityAudio(isMuted);
+		this.applyProximityVolumeAndFade(audio, dist, isMuted);
+	}
+
+	/**
+	 * Prepares the proximity audio for EnemyTwo
+	 */
+	prepareProximityAudio(isMuted) {
+		let a = this.proximitySoundAudio;
+		if (!a) {
+			a = this.proximitySoundAudio = new Audio('sounds/enemy2.mp3');
+			a.loop = true;
+			a.playbackRate = 0.9;
+			a.volume = isMuted ? 0 : 0.5;
+			a.play();
+		} else if (a.paused) {
+			a.currentTime = 0;
+			a.play();
 		}
+		return a;
+	}
+
+	/**
+	 * Sets volume and optional fade-out based on distance
+	 */
+	applyProximityVolumeAndFade(audio, dist, isMuted) {
+		audio.volume = isMuted ? 0 : 0.5;
+		if (!isMuted && dist > 250) this.fadeOutProximitySound(250, 350, dist);
 	}
 
 	/**
@@ -67,14 +78,8 @@ class EnemyTwoSounds {
 	 * Immediately stops all EnemyTwo sounds (proximity, death, etc.)
 	 */
 	stopAllEnemyTwoSounds(enemy) {
-		if (this.proximitySoundAudio) {
-			try {
-				this.proximitySoundAudio.pause();
-				this.proximitySoundAudio.currentTime = 0;
-			} catch (e) {}
-			this.proximitySoundAudio = null;
-		}
-		if (enemy && enemy.deathSoundAudio) {
+		this.stopProximitySound();
+		if (enemy?.deathSoundAudio) {
 			try {
 				enemy.deathSoundAudio.pause();
 				enemy.deathSoundAudio.currentTime = 0;

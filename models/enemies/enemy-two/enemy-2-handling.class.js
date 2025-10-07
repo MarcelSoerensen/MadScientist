@@ -13,24 +13,14 @@ class EnemyTwoHandling {
      * Initializes and starts the main animation intervals for EnemyTwo
      */
     startEnemyTwoAnimationIntervals(enemy) {
-        if (enemy.animationStarted) return; 
-        enemy.animationStarted = true;
-        enemy.moveInterval = setInterval(() => {
-            enemy.moveVertically();
-        }, 1000 / 60);
-        enemy.deathFrame = 0;
-        enemy.deathDone = false;
+        if (enemy.animationStarted) return;
+        Object.assign(enemy, { animationStarted: true, deathFrame: 0, deathDone: false });
+        enemy.moveInterval = setInterval(enemy.moveVertically.bind(enemy), 1000 / 60);
         enemy.animInterval = setInterval(() => {
-            if (enemy.laserHitCount >= 3 && !enemy.isElectricHurt) {
-                this.handleDeathAnimationFrame(enemy);
-                return;
-            }
-            if (enemy.isElectricHurt) {
-                enemy.playAnimation(enemy.animations.IMAGES_GET_ELECTRIC);
-                return;
-            }
-            enemy.playAnimation(enemy.animations.IMAGES_WALKING);
-            enemy.playProximitySound();
+            if (enemy.laserHitCount >= 3 && !enemy.isElectricHurt) return this.handleDeathAnimationFrame(enemy);
+            const images = enemy.isElectricHurt ? enemy.animations.IMAGES_GET_ELECTRIC : enemy.animations.IMAGES_WALKING;
+            enemy.playAnimation(images);
+            if (!enemy.isElectricHurt) enemy.playProximitySound();
         }, 50);
     }
 

@@ -27,7 +27,7 @@ class WorldCleanup {
     }
 
     /**
-     * Stoppt alle laufenden Sammelgeräusche (Bomben, Energie-Bälle, Herzen).
+     * Stops all collectible sounds (energy balls, bombs, hearts).
      */
     stopAllCollectibleSounds() {
         if (typeof window !== 'undefined') {
