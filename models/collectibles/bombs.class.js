@@ -63,31 +63,48 @@ class CollectibleBomb extends CollidableObject {
      */
     startCollecting(targetX, targetY) {
         if (this.isCollecting) return;
-        this.isCollecting = true;
-        this.collectProgress = 0;
-        this.startX = this.originX;
-        this.startY = this.originY;
-        this.targetX = targetX;
-        this.targetY = targetY;
-        this.startWidth = 40;
-        this.startHeight = 40;
-        try {
-            const collectedSound = SoundCacheManager.getAudio('sounds/collected-bomb.mp3');
-            collectedSound.play();
-            CollectibleBomb.activeSounds.push(collectedSound);
-            collectedSound.addEventListener('ended', () => {
-                const idx = CollectibleBomb.activeSounds.indexOf(collectedSound);
-                if (idx !== -1) CollectibleBomb.activeSounds.splice(idx, 1);
-            });
-        } catch (e) {}
-        const dx = this.targetX - this.startX;
-        const dy = this.targetY - this.startY;
-        this.distance = Math.sqrt(dx * dx + dy * dy);
-        this.speed = 10;
-        this.duration = this.distance / this.speed;
-        if (this.duration < 1) this.duration = 1;
+        this.initCollectingState(targetX, targetY);
+        this.playCollectingSound();
     }
 
+    /** 
+    * Initializes collecting state and parameters.
+    */
+    initCollectingState(targetX, targetY) {
+        Object.assign(this, {
+            isCollecting: true,
+            collectProgress: 0,
+            startX: this.originX,
+            startY: this.originY,
+            targetX,
+            targetY,
+            startWidth: 40,
+            startHeight: 40
+        });
+        const dx = targetX - this.startX, dy = targetY - this.startY;
+        this.distance = Math.hypot(dx, dy);
+        this.speed = 10;
+        this.duration = Math.max(1, this.distance / this.speed);
+    }
+
+    /** 
+    * Plays the collecting sound effect.
+    */
+    playCollectingSound() {
+        try {
+            const s = SoundCacheManager.getAudio('sounds/collected-bomb.mp3');
+            s.play();
+            CollectibleBomb.activeSounds.push(s);
+            s.addEventListener('ended', () => {
+                const i = CollectibleBomb.activeSounds.indexOf(s);
+                if (i !== -1) CollectibleBomb.activeSounds.splice(i, 1);
+            });
+        } catch (e) {}
+    }
+
+    /** 
+    * Stops all currently playing collecting sounds.
+    */
     static stopAllCollectingSounds() {
         CollectibleBomb.activeSounds.forEach(sound => {
             sound.pause();
@@ -141,18 +158,16 @@ class CollectibleBomb extends CollidableObject {
      */
     draw(ctx) {
         ctx.save();
-        if (!this.isCollecting) {
-            let t = performance.now() * 0.003;
-            let angle = t % (2 * Math.PI);
-            let radius = (this.width + this.height) / 32;
-            let xOffset = Math.cos(angle) * radius;
-            let yOffset = Math.sin(angle) * radius;
-            ctx.globalAlpha = 1;
-            ctx.drawImage(this.img, this.x + xOffset, this.y + yOffset, this.width, this.height);
-        } else {
-            ctx.globalAlpha = 1;
-            ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        const collecting = this.isCollecting;
+        let xOff = 0, yOff = 0;
+        if (!collecting) {
+            const t = performance.now() * 0.003;
+            const radius = (this.width + this.height) / 32;
+            xOff = Math.cos(t) * radius;
+            yOff = Math.sin(t) * radius;
         }
+        ctx.globalAlpha = 1;
+        ctx.drawImage(this.img, this.x + xOff, this.y + yOff, this.width, this.height);
         ctx.restore();
     }
 }

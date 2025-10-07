@@ -55,6 +55,13 @@ class EnergyBall extends CollidableObject {
         this.targetY = targetY;
         this.startWidth = this.width;
         this.startHeight = this.height;
+        this.computeCollectingDistanceAndDuration();
+    }
+
+    /**
+     * Computes the distance and duration for the collecting animation.
+     */
+    computeCollectingDistanceAndDuration() {
         const dx = this.targetX - this.startX;
         const dy = this.targetY - this.startY;
         this.distance = Math.sqrt(dx * dx + dy * dy);
@@ -64,6 +71,7 @@ class EnergyBall extends CollidableObject {
     }
 
     static activeSounds = [];
+
     /**
      * Plays the collecting sound effect.
      */
@@ -79,6 +87,9 @@ class EnergyBall extends CollidableObject {
         } catch (e) {}
     }
 
+    /** 
+     * Stops all currently playing collecting sounds.
+     */
     static stopAllCollectingSounds() {
         EnergyBall.activeSounds.forEach(sound => {
             sound.pause();
@@ -91,14 +102,6 @@ class EnergyBall extends CollidableObject {
      * Updates pulse and collecting animation.
      */
     updatePulse() {
-        this.updatePulseAnimation();
-        this.updateCollectingAnimation();
-    }
-
-    /**
-     * Updates pulse animation.
-     */
-    updatePulseAnimation() {
         const step = 0.2;
         if (this.pulseUp) {
             this.width += step;
@@ -108,29 +111,39 @@ class EnergyBall extends CollidableObject {
             this.width -= step;
             this.height -= step;
             if (this.width <= this.baseSize) this.pulseUp = true;
-        }
+        }        this.updateCollectingAnimation();
     }
 
     /**
      * Updates collecting animation.
      */
     updateCollectingAnimation() {
-        if (this.isCollecting) {
-            if (!this.duration) this.duration = 1;
-            this.collectProgress += 1 / this.duration;
-            if (this.collectProgress >= 1) {
-                this.x = this.targetX;
-                this.y = this.targetY;
-                this.width = this.startWidth * 0.4;
-                this.height = this.startHeight * 0.4;
-            } else {
-                this.x = this.startX + (this.targetX - this.startX) * this.collectProgress;
-                this.y = this.startY + (this.targetY - this.startY) * this.collectProgress;
-                const shrink = 1 - 0.6 * this.collectProgress;
-                this.width = this.startWidth * shrink;
-                this.height = this.startHeight * shrink;
-            }
-        }
+        if (!this.isCollecting) return;
+        if (!this.duration) this.duration = 1; // ensure duration
+        this.collectProgress += 1 / this.duration; // advance progress
+        if (this.collectProgress >= 1) return this.applyCollectingFinalState();
+        this.applyCollectingInterpolatedState();
+    }
+
+    /**
+     * Applies final state when collecting is complete.
+     */
+    applyCollectingFinalState() {
+        this.x = this.targetX;
+        this.y = this.targetY;
+        this.width = this.startWidth * 0.4;
+        this.height = this.startHeight * 0.4;
+    }
+
+    /**
+     * Applies interpolated state during collecting animation.
+     */
+    applyCollectingInterpolatedState() {
+        this.x = this.startX + (this.targetX - this.startX) * this.collectProgress;
+        this.y = this.startY + (this.targetY - this.startY) * this.collectProgress;
+        const shrink = 1 - 0.6 * this.collectProgress;
+        this.width = this.startWidth * shrink;
+        this.height = this.startHeight * shrink;
     }
 
     /**
@@ -156,22 +169,47 @@ class EnergyBall extends CollidableObject {
      */
     drawElectricEffect(ctx, scale, alpha) {
         ctx.save();
-        let t = performance.now() * 0.005;
-        let randomAngle = Math.random() * Math.PI * 2;
-        let randomRotation = Math.random() * Math.PI * 2;
-        let radius = (this.width + this.height) / 8;
-        let xOffset = Math.cos(randomAngle + t) * radius;
-        let yOffset = Math.sin(randomAngle + t) * radius;
+        const { xOffset, yOffset, rotation } = this.setElectricOffsets();
+        this.applyElectricTransform(ctx, xOffset, yOffset, rotation);
+        this.renderElectricEllipse(ctx, scale);
+        ctx.restore();
+    }
+
+    /**
+     * Sets the electric effect offsets.   
+     */
+    setElectricOffsets() {
+        const t = performance.now() * 0.005;
+        const angle = Math.random() * Math.PI * 2;
+        const rotation = Math.random() * Math.PI * 2;
+        const radius = (this.width + this.height) / 8;
+        return {
+            xOffset: Math.cos(angle + t) * radius,
+            yOffset: Math.sin(angle + t) * radius,
+            rotation
+        };
+    }
+
+    /**
+     * Applies electric effect transformations to the canvas context.
+     */
+    applyElectricTransform(ctx, xOffset, yOffset, rotation) {
         ctx.translate(this.x + this.baseSize / 2 + xOffset - 3, this.y + this.baseSize / 2 + yOffset - 3);
-        ctx.rotate(randomRotation);
+        ctx.rotate(rotation);
+    }
+
+    /**
+     * Renders the electric ellipse.
+     */
+    renderElectricEllipse(ctx, scale) {
         ctx.globalAlpha = 0.6;
         ctx.beginPath();
-        ctx.ellipse(0, 0, this.baseSize * scale * 0.7, this.baseSize * 0.13 * scale * 0.7, 0, 0, 2 * Math.PI);
-        ctx.fillStyle = 'white';
-        ctx.shadowColor = 'white';
+        const w = this.baseSize * scale * 0.7;
+        const h = this.baseSize * 0.13 * scale * 0.7;
+        ctx.ellipse(0, 0, w, h, 0, 0, 2 * Math.PI);
+        ctx.fillStyle = ctx.shadowColor = 'white';
         ctx.shadowBlur = 15;
         ctx.fill();
-        ctx.restore();
     }
 
     /**

@@ -79,29 +79,28 @@ class EnergyBallManager {
         const dy = y1 - y2;
         return Math.sqrt(dx * dx + dy * dy) < minDist;
     }
+
     /**
      * Updates all energy balls (animation, collection).
      */
     update(character) {
-        const barY = 50;
+        const barY = 50, cap = this.maxBalls; 
         for (let i = this.balls.length - 1; i >= 0; i--) {
-            const ball = this.balls[i];
-            ball.updatePulse();
-            if (character && ball.isColliding(character) && !ball.isCollecting && this.collectedCount < this.maxBalls) {
-                ball.startCollecting(ball.x - 100, barY);
+            if (this.collectedCount >= cap) break;
+            const b = this.balls[i];
+            b.updatePulse();
+            if (!b.isCollecting && character && b.isColliding(character) && this.collectedCount < cap) {
+                b.startCollecting(b.x - 100, barY);
+                continue;
             }
-            if (ball.isCollecting && ball.collectProgress >= 1) {
+            if (b.isCollecting && b.collectProgress >= 1) {
                 this.balls.splice(i, 1);
-                this.collectedCount++;
-                this.totalCollectedCount++; 
-                
-                window.gameScoreData = {
-                    collected: this.totalCollectedCount,
-                    total: this.maxBalls
-                };
+                this.collectedCount++; this.totalCollectedCount++;
+                window.gameScoreData = { collected: this.totalCollectedCount, total: cap };
             }
         }
     }
+
     /**
      * Draws all energy balls on the canvas.
      */

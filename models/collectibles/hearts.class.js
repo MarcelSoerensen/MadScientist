@@ -43,26 +43,31 @@ class CollectibleHeart extends CollidableObject {
      */
     startCollecting() {
         if (this.isCollecting) return;
-        this.isCollecting = true;
-        this.pulse = 0;
-        this.pulseCount = 0;
-        this.fadeAlpha = 1;
-        this.collectProgress = 0;
+        Object.assign(this, { isCollecting: true, pulse: 0, pulseCount: 0, fadeAlpha: 1, collectProgress: 0 });
         try {
-            const heartSound = SoundCacheManager.getAudio('sounds/heartbeat.mp3');
-            heartSound.volume = 0.7;
-            heartSound.play();
-            CollectibleHeart.activeSounds.push(heartSound);
+            const snd = SoundCacheManager.getAudio('sounds/heartbeat.mp3');
+            snd.volume = 0.7; snd.play();
+            CollectibleHeart.activeSounds.push(snd);
             setTimeout(() => {
-                heartSound.pause();
-                heartSound.currentTime = 0;
-                const idx = CollectibleHeart.activeSounds.indexOf(heartSound);
-                if (idx !== -1) CollectibleHeart.activeSounds.splice(idx, 1);
+                snd.pause(); snd.currentTime = 0;
+                const i = CollectibleHeart.activeSounds.indexOf(snd);
+                if (i !== -1) CollectibleHeart.activeSounds.splice(i, 1);
             }, 500);
         } catch (e) {}
     }
 
     /**
+     * Updates pulse and collecting animation.
+     */
+    updatePulse() {
+        this.fadeScale = 1;
+            if (this.isCollecting) {
+            if (this.collectProgress === undefined) this.collectProgress = 0;
+            this.collectProgress += 0.04;
+        }    
+    }
+
+     /**
      * Stops all active collecting sounds immediately.
      */
     static stopAllCollectingSounds() {
@@ -71,31 +76,6 @@ class CollectibleHeart extends CollidableObject {
             sound.currentTime = 0;
         });
         CollectibleHeart.activeSounds = [];
-    }
-
-    /**
-     * Updates pulse and collecting animation.
-     */
-    updatePulse() {
-        this.updatePulseAnimation();
-        this.updateCollectingAnimation();
-    }
-
-    /**
-     * Updates pulse animation.
-     */
-    updatePulseAnimation() {
-        this.fadeScale = 1;
-    }
-
-    /**
-     * Updates collecting animation.
-     */
-    updateCollectingAnimation() {
-        if (this.isCollecting) {
-            if (this.collectProgress === undefined) this.collectProgress = 0;
-            this.collectProgress += 0.04;
-        }
     }
 
     /**
@@ -149,20 +129,11 @@ class CollectibleHeart extends CollidableObject {
      */
     drawCollectingAnimation(ctx) {
         ctx.save();
-        if (this.collectProgress === undefined) this.collectProgress = 0;
-        this.collectProgress += 0.04;
-        let pulse = 1;
-        let alpha = 1;
-        if (this.collectProgress < 1) {
-            pulse = 1 + 22 / this.width * Math.abs(Math.sin(this.collectProgress * Math.PI * 2));
-            alpha = 1;
-        } else if (this.collectProgress < 2) {
-            pulse = 1 + 22 / this.width * Math.abs(Math.sin((this.collectProgress - 1) * Math.PI * 2));
-            alpha = Math.max(0, 1 - (this.collectProgress - 1));
-        } else {
-            pulse = 2.3;
-            alpha = 0;
-        }
+        const p = this.collectProgress = (this.collectProgress ?? 0) + 0.04;
+        const base = 22 / this.width;
+        const phase = p < 1 ? p : p < 2 ? p - 1 : 0;
+        const pulse = p < 2 ? 1 + base * Math.abs(Math.sin(phase * Math.PI * 2)) : 2.3;
+        const alpha = p < 1 ? 1 : p < 2 ? Math.max(0, 1 - phase) : 0;
         ctx.globalAlpha = alpha;
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.scale(pulse, pulse);
