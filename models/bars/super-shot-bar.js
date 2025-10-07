@@ -54,6 +54,8 @@ class SuperShotBar extends DrawableObject {
      */
     drawBarFill(ctx) {
         const visibleWidth = this.currentBallWidth;
+        if (visibleWidth <= 0) return;
+        ctx.save();
         ctx.beginPath();
         ctx.rect(this.x, this.y, visibleWidth, this.height);
         ctx.clip();

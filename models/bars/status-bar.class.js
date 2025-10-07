@@ -40,8 +40,11 @@ class StatusBar extends DrawableObject {
     draw(ctx) {
         if (this.percentage <= 0) return;
         ctx.save();
+        if (this.img) {
+            ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        }
         this.drawHealthOutline(ctx);
-    this.drawHealthFill(ctx);
+        this.drawHealthFill(ctx);
         ctx.restore();
     }
 
