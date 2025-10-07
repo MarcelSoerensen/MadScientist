@@ -13,6 +13,7 @@ class Character extends CollidableObject {
         right: 110,
         bottom: 110
     };
+    
     world;
     lastAnimation = '';
     currentImage = 0;
@@ -63,19 +64,14 @@ class Character extends CollidableObject {
     enemyHit(enemy) {
         if (this.isInvulnerable || this.deathAnimationPlayed) return;
         this.isInvulnerable = true;
-        const knockback = (enemy && enemy.x < this.x) ? 80 : -80;
-        this.x += knockback;
-        this.sounds ??= new CharacterSounds();
+        this.x += (enemy && enemy.x < this.x) ? 80 : -80;
+        const s = this.sounds ??= new CharacterSounds();
         this.energy = Math.max(0, this.energy - 10);
         this.world?.statusBar?.setPercentage(this.energy);
-        if (this.energy === 0) {
-            this.sounds.deathSound(this);
-            this.playDeathAnimation();
-            return;
-        }
-        this.sounds.hurtSound(this, this.world);
+        if (!this.energy) return s.deathSound(this), this.playDeathAnimation();
+        s.hurtSound(this, this.world);
         this.animHurtOnce();
-        if (this.invulnerableTimeout) clearTimeout(this.invulnerableTimeout);
+        clearTimeout(this.invulnerableTimeout);
         this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, 500);
     }
 
@@ -86,17 +82,13 @@ class Character extends CollidableObject {
         if (this.isInvulnerable || this.deathAnimationPlayed) return;
         this.isInvulnerable = true;
         this.x -= 80;
-        this.sounds ??= new CharacterSounds();
+        const s = this.sounds ??= new CharacterSounds();
         this.energy = Math.max(0, this.energy - 15);
         this.world?.statusBar?.setPercentage(this.energy);
-        if (this.energy === 0) {
-            this.sounds.deathSound(this);
-            this.playDeathAnimation();
-            return;
-        }
-        this.sounds.hurtSound(this, this.world);
+        if (!this.energy) return s.deathSound(this), this.playDeathAnimation();
+        s.hurtSound(this, this.world);
         this.animHurtOnce();
-        if (this.invulnerableTimeout) clearTimeout(this.invulnerableTimeout);
+        clearTimeout(this.invulnerableTimeout);
         this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, 500);
     }
 
@@ -107,21 +99,12 @@ class Character extends CollidableObject {
         if (this.isAnimationLocked) return;
         this.isAnimationLocked = true;
         this.lastAnimation = 'hurt';
-        let frame = 0;
-        const images = this.anim.IMAGES_HURT;
-        const delays = new Array(images.length).fill(30);
-        const animateHurtFrame = () => {
-            if (frame < images.length) {
-                this.img = this.imageCache[images[frame]];
-                let delay = delays[frame];
-                frame++;
-                setTimeout(animateHurtFrame, delay);
-            } else {
-                this.lastAnimation = '';
-                this.isAnimationLocked = false;
-            }
-        };
-        animateHurtFrame();
+        const imgs = this.anim.IMAGES_HURT;
+        let i = 0;
+        const next = () => i < imgs.length
+            ? (this.img = this.imageCache[imgs[i++]], setTimeout(next, 30))
+            : (this.lastAnimation = '', this.isAnimationLocked = false);
+        next();
     }
 
     /**
@@ -158,8 +141,8 @@ class Character extends CollidableObject {
      * Triggers the death animation and sound.
      */
     playDeathAnimation() {
-        if (this._deathAnimationStarted) return;
-        this._deathAnimationStarted = true;
+        if (this.deathAnimationStarted) return;
+        this.deathAnimationStarted = true;
         if (!this.sounds) this.sounds = new CharacterSounds();
         this.sounds.stopStepSound(this);
         this.sounds.deathSound(this);

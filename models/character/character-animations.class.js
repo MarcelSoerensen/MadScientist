@@ -58,17 +58,13 @@ class CharacterAnimations {
      */
     animateJumpUp(character, imageArray) {
         if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
-        if (character.lastAnimation === 'hurt') {
-            setTimeout(() => this.animateJumpUp(character, imageArray), this.JUMP_DELAYS[character.jumpFrame] || 60);
-            return;
-        }
-        character.img = character.imageCache[imageArray[character.jumpFrame]];
-        character.jumpOffsetY = -(character.jumpFrame / character.totalJumpFrames) * character.maxJumpHeight;
-        let delay = this.JUMP_DELAYS[character.jumpFrame] || 60;
-        character.jumpFrame++;
-        if (character.jumpFrame < imageArray.length) {
-            setTimeout(() => this.animateJumpUp(character, imageArray), delay);
-        } else {
+        const frame = character.jumpFrame;
+        const delay = this.JUMP_DELAYS[frame] || 60;
+        if (character.lastAnimation === 'hurt') return setTimeout(() => this.animateJumpUp(character, imageArray), delay);
+        character.img = character.imageCache[imageArray[frame]];
+        character.jumpOffsetY = -(frame / character.totalJumpFrames) * character.maxJumpHeight;
+        if (++character.jumpFrame < imageArray.length) setTimeout(() => this.animateJumpUp(character, imageArray), delay);
+        else {
             character.jumpFrame = imageArray.length - 1;
             this.holdJumpOnTop(character, imageArray);
         }
@@ -79,19 +75,13 @@ class CharacterAnimations {
      */
     holdJumpOnTop(character, imageArray) {
         if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
-        if (character.lastAnimation === 'hurt') {
-            setTimeout(() => this.holdJumpOnTop(character, imageArray), 20);
-            return;
-        }
-        const maxJumpDistance = 150;
-        const distance = Math.abs(character.x - character.startJumpX);
-        const isMoving = character.world.keyboard.RIGHT || character.world.keyboard.LEFT;
+        const retry = () => setTimeout(() => this.holdJumpOnTop(character, imageArray), 20);
+        if (character.lastAnimation === 'hurt') return retry();
+        const keyboard = character.world.keyboard;
         character.jumpOffsetY = -character.maxJumpHeight / 1.5;
-        if (character.world.keyboard.UP && isMoving && distance < maxJumpDistance) {
-            setTimeout(() => this.holdJumpOnTop(character, imageArray), 20);
-        } else {
-            this.animateJumpDown(character, imageArray);
-        }
+        const moving = keyboard.RIGHT || keyboard.LEFT;
+        const withinDistance = Math.abs(character.x - character.startJumpX) < 150;
+        return (keyboard.UP && moving && withinDistance) ? retry() : this.animateJumpDown(character, imageArray);
     }
 
     /**
@@ -99,17 +89,14 @@ class CharacterAnimations {
      */
     animateJumpDown(character, imageArray) {
         if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
-        if (character.lastAnimation === 'hurt') {
-            setTimeout(() => this.animateJumpDown(character, imageArray), this.JUMP_DELAYS_DOWN[imageArray.length - 1 - character.jumpFrame] || 60);
-            return;
-        }
-        let delay = this.JUMP_DELAYS_DOWN[imageArray.length - 1 - character.jumpFrame] || 60;
-        character.img = character.imageCache[imageArray[character.jumpFrame]];
-        character.jumpOffsetY = -(character.jumpFrame / character.totalJumpFrames) * character.maxJumpHeight;
-        character.jumpFrame--;
-        if (character.jumpFrame >= 0) {
-            setTimeout(() => this.animateJumpDown(character, imageArray), delay);
-        } else {
+        const frame = character.jumpFrame;
+        const delayIndex = imageArray.length - 1 - frame;
+        const delay = this.JUMP_DELAYS_DOWN[delayIndex] || 60;
+        if (character.lastAnimation === 'hurt') return setTimeout(() => this.animateJumpDown(character, imageArray), delay);
+        character.img = character.imageCache[imageArray[frame]];
+        character.jumpOffsetY = -(frame / character.totalJumpFrames) * character.maxJumpHeight;
+        if (--character.jumpFrame >= 0) setTimeout(() => this.animateJumpDown(character, imageArray), delay);
+        else {
             character.isAboveGroundActive = false;
             character.currentImage = 0;
             character.lastAnimation = '';
@@ -139,18 +126,11 @@ class CharacterAnimations {
     deathAnimation(character, onComplete) {
         character.lastAnimation = 'dead';
         let frame = 0;
-        const delays = new Array(this.IMAGES_DEAD.length).fill(30);
-        const animateDeathFrame = () => {
-            if (frame < this.IMAGES_DEAD.length) {
-                character.img = character.imageCache[this.IMAGES_DEAD[frame]];
-                let delay = delays[frame];
-                frame++;
-                setTimeout(animateDeathFrame, delay);
-            } else if (typeof onComplete === 'function') {
-                onComplete();
-            }
-        };
-        animateDeathFrame();
+        const frames = this.IMAGES_DEAD;
+        const next = () => frame < frames.length
+            ? (character.img = character.imageCache[frames[frame++]], setTimeout(next, 30))
+            : (typeof onComplete === 'function' && onComplete());
+        next();
         }
 
     /**
@@ -224,19 +204,11 @@ class CharacterAnimations {
      */
     throwBombAnimation(character) {
         let frame = 0;
-        const delays = new Array(this.IMAGES_THROW_BOMB.length).fill(30);
-        const animateBombFrame = () => {
-            if (frame < this.IMAGES_THROW_BOMB.length) {
-                character.img = character.imageCache[this.IMAGES_THROW_BOMB[frame]];
-                let delay = delays[frame];
-                frame++;
-                setTimeout(animateBombFrame, delay);
-            } else {
-                character.lastAnimation = 'throw';
-                character.throwAnimationPlaying = false;
-            }
-        };
-        animateBombFrame();
+        const frames = this.IMAGES_THROW_BOMB;
+        const next = () => frame < frames.length
+            ? (character.img = character.imageCache[frames[frame++]], setTimeout(next, 30))
+            : (character.lastAnimation = 'throw', character.throwAnimationPlaying = false);
+        next();
     }
 
 

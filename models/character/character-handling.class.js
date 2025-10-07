@@ -6,23 +6,41 @@ class CharacterHandling {
      * Starts all character animation intervals.
      */
     animateCharacter(character) {
-        setInterval(() => {
+        this.handleMovementLoop(character);
+        this.handleAnimationLoop(character);
+        this.handleStateLoop(character);
+    }
+
+    /** 
+     * Movement & camera/jump loop 
+     */
+    handleMovementLoop(character) {
+        character.movementInterval = setInterval(() => {
             if (character.deathAnimationPlayed) return;
             if (this.handleLevelCompleteAnimation(character)) return;
             this.handleMovement(character);
             this.handleCamera(character);
             this.handleJumpAnimation(character);
         }, 1000 / 60);
+    }
 
-        setInterval(() => {
+    /** 
+     * Idle / walk animations + sounds 
+     */
+    handleAnimationLoop(character) {
+        character.animationInterval = setInterval(() => {
             this.handleIdleAnimation(character);
             this.handleWalkingAnimation(character);
-            if (!this.sounds) this.sounds = new CharacterSounds();
-            this.sounds.jumpSound(character);
+            (this.sounds ??= new CharacterSounds()).jumpSound(character);
             this.handleStepSound(character);
         }, 60);
+    }
 
-        setInterval(() => {
+    /** 
+     * Death & hurt checks (fast) 
+     */
+    handleStateLoop(character) {
+        character.stateInterval = setInterval(() => {
             this.handleDeathAnimation(character);
             this.handleHurtAnimation(character);
         }, 30);
@@ -33,8 +51,8 @@ class CharacterHandling {
      */
     handleLevelCompleteAnimation(character) {
         if (window.endbossDefeated) {
-            if (!character._isDoubled && !character._isDoublingAnimRunning) {
-                character._isDoublingAnimRunning = true;
+            if (!character.isDoubled && !character.isDoublingAnimRunning) {
+                character.isDoublingAnimRunning = true;
                 const params = this.getLevelCompleteAnimationParams(character);
                 this.startLevelCompleteAnimation(character, params);
             }
@@ -64,27 +82,16 @@ class CharacterHandling {
      * Starts the level complete grow animation.
      */
     startLevelCompleteAnimation(character, params) {
+        const {startHeight, startWidth, startY, startX, targetHeight, targetWidth, targetY, targetX, steps} = params;
         let step = 0;
-        const heightStep = (params.targetHeight - params.startHeight) / params.steps;
-        const widthStep = (params.targetWidth - params.startWidth) / params.steps;
-        const yStep = (params.targetY - params.startY) / params.steps;
-        const xStep = (params.targetX - params.startX) / params.steps;
-        character._doubleAnimInterval = setInterval(() => {
-            if (step < params.steps) {
-                character.height += heightStep;
-                character.width += widthStep;
-                character.y += yStep;
-                character.x += xStep;
-                step++;
-            } else {
-                character.height = params.targetHeight;
-                character.width = params.targetWidth;
-                character.y = params.targetY;
-                character.x = params.targetX;
-                clearInterval(character._doubleAnimInterval);
-                character._isDoubled = true;
-            }
-        }, 40);
+        const heightStep = (targetHeight - startHeight) / steps;
+        const widthStep  = (targetWidth  - startWidth)  / steps;
+        const yStep      = (targetY      - startY)      / steps;
+        const xStep      = (targetX      - startX)      / steps;
+        character.doubleAnimInterval = setInterval(() => step < steps
+            ? (character.height += heightStep, character.width += widthStep, character.y += yStep, character.x += xStep, step++)
+            : (character.height = targetHeight, character.width = targetWidth, character.y = targetY, character.x = targetX,
+               clearInterval(character.doubleAnimInterval), character.isDoubled = true), 40);
     }
 
     /**
@@ -92,28 +99,15 @@ class CharacterHandling {
      */
     handleMovement(character) {
         if (character.lastAnimation === 'hurt' || character.lastAnimation === 'dead') return;
-        let moveSpeed = character.speed;
-        if (character.isAboveGround() && character.world.keyboard.UP) moveSpeed = character.speed * 1.5;
-
-        if (!character._enteredEndbossZone && character.x >= 2600) {
-            character._enteredEndbossZone = true;
-        }
-        let minX = (character._enteredEndbossZone) ? 2600 : 0;
-
-        if (character.world.keyboard.RIGHT && character.x < 3250) {
-            if (typeof character.moveRight === 'function') {
-                character.moveRight(moveSpeed);
-            } else {
-                character.x += moveSpeed;
-            }
+        const keyboard = character.world.keyboard;
+        const moveSpeed = (character.isAboveGround() && keyboard.UP) ? character.speed * 1.5 : character.speed;
+            if (!character.enteredEndbossZone && character.x >= 2600) character.enteredEndbossZone = true;
+            const minX = character.enteredEndbossZone ? 2600 : 0;
+        if (keyboard.RIGHT && character.x < 3250) {
+            typeof character.moveRight === 'function' ? character.moveRight(moveSpeed) : (character.x += moveSpeed);
             character.otherDirection = false;
-        }
-        if (character.world.keyboard.LEFT && character.x > minX) {
-            if (typeof character.moveLeft === 'function') {
-                character.moveLeft(moveSpeed);
-            } else {
-                character.x -= moveSpeed;
-            }
+        } else if (keyboard.LEFT && character.x > minX) {
+            typeof character.moveLeft === 'function' ? character.moveLeft(moveSpeed) : (character.x -= moveSpeed);
             character.otherDirection = true;
         }
         if (character.x < minX) character.x = minX;
