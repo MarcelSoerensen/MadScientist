@@ -55,32 +55,19 @@ class PauseButtonManager {
      * Pause the game and related activities
      */
     static pauseGame() {
-        PauseButtonManager.pauseEndboss();
-        PauseButtonManager.pauseEnemyTwo();
-        PauseButtonManager.pauseEnemyOne();
-        AudioButtonManager.configs.forEach(cfg => {
-            const btn = document.getElementById(cfg.btnId);
-            if (btn) btn.setAttribute('disabled', 'disabled');
-        });
-        const backBtn = document.getElementById('back-btn');
-        if (backBtn) backBtn.setAttribute('disabled', 'disabled');
+        ['pauseEndboss', 'pauseEnemyTwo', 'pauseEnemyOne'].forEach(m => PauseButtonManager[m]());
+        AudioButtonManager.configs.forEach(cfg => document.getElementById(cfg.btnId)?.setAttribute('disabled', 'disabled'));
+        document.getElementById('back-btn')?.setAttribute('disabled', 'disabled');
         window.isPaused = true;
         PauseButtonManager.prevAudioWasOn = !AudioButtonManager.muted;
-        if (PauseButtonManager.prevAudioWasOn) {
-            AudioButtonManager.setMutedAll(true);
-        }
-        if (window.character && typeof window.character.setIdle === 'function') {
-            window.character.setIdle();
-        }
-        // Mobile Controls: merken und ausblenden
+        if (PauseButtonManager.prevAudioWasOn) AudioButtonManager.setMutedAll(true);
+        window.character?.setIdle?.();
         try {
-            const mobileContainer = document.querySelector('.mobile-controls-container');
-            const weaponContainer = document.querySelector('.weapon-controls-container');
-            const anyVisible = mobileContainer?.classList.contains('controls-visible') || weaponContainer?.classList.contains('controls-visible');
+            const mobile = document.querySelector('.mobile-controls-container');
+            const weapon = document.querySelector('.weapon-controls-container');
+            const anyVisible = mobile?.classList.contains('controls-visible') || weapon?.classList.contains('controls-visible');
             PauseButtonManager.prevMobileControlsVisible = anyVisible;
-            if (anyVisible && window.mobileOrientationManager) {
-                window.mobileOrientationManager.setControlsVisibility(false);
-            }
+            if (anyVisible) window.mobileOrientationManager?.setControlsVisibility(false);
         } catch {}
     }
 
@@ -134,24 +121,14 @@ class PauseButtonManager {
      * Resume the game and related activities
      */
     static resumeGame() {
-        PauseButtonManager.resumeEndboss();
-        PauseButtonManager.resumeEnemyTwo();
-        PauseButtonManager.resumeEnemyOne();
-        AudioButtonManager.configs.forEach(cfg => {
-            const btn = document.getElementById(cfg.btnId);
-            if (btn) btn.removeAttribute('disabled');
-        });
-        const backBtn = document.getElementById('back-btn');
-        if (backBtn) backBtn.removeAttribute('disabled');
+        ['resumeEndboss', 'resumeEnemyTwo', 'resumeEnemyOne'].forEach(m => PauseButtonManager[m]());
+        AudioButtonManager.configs.forEach(cfg => document.getElementById(cfg.btnId)?.removeAttribute('disabled'));
+        document.getElementById('back-btn')?.removeAttribute('disabled');
         window.isPaused = false;
-        if (PauseButtonManager.prevAudioWasOn) {
-            AudioButtonManager.setMutedAll(false);
+        if (PauseButtonManager.prevAudioWasOn) AudioButtonManager.setMutedAll(false);
+        if (PauseButtonManager.prevMobileControlsVisible && window.mobileOrientationManager) {
+            try { window.mobileOrientationManager.updateOrientation(); } catch {}
         }
-        try {
-            if (PauseButtonManager.prevMobileControlsVisible && window.mobileOrientationManager) {
-                window.mobileOrientationManager.updateOrientation();
-            }
-        } catch {}
     }
 
     /**

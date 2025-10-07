@@ -2,6 +2,9 @@
  * AudioButtonManager: Steuert die Audio-Button-Funktion als Klasse.
  */
 class AudioButtonManager {
+    /**
+     * Configuration for audio buttons and their associated icons.
+     */
     static configs = [
         {
             btnId: 'audio-toggle-btn',
@@ -14,6 +17,10 @@ class AudioButtonManager {
             offId: 'system-audio-off-icon'
         }
     ];
+
+    /**
+     * Global mute state for audio; defaults to true (muted) if not set.
+     */
     static muted = (typeof window.isAudioMuted !== 'undefined') ? window.isAudioMuted : (window.SoundCacheManager ? SoundCacheManager.muted : true);
     static unlocked = false;
 
@@ -102,5 +109,14 @@ class AudioButtonManager {
     }
 }
 
-document.addEventListener('DOMContentLoaded', AudioButtonManager.init);
+/**
+ * Initialize AudioButtonManager when DOM is ready
+ */
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        AudioButtonManager.init();
+    });
+} else {
+    AudioButtonManager.init();
+}
 window.AudioButtonManager = AudioButtonManager;

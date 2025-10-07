@@ -32,7 +32,6 @@ function updateWinScreenScore(scoreData = null) {
         collectedBalls = window.world.energyBallManager.totalCollectedCount || 0;
         totalBalls = window.world.energyBallManager.maxBalls || 20;
     }
-    
     winTextbox.textContent = `Experiment successful! You collected ${collectedBalls}/${totalBalls} energy balls!`;
 }
 

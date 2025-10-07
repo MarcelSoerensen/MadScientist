@@ -2,16 +2,16 @@
  * Mobile left movement control for Mad Scientist game
  */
 class LeftButton {
+    /**
+     * Initializes the left movement button and its functionality.
+     */
     constructor() {
         this.leftButton = null;
         this.leftButtonContainer = null;
         this.keyboard = null;
-        
         this.isMovingLeft = false;
         this.leftInterval = null;
-        
         this.isGameRunning = false;
-        
         this.init();
     }
 
@@ -27,24 +27,12 @@ class LeftButton {
      * Try to get keyboard reference with multiple attempts
      */
     tryGetKeyboard() {
-        if (window.keyboard) {
-            this.keyboard = window.keyboard;
-            return;
-        }
-
-        const attempts = [100, 500, 1000, 2000, 3000];
-        
-        attempts.forEach(delay => {
-            setTimeout(() => {
-                if (!this.keyboard) {
-                    if (window.keyboard) {
-                        this.keyboard = window.keyboard;
-                    } else if (window.world && window.world.keyboard) {
-                        this.keyboard = window.world.keyboard;
-                    }
-                }
-            }, delay);
-        });
+        const grab = () => {
+            this.keyboard ||= window.keyboard || (window.world && window.world.keyboard) || null;
+            return !!this.keyboard;
+        };
+        if (grab()) return;
+        [100, 500, 1000, 2000, 3000].forEach(ms => setTimeout(grab, ms));
     }
 
     /**
@@ -52,21 +40,9 @@ class LeftButton {
      */
     setupGameStateListeners() {
         const canvas = document.getElementById('canvas');
-        if (canvas) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'attributes' && 
-                        mutation.attributeName === 'style') {
-                        this.checkGameState();
-                    }
-                });
-            });
-
-            observer.observe(canvas, {
-                attributes: true,
-                attributeFilter: ['style']
-            });
-        }
+        if (!canvas) return;
+        new MutationObserver(() => this.checkGameState())
+            .observe(canvas, { attributes: true, attributeFilter: ['style'] });
     }
 
     /**
@@ -77,7 +53,6 @@ class LeftButton {
         const isCanvasVisible = canvas && 
                                canvas.classList.contains('canvas-visible') &&
                                canvas.style.pointerEvents === 'auto';
-
         if (isCanvasVisible && !this.isGameRunning) {
             this.showLeftButton();
             this.isGameRunning = true;
@@ -92,19 +67,15 @@ class LeftButton {
      */
     showLeftButton() {
         if (this.leftButton) return;
-        
         const canvas = document.getElementById('canvas');
         if (!canvas) return;
-        
         this.createLeftButton();
-        
         let mobileControlsContainer = document.querySelector('.mobile-controls-container');
         if (!mobileControlsContainer) {
             mobileControlsContainer = document.createElement('div');
             mobileControlsContainer.className = 'mobile-controls-container';
             canvas.parentElement.appendChild(mobileControlsContainer);
         }
-        
         mobileControlsContainer.insertBefore(this.leftButtonContainer, mobileControlsContainer.firstChild);
     }
 
@@ -114,18 +85,15 @@ class LeftButton {
     createLeftButton() {
         this.leftButtonContainer = document.createElement('div');
         this.leftButtonContainer.className = 'move-button-container move-left-container';
-        
         this.leftButton = document.createElement('button');
         this.leftButton.className = 'move-btn move-left-btn';
         this.leftButton.title = 'Move Left (Hold to move)';
         this.leftButton.setAttribute('aria-label', 'Move left button');
-        
         this.leftButton.innerHTML = `
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                 <path d="M15 18L9 12L15 6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         `;
-        
         this.addLeftTouchListeners();
         this.leftButtonContainer.appendChild(this.leftButton);
     }
@@ -147,46 +115,11 @@ class LeftButton {
      */
     addLeftTouchListeners() {
         if (!this.leftButton) return;
-
-        this.leftButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.add('pressed');
-            this.startMovingLeft();
-        });
-
-        this.leftButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.remove('pressed');
-            this.stopMovingLeft();
-        });
-
-        this.leftButton.addEventListener('touchcancel', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.remove('pressed');
-            this.stopMovingLeft();
-        });
-
-        this.leftButton.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.add('pressed');
-            this.startMovingLeft();
-        });
-
-        this.leftButton.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.leftButton.classList.remove('pressed');
-            this.stopMovingLeft();
-        });
-
-        this.leftButton.addEventListener('mouseleave', (e) => {
-            this.leftButton.classList.remove('pressed');
-            this.stopMovingLeft();
-        });
+        const btn = this.leftButton;
+        const press = e => { e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); this.startMovingLeft(); };
+        const release = e => { e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.stopMovingLeft(); };
+        ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, press, { passive:false }));
+        ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, release, { passive:false }));
     }
 
     /**
@@ -194,29 +127,16 @@ class LeftButton {
      */
     startMovingLeft() {
         if (this.isMovingLeft) return;
-        
-        if (!this.keyboard) {
-            if (window.keyboard) {
-                this.keyboard = window.keyboard;
-            } else if (window.world && window.world.keyboard) {
-                this.keyboard = window.world.keyboard;
-            }
-        }
-        
+        this.keyboard ||= window.keyboard || (window.world && window.world.keyboard) || null;
         this.isMovingLeft = true;
-        this.leftButton.classList.add('moving');
-        
-        if (this.keyboard) {
-            this.keyboard.LEFT = true;
-        } else {
-            this.triggerLeftManually();
-        }
-        
-        this.leftInterval = setInterval(() => {
-            if (this.keyboard) {
-                this.keyboard.LEFT = true;
-            }
-        }, 16);
+        this.leftButton && this.leftButton.classList.add('moving');
+        if (this.keyboard) this.keyboard.LEFT = true; 
+            else 
+                this.triggerLeftManually();
+        if (this.leftInterval) 
+            clearInterval(this.leftInterval);
+        this.leftInterval = setInterval(() => { 
+            if (this.keyboard) this.keyboard.LEFT = true; }, 16);
     }
 
     /**
@@ -224,32 +144,17 @@ class LeftButton {
      */
     stopMovingLeft() {
         if (!this.isMovingLeft) return;
-        
         this.isMovingLeft = false;
-        
-        if (this.leftButton) {
-            this.leftButton.classList.remove('moving');
-        }
-        
-        if (this.leftInterval) {
-            clearInterval(this.leftInterval);
-            this.leftInterval = null;
-        }
-        
+        this.leftButton && this.leftButton.classList.remove('moving');
+        if (this.leftInterval) { clearInterval(this.leftInterval); this.leftInterval = null; }
         if (this.keyboard) {
             this.keyboard.LEFT = false;
         } else {
             try {
-                const keyUpEvent = new KeyboardEvent('keyup', {
-                    key: 'ArrowLeft',
-                    code: 'ArrowLeft',
-                    keyCode: 37,
-                    which: 37,
-                    bubbles: true
-                });
-                window.dispatchEvent(keyUpEvent);
-            } catch (error) {
-            }
+                window.dispatchEvent(new KeyboardEvent('keyup', {
+                    key: 'ArrowLeft', code: 'ArrowLeft', keyCode: 37, which: 37, bubbles: true
+                }));
+            } catch (_) {}
         }
     }
 
@@ -257,21 +162,9 @@ class LeftButton {
      * Fallback method to trigger left movement manually if keyboard is not available
      */
     triggerLeftManually() {
-        try {
-            if (window.world && window.world.character) {
-                const character = window.world.character;
-                
-                if (character && typeof character.moveLeft === 'function') {
-                    character.moveLeft();
-                } else {
-                    this.simulateLeftKeyboardEvent();
-                }
-            } else {
-                this.simulateLeftKeyboardEvent();
-            }
-        } catch (error) {
-            this.simulateLeftKeyboardEvent();
-        }
+        const char = window.world?.character;
+        if (char?.moveLeft) char.moveLeft();
+        else this.simulateLeftKeyboardEvent();
     }
 
     /**
@@ -292,6 +185,9 @@ class LeftButton {
     }
 }
 
+/** 
+ * Initialize LeftButton when DOM is ready
+ */
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.leftButton = new LeftButton();

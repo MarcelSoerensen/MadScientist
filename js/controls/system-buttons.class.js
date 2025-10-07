@@ -81,13 +81,13 @@ class SystemButtonManager {
      * Cleans up all game state, sounds, and animations (used before returning to start screen).
      */
     static cleanupGameState() {
-        const w = window.world;
-        if (w) {
-            w.gameOver = true;
-            w.cleanup?.cleanupIntervals?.();
-            (w.level?.enemies || []).forEach(enemy => {
-                if (enemy instanceof Endboss) w.cleanup?.stopAndRemoveEndboss?.(enemy);
-                else if (enemy.constructor?.name === 'EnemyTwo') w.cleanup?.stopAndRemoveEnemyTwo?.(enemy);
+        const gameWorld = window.world;
+        if (gameWorld) {
+            gameWorld.gameOver = true;
+            gameWorld.cleanup?.cleanupIntervals?.();
+            (gameWorld.level?.enemies || []).forEach(enemy => {
+                if (enemy instanceof Endboss) gameWorld.cleanup?.stopAndRemoveEndboss?.(enemy);
+                else if (enemy.constructor?.name === 'EnemyTwo') gameWorld.cleanup?.stopAndRemoveEnemyTwo?.(enemy);
             });
         }
         window.cleanup?.();
@@ -110,8 +110,18 @@ class SystemButtonManager {
     }
 }
 
-document.addEventListener('DOMContentLoaded', SystemButtonManager.setupSystemButtonManager);
-document.addEventListener('DOMContentLoaded', SystemButtonManager.initSystemButtons);
+/**
+ * Initialize SystemButtonManager when DOM is ready
+ */
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        SystemButtonManager.setupSystemButtonManager();
+        SystemButtonManager.initSystemButtons();
+    });
+} else {
+    SystemButtonManager.setupSystemButtonManager();
+    SystemButtonManager.initSystemButtons();
+}
 
 window.handleBackToStart = SystemButtonManager.handleBackToStart;
 window.hideSystemButtons = SystemButtonManager.hideSystemButtons;

@@ -23,13 +23,8 @@ class MobileOrientationManager {
      * Sets up initial orientation and resize event listener.
      */
     init() {
-        setTimeout(() => {
-            this.updateOrientation();
-        }, 250);
-
-        window.addEventListener('resize', () => {
-            this.updateOrientation();
-        });
+        setTimeout(() => this.updateOrientation(), 250);
+        ['resize','orientationchange'].forEach(ev => window.addEventListener(ev, () => this.updateOrientation()));
     }
 
     /**
@@ -43,7 +38,6 @@ class MobileOrientationManager {
         if (this.isMobile) {
             this.repositionControls();
         } else {
-            // Desktop: niemals Turn-Display-Overlay zeigen
             this.hideControls();
             this.hideOrientationOverlay();
         }
@@ -53,58 +47,31 @@ class MobileOrientationManager {
      * Positions and shows/hides the control containers based on orientation and device type.
      */
     repositionControls() {
-        let mobileContainer = document.querySelector('.mobile-controls-container');
-        let weaponContainer = document.querySelector('.weapon-controls-container');
-        if (!this.isMobile) {
-            this.hideControls();
-            this.hideOrientationOverlay();
-            return;
-        }
-        if (window.PauseButtonManager?.isPaused || window.isPaused) {
-            this.hideControls();
-            return;
-        }
-        if (this.isPortrait) {
-            if (window.innerWidth > 480) {
-                this.setPortraitLayout(mobileContainer, weaponContainer);
-                this.setControlsVisibility(true);
-                this.hideOrientationOverlay();
-            } else {
-                this.showOrientationOverlay();
-                this.hideControls();
-                return;
-            }
-        } else {
-            this.setLandscapeLayout(mobileContainer, weaponContainer);
-            this.setControlsVisibility(true);
-            this.hideOrientationOverlay();
-        }
+        const mobileContainer = document.querySelector('.mobile-controls-container');
+        const weaponContainer = document.querySelector('.weapon-controls-container');
+        if (!this.isMobile || window.PauseButtonManager?.isPaused || window.isPaused)
+            return this.hideControls(), this.hideOrientationOverlay();
+        if (this.isPortrait && window.innerWidth <= 480)
+            return this.showOrientationOverlay(), this.hideControls();
+        (this.isPortrait ? this.setPortraitLayout : this.setLandscapeLayout)(mobileContainer, weaponContainer);
+        this.setControlsVisibility(true);
+        this.hideOrientationOverlay();
     }
 
     /**
      * Positions the control containers below the canvas for portrait mode.
      */
     setPortraitLayout(mobileContainer, weaponContainer) {
-        if (mobileContainer.parentElement !== document.body) {
-            document.body.appendChild(mobileContainer);
-        }
-        if (weaponContainer.parentElement !== document.body) {
-            document.body.appendChild(weaponContainer);
-        }
+        [mobileContainer, weaponContainer].forEach(c => c.parentElement !== document.body && document.body.appendChild(c));
         const canvas = document.querySelector('canvas');
         if (canvas) {
-            const canvasRect = canvas.getBoundingClientRect();
-            const canvasBottom = canvasRect.bottom + window.scrollY;
-            const canvasLeft = canvasRect.left + window.scrollX;
-            const canvasRight = canvasRect.right + window.scrollX;
-            const halfCanvasWidth = Math.max(0, Math.floor(canvasRect.width / 2) - 10);
-            mobileContainer.style.top = `${canvasBottom + 10}px`;
-            mobileContainer.style.left = `${canvasLeft}px`;
-            mobileContainer.style.maxWidth = `${halfCanvasWidth}px`;
-            weaponContainer.style.top = `${canvasBottom + 10}px`;
-            const rightOffset = Math.max(0, window.innerWidth - canvasRight);
-            weaponContainer.style.right = `${rightOffset}px`;
-            weaponContainer.style.maxWidth = `${halfCanvasWidth}px`;
+            const rect = canvas.getBoundingClientRect();
+            const canvasBottom = rect.bottom + window.scrollY;
+            const canvasLeft = rect.left + window.scrollX;
+            const canvasRight = rect.right + window.scrollX;
+            const halfCanvasWidth = Math.max(0, Math.floor(rect.width / 2) - 10);
+            Object.assign(mobileContainer.style, { top: `${canvasBottom + 10}px`, left: `${canvasLeft}px`, maxWidth: `${halfCanvasWidth}px` });
+            Object.assign(weaponContainer.style, { top: `${canvasBottom + 10}px`, right: `${Math.max(0, window.innerWidth - canvasRight)}px`, maxWidth: `${halfCanvasWidth}px` });
         }
         document.body.classList.add('mobile-portrait');
         document.body.classList.remove('mobile-landscape');
@@ -115,19 +82,12 @@ class MobileOrientationManager {
      */
     setLandscapeLayout(mobileContainer, weaponContainer) {
         const canvas = document.querySelector('canvas');
-        if (canvas && canvas.parentElement) {
-            if (mobileContainer.parentElement !== canvas.parentElement) {
-                canvas.parentElement.appendChild(mobileContainer);
-            }
-            if (weaponContainer.parentElement !== canvas.parentElement) {
-                canvas.parentElement.appendChild(weaponContainer);
-            }
+        if (canvas?.parentElement) {
+            [mobileContainer, weaponContainer].forEach(c => c.parentElement !== canvas.parentElement && canvas.parentElement.appendChild(c));
         }
         ['top','left','right','maxWidth'].forEach(prop => {
-            if (mobileContainer && mobileContainer.style[prop] !== undefined) mobileContainer.style[prop] = '';
-            if (weaponContainer && weaponContainer.style[prop] !== undefined) weaponContainer.style[prop] = '';
+            [mobileContainer, weaponContainer].forEach(c => c?.style[prop] !== undefined && (c.style[prop] = ''));
         });
-
         document.body.classList.add('mobile-landscape');
         document.body.classList.remove('mobile-portrait');
     }
@@ -184,8 +144,13 @@ class MobileOrientationManager {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof window !== 'undefined') {
+/**
+ * Initialize MobileOrientationManager when DOM is ready
+ */
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
         window.mobileOrientationManager = new MobileOrientationManager();
-    }
-});
+    });
+} else {
+    window.mobileOrientationManager = new MobileOrientationManager();
+}

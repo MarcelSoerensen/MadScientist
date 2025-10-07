@@ -2,6 +2,9 @@
  * Touch Jump Button for Mobile Devices
  */
 class JumpButton {
+    /**
+     * Initializes the jump button and its functionality.
+     */
     constructor() {
         this.jumpButton = null;
         this.jumpButtonContainer = null;
@@ -9,7 +12,6 @@ class JumpButton {
         this.jumpInterval = null;
         this.keyboard = null;
         this.isGameRunning = false;
-        
         this.init();
     }
 
@@ -18,7 +20,6 @@ class JumpButton {
      */
     init() {
         this.tryGetKeyboard();
-        
         this.setupGameStateListeners();
     }
 
@@ -26,24 +27,12 @@ class JumpButton {
      * Try to get keyboard reference with multiple attempts
      */
     tryGetKeyboard() {
-        if (window.keyboard) {
-            this.keyboard = window.keyboard;
-            return;
-        }
-
-        const attempts = [100, 500, 1000, 2000, 3000];
-        
-        attempts.forEach(delay => {
-            setTimeout(() => {
-                if (!this.keyboard) {
-                    if (window.keyboard) {
-                        this.keyboard = window.keyboard;
-                    } else if (window.world && window.world.keyboard) {
-                        this.keyboard = window.world.keyboard;
-                    }
-                }
-            }, delay);
-        });
+        const grab = () => {
+            this.keyboard ||= window.keyboard || (window.world && window.world.keyboard) || null;
+            return !!this.keyboard;
+        };
+        if (grab()) return;
+        [100, 500, 1000, 2000, 3000].forEach(ms => setTimeout(grab, ms));
     }
 
     /**
@@ -51,21 +40,9 @@ class JumpButton {
      */
     setupGameStateListeners() {
         const canvas = document.getElementById('canvas');
-        if (canvas) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'attributes' && 
-                        mutation.attributeName === 'style') {
-                        this.checkGameState();
-                    }
-                });
-            });
-            
-            observer.observe(canvas, {
-                attributes: true,
-                attributeFilter: ['style']
-            });
-        }
+        if (!canvas) return;
+        new MutationObserver(() => this.checkGameState())
+            .observe(canvas, { attributes: true, attributeFilter: ['style'] });
     }
 
     /**
@@ -76,7 +53,6 @@ class JumpButton {
         const isCanvasVisible = canvas && 
                                canvas.classList.contains('canvas-visible') &&
                                canvas.style.pointerEvents === 'auto';
-        
         if (isCanvasVisible && !this.isGameRunning) {
             this.showJumpButton();
             this.isGameRunning = true;
@@ -91,19 +67,15 @@ class JumpButton {
      */
     showJumpButton() {
         if (this.jumpButton) return;
-        
         const canvas = document.getElementById('canvas');
         if (!canvas) return;
-        
         this.createJumpButton();
-        
         let mobileControlsContainer = document.querySelector('.mobile-controls-container');
         if (!mobileControlsContainer) {
             mobileControlsContainer = document.createElement('div');
             mobileControlsContainer.className = 'mobile-controls-container';
             canvas.parentElement.appendChild(mobileControlsContainer);
         }
-        
         mobileControlsContainer.appendChild(this.jumpButtonContainer);
     }
 
@@ -113,18 +85,15 @@ class JumpButton {
     createJumpButton() {
         this.jumpButtonContainer = document.createElement('div');
         this.jumpButtonContainer.className = 'jump-button-container';
-        
         this.jumpButton = document.createElement('button');
         this.jumpButton.className = 'jump-btn';
         this.jumpButton.title = 'Jump (Hold to jump longer)';
         this.jumpButton.setAttribute('aria-label', 'Jump button');
-        
         this.jumpButton.innerHTML = `
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                 <path d="M18 15L12 9L6 15" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         `;
-        
         this.addTouchListeners();
         this.jumpButtonContainer.appendChild(this.jumpButton);
     }
@@ -138,8 +107,6 @@ class JumpButton {
             this.jumpButtonContainer = null;
             this.jumpButton = null;
             this.stopJumping();
-            
-            // Remove mobile controls container if it's empty
             const mobileControlsContainer = document.querySelector('.mobile-controls-container');
             if (mobileControlsContainer && mobileControlsContainer.children.length === 0) {
                 mobileControlsContainer.parentElement.removeChild(mobileControlsContainer);
@@ -152,46 +119,11 @@ class JumpButton {
      */
     addTouchListeners() {
         if (!this.jumpButton) return;
-
-        this.jumpButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.jumpButton.classList.add('pressed');
-            this.startJumping();
-        });
-
-        this.jumpButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.jumpButton.classList.remove('pressed');
-            this.stopJumping();
-        });
-
-        this.jumpButton.addEventListener('touchcancel', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.jumpButton.classList.remove('pressed');
-            this.stopJumping();
-        });
-
-        this.jumpButton.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.jumpButton.classList.add('pressed');
-            this.startJumping();
-        });
-
-        this.jumpButton.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.jumpButton.classList.remove('pressed');
-            this.stopJumping();
-        });
-
-        this.jumpButton.addEventListener('mouseleave', (e) => {
-            this.jumpButton.classList.remove('pressed');
-            this.stopJumping();
-        });
+        const btn = this.jumpButton;
+        const press = e => { e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); this.startJumping(); };
+        const release = e => { e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.stopJumping(); };
+        ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, press, { passive:false }));
+        ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, release, { passive:false }));
     }
 
     /**
@@ -199,29 +131,16 @@ class JumpButton {
      */
     startJumping() {
         if (this.isJumping) return;
-        
-        if (!this.keyboard) {
-            if (window.keyboard) {
-                this.keyboard = window.keyboard;
-            } else if (window.world && window.world.keyboard) {
-                this.keyboard = window.world.keyboard;
-            }
-        }
-        
+        this.keyboard ||= window.keyboard || (window.world && window.world.keyboard) || null;
         this.isJumping = true;
-        this.jumpButton.classList.add('jumping');
-        
-        if (this.keyboard) {
-            this.keyboard.UP = true;
-        } else {
-            this.triggerJumpManually();
-        }
-        
-        this.jumpInterval = setInterval(() => {
-            if (this.keyboard) {
-                this.keyboard.UP = true;
-            }
-        }, 16);
+        this.jumpButton && this.jumpButton.classList.add('jumping');
+        if (this.keyboard) this.keyboard.UP = true; 
+            else 
+                this.triggerJumpManually();
+        if (this.jumpInterval) 
+            clearInterval(this.jumpInterval);
+        this.jumpInterval = setInterval(() => { 
+            if (this.keyboard) this.keyboard.UP = true; }, 16);
     }
 
     /**
@@ -229,32 +148,17 @@ class JumpButton {
      */
     stopJumping() {
         if (!this.isJumping) return;
-        
         this.isJumping = false;
-        
-        if (this.jumpButton) {
-            this.jumpButton.classList.remove('jumping');
-        }
-        
-        if (this.jumpInterval) {
-            clearInterval(this.jumpInterval);
-            this.jumpInterval = null;
-        }
-        
+        this.jumpButton && this.jumpButton.classList.remove('jumping');
+        if (this.jumpInterval) { clearInterval(this.jumpInterval); this.jumpInterval = null; }
         if (this.keyboard) {
             this.keyboard.UP = false;
         } else {
             try {
-                const keyUpEvent = new KeyboardEvent('keyup', {
-                    key: 'ArrowUp',
-                    code: 'ArrowUp',
-                    keyCode: 38,
-                    which: 38,
-                    bubbles: true
-                });
-                window.dispatchEvent(keyUpEvent);
-            } catch (error) {
-            }
+                window.dispatchEvent(new KeyboardEvent('keyup', {
+                    key: 'ArrowUp', code: 'ArrowUp', keyCode: 38, which: 38, bubbles: true
+                }));
+            } catch (_) {}
         }
     }
 
@@ -262,21 +166,12 @@ class JumpButton {
      * Fallback method to trigger jump manually if keyboard is not available
      */
     triggerJumpManually() {
-        try {
-            if (window.world && window.world.character) {
-                const character = window.world.character;
-                
-                if (character && !character.isAboveGround() && typeof character.playJumpAnimation === 'function') {
-                    character.isAboveGroundActive = true;
-                    character.currentImage = 0;
-                    character.playJumpAnimation();
-                } else {
-                    this.simulateKeyboardEvent();
-                }
-            } else {
-                this.simulateKeyboardEvent();
-            }
-        } catch (error) {
+        const character = window.world?.character;
+        if (character && !character.isAboveGround() && typeof character.playJumpAnimation === 'function') {
+            character.isAboveGroundActive = true;
+            character.currentImage = 0;
+            character.playJumpAnimation();
+        } else {
             this.simulateKeyboardEvent();
         }
     }
@@ -299,6 +194,10 @@ class JumpButton {
     }
 }
 
+
+/** 
+ * Initialize JumpButton when DOM is ready
+ */
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.jumpButton = new JumpButton();

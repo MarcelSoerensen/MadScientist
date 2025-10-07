@@ -2,20 +2,19 @@
  * Mobile laser weapon control for Mad Scientist game
  */
 class LaserButton {
+    /**
+     * Initializes the laser weapon button and its functionality.
+     */
     constructor() {
         this.laserButton = null;
         this.laserButtonContainer = null;
         this.keyboard = null;
-        
         this.isUsingLaser = false;
         this.laserInterval = null;
-        
         this.lastTapTime = 0;
         this.doubleTapDelay = 300;
         this.singleTapTimeout = null;
-        
         this.isGameRunning = false;
-        
         this.init();
     }
 
@@ -31,24 +30,12 @@ class LaserButton {
      * Try to get keyboard reference with multiple attempts
      */
     tryGetKeyboard() {
-        if (window.keyboard) {
-            this.keyboard = window.keyboard;
-            return;
-        }
-
-        const attempts = [100, 500, 1000, 2000, 3000];
-        
-        attempts.forEach(delay => {
-            setTimeout(() => {
-                if (!this.keyboard) {
-                    if (window.keyboard) {
-                        this.keyboard = window.keyboard;
-                    } else if (window.world && window.world.keyboard) {
-                        this.keyboard = window.world.keyboard;
-                    }
-                }
-            }, delay);
-        });
+        const grab = () => {
+            this.keyboard ||= window.keyboard || (window.world && window.world.keyboard) || null;
+            return !!this.keyboard;
+        };
+        if (grab()) return;
+        [100, 500, 1000, 2000, 3000].forEach(ms => setTimeout(grab, ms));
     }
 
     /**
@@ -56,21 +43,9 @@ class LaserButton {
      */
     setupGameStateListeners() {
         const canvas = document.getElementById('canvas');
-        if (canvas) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'attributes' && 
-                        mutation.attributeName === 'style') {
-                        this.checkGameState();
-                    }
-                });
-            });
-
-            observer.observe(canvas, {
-                attributes: true,
-                attributeFilter: ['style']
-            });
-        }
+        if (!canvas) return;
+        new MutationObserver(() => this.checkGameState())
+            .observe(canvas, { attributes: true, attributeFilter: ['style'] });
     }
 
     /**
@@ -81,7 +56,6 @@ class LaserButton {
         const isCanvasVisible = canvas && 
                                canvas.classList.contains('canvas-visible') &&
                                canvas.style.pointerEvents === 'auto';
-
         if (isCanvasVisible && !this.isGameRunning) {
             this.showLaserButton();
             this.isGameRunning = true;
@@ -96,19 +70,15 @@ class LaserButton {
      */
     showLaserButton() {
         if (this.laserButton) return;
-        
         const canvas = document.getElementById('canvas');
         if (!canvas) return;
-        
         this.createLaserButton();
-        
         let weaponControlsContainer = document.querySelector('.weapon-controls-container');
         if (!weaponControlsContainer) {
             weaponControlsContainer = document.createElement('div');
             weaponControlsContainer.className = 'weapon-controls-container';
             canvas.parentElement.appendChild(weaponControlsContainer);
         }
-        
         weaponControlsContainer.insertBefore(this.laserButtonContainer, weaponControlsContainer.firstChild);
     }
 
@@ -118,70 +88,33 @@ class LaserButton {
     createLaserButton() {
         this.laserButtonContainer = document.createElement('div');
         this.laserButtonContainer.className = 'weapon-button-container laser-container';
-        
         this.laserButton = document.createElement('button');
         this.laserButton.className = 'weapon-btn laser-btn';
         this.laserButton.title = 'Fire Laser (Hold to fire)';
         this.laserButton.setAttribute('aria-label', 'Fire laser button');
-        
         this.laserButton.innerHTML = `
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                 <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         `;
-        
         setInterval(() => {
             this.updateSuperlaserVisuals();
         }, 500);
-        
-        this.laserButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.laserButton.classList.add('pressed');
-        }, { passive: false });
-
-        this.laserButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.laserButton.classList.remove('pressed');
-            this.handleTap();
-        }, { passive: false });
-
-        this.laserButton.addEventListener('touchcancel', (e) => {
-            e.preventDefault();
-            this.laserButton.classList.remove('pressed');
-            if (this.singleTapTimeout) {
-                clearTimeout(this.singleTapTimeout);
-                this.singleTapTimeout = null;
-            }
-        }, { passive: false });
-
-        this.laserButton.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.laserButton.classList.add('pressed');
-        });
-
-        this.laserButton.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.laserButton.classList.remove('pressed');
-            this.handleTap();
-        });
-
-        this.laserButton.addEventListener('mouseleave', (e) => {
-            this.laserButton.classList.remove('pressed');
-            if (this.singleTapTimeout) {
-                clearTimeout(this.singleTapTimeout);
-                this.singleTapTimeout = null;
-            }
-        });
-
-        this.laserButton.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
-        
+        this.addLaserTouchListeners();
         this.laserButtonContainer.appendChild(this.laserButton);
+    }
+
+    /**
+     * Add touch/mouse event listeners for laser button
+     */
+    addLaserTouchListeners() {
+        if (!this.laserButton) return;
+        const btn = this.laserButton;
+        const press = e => { e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); };
+        const release = e => { e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.handleTap(); };
+        ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, press, { passive:false }));
+        ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, release, { passive:false }));
+        btn.addEventListener('contextmenu', e => e.preventDefault());
     }
 
     /**
@@ -189,29 +122,14 @@ class LaserButton {
      */
     updateSuperlaserVisuals() {
         if (!this.laserButton) return;
-        
-        try {
-            let worldRef = null;
-            
-            if (typeof world !== 'undefined') {
-                worldRef = world;
-            } else if (window.world) {
-                worldRef = window.world;
-            }
-            
-            if (worldRef && worldRef.superShotBar) {
-                const superShots = worldRef.superShotBar.getSuperShots();
-                
-                if (superShots > 0) {
-                    this.laserButton.classList.add('superlaser-ready');
-                    this.laserButton.title = `Fire Laser (Tap=Normal, Double-tap=SUPERLASER! ${superShots} available)`;
-                } else {
-                    this.laserButton.classList.remove('superlaser-ready');
-                    this.laserButton.title = 'Fire Laser (Tap=Normal, collect 3 energy balls for superlaser)';
-                }
-            }
-        } catch (error) {
-            
+        const worldRef = window.world;
+        const superShots = worldRef?.superShotBar?.getSuperShots?.();
+        if (superShots > 0) {
+            this.laserButton.classList.add('superlaser-ready');
+            this.laserButton.title = `Fire Laser (Tap=Normal, Double-tap=SUPERLASER! ${superShots} available)`;
+        } else {
+            this.laserButton.classList.remove('superlaser-ready');
+            this.laserButton.title = 'Fire Laser (Tap=Normal, collect 3 energy balls for superlaser)';
         }
     }
 
@@ -233,7 +151,6 @@ class LaserButton {
     handleTap() {
         const currentTime = Date.now();
         const timeSinceLastTap = currentTime - this.lastTapTime;
-
         if (timeSinceLastTap < this.doubleTapDelay && this.singleTapTimeout) {
             clearTimeout(this.singleTapTimeout);
             this.singleTapTimeout = null;
@@ -244,7 +161,6 @@ class LaserButton {
                 this.singleTapTimeout = null;
             }, this.doubleTapDelay);
         }
-        
         this.lastTapTime = currentTime;
     }
 
@@ -252,23 +168,12 @@ class LaserButton {
      * Fire normal laser
      */
     fireLaser() {
-        if (!this.keyboard) {
-            if (typeof keyboard !== 'undefined') {
-                this.keyboard = keyboard;
-            } else if (window.keyboard) {
-                this.keyboard = window.keyboard;
-            } else if (window.world && window.world.keyboard) {
-                this.keyboard = window.world.keyboard;
-            }
-        }
-        
+        this.keyboard ||= window.keyboard || (window.world && window.world.keyboard) || null;
         if (!this.keyboard) {
             this.triggerLaserManually();
             return;
         }
-        
         this.keyboard.Y = true;
-        
         setTimeout(() => {
             if (this.keyboard) {
                 this.keyboard.Y = false;
@@ -280,23 +185,12 @@ class LaserButton {
      * Fire superlaser
      */
     fireSuperlaser() {
-        if (!this.keyboard) {
-            if (typeof keyboard !== 'undefined') {
-                this.keyboard = keyboard;
-            } else if (window.keyboard) {
-                this.keyboard = window.keyboard;
-            } else if (window.world && window.world.keyboard) {
-                this.keyboard = window.world.keyboard;
-            }
-        }
-        
+        this.keyboard ||= window.keyboard || (window.world && window.world.keyboard) || null;
         if (!this.keyboard) {
             this.triggerSuperlaserManually();
             return;
         }
-        
         this.keyboard.S = true;
-        
         setTimeout(() => {
             if (this.keyboard) {
                 this.keyboard.S = false;
@@ -308,26 +202,14 @@ class LaserButton {
      * Fallback method to trigger laser manually if keyboard is not available
      */
     triggerLaserManually() {
-        try {
-            let worldRef = null;
-            
-            if (typeof world !== 'undefined') {
-                worldRef = world;
-            } else if (window.world) {
-                worldRef = window.world;
-            }
-            
-            if (worldRef && worldRef.worldCheck) {
-                const worldCheck = worldRef.worldCheck;
-                
-                if (worldCheck && typeof worldCheck.createLaserBeam === 'function' && 
-                    worldRef.energyBallManager?.collectedCount > 0 && 
-                    worldRef.laserBeams?.length === 0) {
-                    const laser = worldCheck.createLaserBeam();
-                    worldCheck.activateLaserBeam(laser);
-                }
-            }
-        } catch (error) {
+        const worldRef = window.world ?? (typeof world !== 'undefined' ? world : null);
+        const worldCheck = worldRef?.worldCheck;
+        if (
+            typeof worldCheck?.createLaserBeam === 'function' &&
+            worldRef?.energyBallManager?.collectedCount > 0 &&
+            worldRef?.laserBeams?.length === 0
+        ) {
+            worldCheck.activateLaserBeam(worldCheck.createLaserBeam());
         }
     }
 
@@ -335,29 +217,19 @@ class LaserButton {
      * Fallback method to trigger superlaser manually if keyboard is not available
      */
     triggerSuperlaserManually() {
-        try {
-            let worldRef = null;
-            
-            if (typeof world !== 'undefined') {
-                worldRef = world;
-            } else if (window.world) {
-                worldRef = window.world;
-            }
-            
-            if (worldRef && worldRef.worldCheck) {
-                const worldCheck = worldRef.worldCheck;
-                
-                if (worldCheck && typeof worldCheck.createSuperlaserBeam === 'function' && 
-                    worldRef.energyBallManager?.collectedCount >= 3 && 
-                    worldRef.laserBeams?.length === 0) {
-                    const superlaser = worldCheck.createSuperlaserBeam();
-                    worldCheck.activateSuperlaser(superlaser);
-                } else if (worldCheck && typeof worldCheck.triggerSuperlaser === 'function' && 
-                          worldRef.energyBallManager?.collectedCount >= 3) {
-                    worldCheck.triggerSuperlaser();
-                }
-            }
-        } catch (error) {
+        const worldRef = window.world ?? (typeof world !== 'undefined' ? world : null);
+        const worldCheck = worldRef?.worldCheck;
+        if (
+            typeof worldCheck?.createSuperlaserBeam === 'function' &&
+            worldRef?.energyBallManager?.collectedCount >= 3 &&
+            worldRef?.laserBeams?.length === 0
+        ) {
+            worldCheck.activateSuperlaser(worldCheck.createSuperlaserBeam());
+        } else if (
+            typeof worldCheck?.triggerSuperlaser === 'function' &&
+            worldRef?.energyBallManager?.collectedCount >= 3
+        ) {
+            worldCheck.triggerSuperlaser();
         }
     }
 
@@ -366,12 +238,10 @@ class LaserButton {
      */
     stopUsingLaser() {
         this.isUsingLaser = false;
-        
         if (this.laserInterval) {
             clearInterval(this.laserInterval);
             this.laserInterval = null;
         }
-        
         if (this.singleTapTimeout) {
             clearTimeout(this.singleTapTimeout);
             this.singleTapTimeout = null;
@@ -380,8 +250,13 @@ class LaserButton {
 
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof window !== 'undefined') {
+/**
+ * Initialize LaserButton when DOM is ready
+ */
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
         window.laserButton = new LaserButton();
-    }
-});
+    });
+} else {
+    window.laserButton = new LaserButton();
+}
