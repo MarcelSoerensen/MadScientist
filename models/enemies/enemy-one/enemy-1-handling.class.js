@@ -14,22 +14,12 @@ class EnemyOneHandling {
 	 */
 	startEnemyOneAnimationIntervals(enemy) {
 		if (enemy.animationStarted) return;
-		enemy.animationStarted = true;
-		enemy.moveInterval = setInterval(() => {
-			enemy.moveLeft();
-		}, 1000 / 60);
-		enemy.deathFrame = 0;
-		enemy.deathDone = false;
+		Object.assign(enemy, { animationStarted: true, deathFrame: 0, deathDone: false });
+		enemy.moveInterval = setInterval(enemy.moveLeft.bind(enemy), 1000 / 60);
 		enemy.animInterval = setInterval(() => {
-			if (enemy.laserHitCount >= 3 && !enemy.isElectricHurt) {
-				this.handleDeathAnimationFrame(enemy);
-				return;
-			}
-			if (enemy.isElectricHurt) {
-				enemy.playAnimation(enemy.animations.IMAGES_GET_ELECTRIC);
-				return;
-			}
-			enemy.playAnimation(enemy.animations.IMAGES_WALKING);
+			if (enemy.laserHitCount >= 3 && !enemy.isElectricHurt) return this.handleDeathAnimationFrame(enemy);
+			const images = enemy.isElectricHurt ? enemy.animations.IMAGES_GET_ELECTRIC : enemy.animations.IMAGES_WALKING;
+			enemy.playAnimation(images);
 		}, 50);
 	}
 
@@ -78,7 +68,7 @@ class EnemyOneHandling {
 	 */
 	handleDeathAnimation(enemy) {
 		this.handleDeathStatus(enemy);
-	enemy.sounds?.deathSoundCreation?.(enemy);
+		enemy.sounds?.deathSoundCreation?.(enemy);
 		let deathFrame = 0;
 		enemy.deathAnimInterval = setInterval(() => {
 			if (deathFrame < enemy.animations.IMAGES_DEATH.length) {
