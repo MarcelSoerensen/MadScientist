@@ -4,8 +4,7 @@
 class Level {
     enemies;
     backgroundObjects;
-    level_end_x = (1952*2-400 + 80); // Level-Ende = rechtes Ende des letzten Backgrounds
-
+    level_end_x = (1952*2-400 + 80);
     /**
      * Creates a new Level instance
      */

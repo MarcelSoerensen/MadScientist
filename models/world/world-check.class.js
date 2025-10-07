@@ -28,34 +28,40 @@ class WorldCheck {
     checkFirstEnemyDistance() {
         const w = this.world;
         if (window.isPaused || (window.PauseButtonManager && window.PauseButtonManager.isPaused)) return;
-        (w.level?.enemies ?? []).forEach(enemy => {
+        const enemies = w.level?.enemies || [];
+        const character = w.character;
+        if (!character) return;
+        for (const enemy of enemies) {
             const activateAt = enemy._activateAt || 500;
-            if (!enemy._waitingForCharacter || w.character.x < activateAt) return;
-            if (enemy instanceof EnemyOne) {
-                const minViewportDistance = 650; 
-                const canvasWidth = w.canvas?.width || 720;
-                const cameraLeft = charX - canvasWidth * 0.5; 
-                const cameraRight = charX + canvasWidth * 0.5;
-                const tooClose = Math.abs(enemy.x - charX) < minViewportDistance || (enemy.x > cameraLeft && enemy.x < cameraRight);
-                if (tooClose && enemy.getEnemyOneSpawnRange && enemy.calculateEnemyOnePosition) {
-                    const { minX, maxX } = enemy.getEnemyOneSpawnRange(enemy._activateAt);
-                    let newX = enemy.calculateEnemyOnePosition(minX, maxX);
-                    if (Math.abs(newX - charX) < minViewportDistance) {
-                        newX = charX + minViewportDistance + 100; 
-                    }
-                    enemy.x = newX;
-                }
-            }
+            if (!enemy._waitingForCharacter || character.x < activateAt) continue;
+            if (enemy instanceof EnemyOne) this.checkEnemyOneSpawn(enemy, character);
             enemy.visible = true;
             enemy._waitingForCharacter = false;
             if (!enemy.moveInterval && !enemy.animInterval) {
-                if (enemy instanceof EnemyOne && enemy.handler?.animateEnemyOne) {
-                    enemy.handler.animateEnemyOne(enemy);
-                } else if (typeof enemy.animate === 'function') {
-                    enemy.animate();
-                }
+                if (enemy instanceof EnemyOne && enemy.handler?.animateEnemyOne) enemy.handler.animateEnemyOne(enemy);
+                else if (typeof enemy.animate === 'function') enemy.animate();
             }
-        });
+        }
+    }
+
+    /**
+     * Repositions EnemyOne if too close to character or in viewport.
+     */
+    checkEnemyOneSpawn(enemy, character) {
+        const w = this.world;
+        const minViewportDistance = 650;
+        const canvasWidth = w.canvas?.width || 720;
+        const half = canvasWidth * 0.5;
+        const charX = character.x;
+        const cameraLeft = charX - half;
+        const cameraRight = charX + half;
+        const inViewport = enemy.x > cameraLeft && enemy.x < cameraRight;
+        const tooClose = Math.abs(enemy.x - charX) < minViewportDistance || inViewport;
+        if (!tooClose || !enemy.getEnemyOneSpawnRange || !enemy.calculateEnemyOnePosition) return;
+        const { minX, maxX } = enemy.getEnemyOneSpawnRange(enemy._activateAt);
+        let newX = enemy.calculateEnemyOnePosition(minX, maxX);
+        if (Math.abs(newX - charX) < minViewportDistance) newX = charX + minViewportDistance + 100;
+        enemy.x = newX;
     }
 
     /**

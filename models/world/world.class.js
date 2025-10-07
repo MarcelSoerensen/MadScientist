@@ -49,7 +49,7 @@ class World {
         }
         this.check = new WorldCheck(this);
         this.worldDraw = new WorldDraw(this);
-    this.cleanup = new WorldCleanup(this);
+        this.cleanup = new WorldCleanup(this);
         this.worldDraw.draw();
         this.run();
     }
@@ -79,7 +79,6 @@ class World {
         this.gameIntervals.push(setInterval(() => {
             this.check.checkCollisions();
         }, 200));
-        
         this.gameIntervals.push(setInterval(() => {
             this.check.checkThrowableObjects();
             this.check.checkLaserBeams();
@@ -87,7 +86,6 @@ class World {
             this.check.checkFirstEnemyDistance();
             this.check.checkEndbossXPositionSound();
         }, 1000 / 60));
-        
         this.gameIntervals.push(setInterval(() => {
             this.check.checkStickCollision();
         }, 50));
@@ -113,25 +111,30 @@ class World {
      * Adds a single movable object to the map with proper flipping and collision frames.
      */
     addToMap(movableObject) {
-        if (
-            movableObject.img &&
-            movableObject.img.complete &&
-            movableObject.img.naturalWidth > 0
-        ) {
-            if (movableObject.otherDirection) {
-                this.flipImage(movableObject);
-            }
-            movableObject.draw(this.ctx);
-            movableObject.drawFrame(this.ctx);
-            if (movableObject instanceof Endboss) {
-                movableObject.drawCollisionFrameEndboss(this.ctx);
-                movableObject.drawCollisionFrameStick(this.ctx);
-            } else if (movableObject.drawCollisionFrame && movableObject.collidable !== false) {
-                movableObject.drawCollisionFrame(this.ctx);
-            }
-            if (movableObject.otherDirection) {
-                this.flipImageBack(movableObject);
-            }
+        const img = movableObject.img;
+        if (!img || !img.complete || img.naturalWidth <= 0) return; // Bild nicht bereit => nichts zeichnen
+
+        const flipped = !!movableObject.otherDirection;
+        if (flipped) this.flipImage(movableObject);
+
+        movableObject.draw(this.ctx);
+        movableObject.drawFrame?.(this.ctx);
+        this.drawCollisionFrames(movableObject);
+
+        if (flipped) this.flipImageBack(movableObject);
+    }
+
+    /**
+     * Draws collision frame for Endboss if applicable.
+     */
+    drawCollisionFrames(movableObject) {
+        if (movableObject instanceof Endboss) {
+            movableObject.drawCollisionFrameEndboss?.(this.ctx);
+            movableObject.drawCollisionFrameStick?.(this.ctx);
+            return;
+        }
+        if (movableObject.drawCollisionFrame && movableObject.collidable !== false) {
+            movableObject.drawCollisionFrame(this.ctx);
         }
     }
 
