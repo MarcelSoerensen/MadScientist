@@ -9,16 +9,15 @@ class EndbossSounds {
         if (!endboss.world?.character) return;
         const charX = endboss.world.character.x;
         const isMuted = window.SoundCacheManager ? SoundCacheManager.muted : false;
-        if (charX >= 2300) {
-            this.pauseBackgroundMusic();
-            this.playEndbossMelody(isMuted);
-            this.playCounterSound(isMuted);
-            if (!isMuted && charX < 2300 && charX > 2250)
-                this.fadeOutXPositionSound(2250, 2300, charX);
-        } else {
+        const THRESHOLD = 2300;
+        if (charX < THRESHOLD) {
             this.pauseEndbossMelody();
             this.stopXPositionSound();
+            return;
         }
+        this.pauseBackgroundMusic();
+        this.playEndbossMelody(isMuted);
+        this.playCounterSound(isMuted);
     }
 
     /**
@@ -102,18 +101,14 @@ class EndbossSounds {
      */
     walkingLeftSoundCreation(endboss) {
         const isMuted = window.SoundCacheManager ? SoundCacheManager.muted : false;
-        if (!endboss.stepSoundAudio) {
-            endboss.stepSoundAudio = SoundCacheManager.getAudio('sounds/endboss-steps-left.mp3');
-            endboss.stepSoundAudio.playbackRate = 1.5;
-            endboss.stepSoundAudio.currentTime = 0.5;
-            if (window.activeSounds && !window.activeSounds.includes(endboss.stepSoundAudio)) {
-                window.activeSounds.push(endboss.stepSoundAudio);
-            }
+        let audio = endboss.stepSoundAudio;
+        if (!audio) {
+            audio = endboss.stepSoundAudio = SoundCacheManager.getAudio('sounds/endboss-steps-left.mp3');
+            Object.assign(audio, { playbackRate: 1.5, currentTime: 0.5 });
+            if (window.activeSounds && !window.activeSounds.includes(audio)) window.activeSounds.push(audio);
         }
-        endboss.stepSoundAudio.volume = isMuted ? 0 : 0.4;
-        if (endboss.stepSoundAudio.paused) {
-            endboss.stepSoundAudio.play();
-        }
+        audio.volume = isMuted ? 0 : 0.4;
+        if (audio.paused) audio.play();
         endboss.isStepSoundPlaying = true;
     }
     
@@ -154,18 +149,14 @@ class EndbossSounds {
      */
     walkingRightSoundCreation(endboss) {
         const isMuted = window.SoundCacheManager ? SoundCacheManager.muted : false;
-        if (!endboss.stepSoundAudioRight) {
-            endboss.stepSoundAudioRight = SoundCacheManager.getAudio('sounds/endboss-steps-right.mp3');
-            endboss.stepSoundAudioRight.playbackRate = 1.5;
-            endboss.stepSoundAudioRight.currentTime = 0.5;
-            if (window.activeSounds && !window.activeSounds.includes(endboss.stepSoundAudioRight)) {
-                window.activeSounds.push(endboss.stepSoundAudioRight);
-            }
+        let audio = endboss.stepSoundAudioRight;
+        if (!audio) {
+            audio = endboss.stepSoundAudioRight = SoundCacheManager.getAudio('sounds/endboss-steps-right.mp3');
+            Object.assign(audio, { playbackRate: 1.5, currentTime: 0.5 });
+            if (window.activeSounds && !window.activeSounds.includes(audio)) window.activeSounds.push(audio);
         }
-        endboss.stepSoundAudioRight.volume = isMuted ? 0 : 0.15;
-        if (endboss.stepSoundAudioRight.paused) {
-            endboss.stepSoundAudioRight.play();
-        }
+        audio.volume = isMuted ? 0 : 0.15;
+        if (audio.paused) audio.play();
         endboss.isStepSoundPlayingRight = true;
     }
 
@@ -189,18 +180,14 @@ class EndbossSounds {
     endbossDeathSound() {
         try {
             const deathSound = SoundCacheManager.getAudio('sounds/endboss-death.mp3');
-            deathSound.volume = 0.4;
+            const MAX_VOL = 0.4, STEPS = 10, INTERVAL = 100;
+            deathSound.volume = MAX_VOL;
             deathSound.play();
-            let fadeSteps = 10;
-            let fadeInterval = 100;
-            let currentStep = 0;
-            let fade = setInterval(() => {
-                currentStep++;
-                deathSound.volume = Math.max(0, 0.4 * (1 - currentStep / fadeSteps));
-                if (currentStep >= fadeSteps) {
-                    clearInterval(fade);
-                }
-            }, fadeInterval);
+            let step = 0;
+            const fade = setInterval(() => {
+                deathSound.volume = Math.max(0, MAX_VOL * (1 - ++step / STEPS));
+                if (step >= STEPS) clearInterval(fade);
+            }, INTERVAL);
         } catch (e) {}
     }
 

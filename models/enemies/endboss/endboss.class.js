@@ -93,18 +93,13 @@ class Endboss extends CollidableObject {
     removeEnemy() {
         this.visible = false;
         this.collidable = false;
-        if (this.blinkInterval) {
-            clearInterval(this.blinkInterval);
-            this.blinkInterval = null;
-        }
-        if (this.checkProximityInterval) {
-            clearInterval(this.checkProximityInterval);
-            this.checkProximityInterval = null;
-        }
-        this.animationStarted = false;
-        this.deathDone = true;
-        this.isDeadAnimationPlaying = false;
-        this._deathAnimationStarted = false;
+        this.clearIntervals?.();
+        Object.assign(this, {
+            animationStarted: false,
+            deathDone: true,
+            isDeadAnimationPlaying: false,
+            _deathAnimationStarted: false
+        });
     }
 
     /**
@@ -131,20 +126,12 @@ class Endboss extends CollidableObject {
      */
     drawCollisionFrameEndboss(ctx) {
         if (!this.collidable) return;
-        let leftOffset = this.offset.left;
+        const { left, right, top, bottom } = this.offset;
+        const yPos = this.y + top + (this.jumpOffsetY ? this.jumpOffsetY * 1.5 : 0);
         ctx.save();
         ctx.strokeStyle = 'rgba(0,0,0,0)';
         ctx.lineWidth = 2;
-        let yPos = this.y + this.offset.top;
-        if (this.jumpOffsetY !== undefined) {
-            yPos += this.jumpOffsetY * 1.5;
-        }
-        ctx.strokeRect(
-            this.x + leftOffset,
-            yPos,
-            this.width - leftOffset - this.offset.right,
-            this.height - this.offset.top - this.offset.bottom
-        );
+        ctx.strokeRect(this.x + left, yPos, this.width - left - right, this.height - top - bottom);
         ctx.restore();
     }
 
@@ -153,16 +140,16 @@ class Endboss extends CollidableObject {
      */
     drawCollisionFrameStick(ctx) {
         if (!this.collidable || this.animState !== 'hit') return;
-        const hitFrame = this.hitFrame || 0;
-        let stickX = this.x + this.width - 60 - 350;
-        let stickY = this.y + this.height / 2;
-        let growFrame = Math.max(0, hitFrame - 4);
-        let stickWidth = 2 + growFrame * 10;
-        let stickHeight = 100;
+        const hit = this.hitFrame || 0;
+        const grow = Math.max(0, hit - 4);
+        const width = 2 + grow * 10;
+        const height = 100;
+        const x = this.x + this.width - 60 - 350 - (width - 2 - 60);
+        const y = this.y + this.height / 2;
         ctx.save();
         ctx.strokeStyle = 'rgba(0,0,0,0)';
         ctx.lineWidth = 2;
-        ctx.strokeRect(stickX - (stickWidth - 2 - 60), stickY, stickWidth, stickHeight);
+        ctx.strokeRect(x, y, width, height);
         ctx.restore();
     }
 
