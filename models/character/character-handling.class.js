@@ -29,6 +29,7 @@ class CharacterHandling {
      */
     handleAnimationLoop(character) {
         character.animationInterval = setInterval(() => {
+            if (character.isAnimationLocked && character.lastAnimation === 'hurt') return; // do not override hurt sequence
             this.handleIdleAnimation(character);
             this.handleWalkingAnimation(character);
             (this.sounds ??= new CharacterSounds()).jumpSound(character);
@@ -42,7 +43,6 @@ class CharacterHandling {
     handleStateLoop(character) {
         character.stateInterval = setInterval(() => {
             this.handleDeathAnimation(character);
-            this.handleHurtAnimation(character);
         }, 30);
     }
 
@@ -185,16 +185,6 @@ class CharacterHandling {
                 character.lastAnimation = 'dead';
                 character.playDeathAnimation();
             }
-        }
-    }
-
-    /**
-     * Handles hurt animation.
-     */
-    handleHurtAnimation(character) {
-        if (character.lastAnimation === 'dead' || character.deathAnimationPlayed) return;
-        if (character.isHurt()) {
-            character.playAnimation(character.anim.IMAGES_HURT);
         }
     }
 }

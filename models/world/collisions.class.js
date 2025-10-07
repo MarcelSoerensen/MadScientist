@@ -156,8 +156,13 @@ class CollisionManager {
     checkEndbossStickCollision(world) {
         world.level.enemies.forEach(enemy => {
             const stickRect = this.getEndbossStickCollisionRect(enemy);
-            if (stickRect && this.checkEndbossStickCharacterCollision(world.character, stickRect)) {
-            }
+            if (!stickRect) return;
+            if (enemy.animState !== 'hit' && enemy._stickHitApplied) enemy._stickHitApplied = false;
+            if (enemy.animState !== 'hit') return;
+            if (!this.checkEndbossStickCharacterCollision(world.character, stickRect)) return;
+            if (enemy._stickHitApplied) return;
+            enemy._stickHitApplied = true;
+            this.applyEndbossStickCollisionEffects(world);
         });
     }
 
@@ -198,9 +203,8 @@ class CollisionManager {
      * Applies the effects of an Endboss stick collision to the character and world.
      */
     applyEndbossStickCollisionEffects(world) {
-        if (!world.character.sounds) world.character.sounds = new CharacterSounds();
-        world.character.sounds.hurtSound(world.character, world);
-        world.character.hit();
-        world.statusBar.setPercentage(world.character.energy);
+        const character = world.character;
+        if (character.deathAnimationPlayed) return;
+        character.takeHit({ damage: 10, knockback: -80 });
     }
 }

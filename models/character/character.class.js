@@ -13,7 +13,7 @@ class Character extends CollidableObject {
         right: 110,
         bottom: 110
     };
-    
+
     world;
     lastAnimation = '';
     currentImage = 0;
@@ -62,34 +62,22 @@ class Character extends CollidableObject {
      * Handles logic when the character is hit by a regular enemy.
      */
     enemyHit(enemy) {
-        if (this.isInvulnerable || this.deathAnimationPlayed) return;
-        this.isInvulnerable = true;
-        this.x += (enemy && enemy.x < this.x) ? 80 : -80;
-        const s = this.sounds ??= new CharacterSounds();
-        this.energy = Math.max(0, this.energy - 10);
-        this.world?.statusBar?.setPercentage(this.energy);
-        if (!this.energy) return s.deathSound(this), this.playDeathAnimation();
-        s.hurtSound(this, this.world);
-        this.animHurtOnce();
-        clearTimeout(this.invulnerableTimeout);
-        this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, 500);
+        this.takeHit({
+            damage: 10,
+            knockback: (enemy && enemy.x < this.x) ? 80 : -80,
+            invulnerableMs: 500
+        });
     }
 
     /**
      * Handles logic when the character is hit by the Endboss.
      */
     endbossHit(enemy) {
-        if (this.isInvulnerable || this.deathAnimationPlayed) return;
-        this.isInvulnerable = true;
-        this.x -= 80;
-        const s = this.sounds ??= new CharacterSounds();
-        this.energy = Math.max(0, this.energy - 15);
-        this.world?.statusBar?.setPercentage(this.energy);
-        if (!this.energy) return s.deathSound(this), this.playDeathAnimation();
-        s.hurtSound(this, this.world);
-        this.animHurtOnce();
-        clearTimeout(this.invulnerableTimeout);
-        this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, 500);
+        this.takeHit({
+            damage: 15,
+            knockback: -80,
+            invulnerableMs: 500
+        });
     }
 
     /**
@@ -105,6 +93,26 @@ class Character extends CollidableObject {
             ? (this.img = this.imageCache[imgs[i++]], setTimeout(next, 30))
             : (this.lastAnimation = '', this.isAnimationLocked = false);
         next();
+    }
+
+    /**
+     * Unified damage intake handler (enemy, endboss, stick, etc.).
+     */
+    takeHit({damage, knockback = 0, invulnerableMs = 500, force = false, playSound = true}) {
+        if ((this.isInvulnerable && !force) || this.deathAnimationPlayed) return;
+        this.isInvulnerable = true;
+        this.x += knockback;
+        const s = this.sounds ??= new CharacterSounds();
+        this.energy = Math.max(0, this.energy - damage);
+        this.world?.statusBar?.setPercentage(this.energy);
+        if (!this.energy) {
+            s.deathSound(this);
+            return this.playDeathAnimation();
+        }
+        if (playSound) s.hurtSound(this, this.world);
+        this.animHurtOnce();
+        clearTimeout(this.invulnerableTimeout);
+        this.invulnerableTimeout = setTimeout(() => this.isInvulnerable = false, invulnerableMs);
     }
 
     /**

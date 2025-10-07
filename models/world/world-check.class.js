@@ -26,22 +26,19 @@ class WorldCheck {
      * Activates the first enemy when the character reaches a certain distance.
      */
     checkFirstEnemyDistance() {
-        const w = this.world;
-        if (window.isPaused || (window.PauseButtonManager && window.PauseButtonManager.isPaused)) return;
-        const enemies = w.level?.enemies || [];
-        const character = w.character;
-        if (!character) return;
-        for (const enemy of enemies) {
-            const activateAt = enemy._activateAt || 500;
-            if (!enemy._waitingForCharacter || character.x < activateAt) continue;
+        const { level, character } = this.world;
+        if (!character || window.isPaused || window.PauseButtonManager?.isPaused) return;
+        (level?.enemies || []).forEach(enemy => {
+            const at = enemy._activateAt || 500;
+            if (!enemy._waitingForCharacter || character.x < at) return;
             if (enemy instanceof EnemyOne) this.checkEnemyOneSpawn(enemy, character);
             enemy.visible = true;
             enemy._waitingForCharacter = false;
-            if (!enemy.moveInterval && !enemy.animInterval) {
-                if (enemy instanceof EnemyOne && enemy.handler?.animateEnemyOne) enemy.handler.animateEnemyOne(enemy);
-                else if (typeof enemy.animate === 'function') enemy.animate();
-            }
-        }
+            if (enemy.moveInterval || enemy.animInterval) return;
+            (enemy instanceof EnemyOne && enemy.handler?.animateEnemyOne)
+                ? enemy.handler.animateEnemyOne(enemy)
+                : (typeof enemy.animate === 'function' && enemy.animate());
+        });
     }
 
     /**
@@ -155,19 +152,19 @@ class WorldCheck {
      * Checks if stick collision with Endboss occurs and applies effects.
      */
     checkStickCollision() {
-        this.world.level.enemies
-            .filter(e => e instanceof Endboss && e.animState === 'hit' && !e.isDeadAnimationPlaying && e.collidable !== false)
-            .forEach(enemy => {
-                const stickRect = enemy.getStickCollisionRect?.();
+        const enemies = this.world.level?.enemies || [];
+        const overlaps = (a,b) => a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+        enemies
+            .filter(e => e instanceof Endboss && !e.isDeadAnimationPlaying && e.collidable !== false)
+            .forEach(e => {
+                if (e.animState !== 'hit') return e._stickHitApplied && (e._stickHitApplied = false);
+                if (e._stickHitApplied) return;
+                const stick = e.getStickCollisionRect?.();
+                if (!stick) return;
                 const charRect = this.getCharacterCollisionRect();
-                if (stickRect &&
-                    charRect.x < stickRect.x + stickRect.width &&
-                    charRect.x + charRect.width > stickRect.x &&
-                    charRect.y < stickRect.y + stickRect.height &&
-                    charRect.y + charRect.height > stickRect.y
-                ) {
-                    this.applyStickCollision();
-                }
+                if (!overlaps(charRect, stick)) return;
+                e._stickHitApplied = true;
+                this.applyStickCollision(e);
             });
     }
 
@@ -187,13 +184,13 @@ class WorldCheck {
     /**
      * Applies effects of stick collision (sound, damage, status bar).
      */
-    applyStickCollision() {
+    applyStickCollision(enemy) {
+        const character = this.world.character;
+        if (character.deathAnimationPlayed) return;
         const now = Date.now();
-        if (!this.world.lastCollisionSoundTime || now - this.world.lastCollisionSoundTime > 500) {
-            this.world.character.sounds.hurtSound(this.world.character, this.world);
-        }
-        this.world.character.hit();
-        this.world.statusBar.setPercentage(this.world.character.energy);
+        const canPlay = !this.world.lastCollisionSoundTime || now - this.world.lastCollisionSoundTime > 500;
+        character.takeHit({ damage: 10, knockback: 0, playSound: canPlay });
+        if (canPlay) this.world.lastCollisionSoundTime = now;
     }
 
     /**
@@ -251,15 +248,12 @@ class WorldCheck {
         w.gameOver = true;
         w.cleanup?.cleanupIntervals?.();
         const endboss = w.level?.enemies?.find(e => e instanceof Endboss);
-        if (endboss?.sounds?.stopAllEndbossSounds) {
-            endboss.sounds.stopAllEndbossSounds(endboss);
-        }
+        endboss?.sounds?.stopAllEndbossSounds?.(endboss);
         endboss?.handler?.handleDeathAnimation?.(endboss);
-        if (w.character && typeof w.characterHandling?.handleLevelCompleteAnimation === 'function') {
-            w.characterHandling.handleLevelCompleteAnimation(w.character);
-        }
-        if (w.character) w.character.energy = -1;
+        const ch = w.character;
+        ch && w.characterHandling?.handleLevelCompleteAnimation?.(ch);
+        if (ch) ch.energy = -1;
         if (w.keyboard) w.keyboard.S = w.keyboard.D = w.keyboard.Y = false;
-        w.gameAlerts?.triggerLevelComplete?.() || w.gameAlerts?.showAlert?.('levelComplete', 'Level Complete');
+        w.gameAlerts?.triggerLevelComplete?.() || w.gameAlerts?.showAlert?.('levelComplete','Level Complete');
     }
 }
