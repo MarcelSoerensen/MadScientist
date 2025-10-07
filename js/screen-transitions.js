@@ -54,8 +54,27 @@ function transitionFromStartScreenToCanvas(startScreen, canvas) {
 
 window.transitionFromStartScreenToCanvas = transitionFromStartScreenToCanvas;
 
-
+/**
+ * Transitions from the canvas (game view) to a target overlay screen.
+ */
 function transitionFromCanvasToScreen(canvas, targetScreen) {
+    if (!canvas || !targetScreen) return;
+    initCanvasToScreenState(canvas, targetScreen);
+    void targetScreen.offsetWidth;
+    targetScreen.classList.remove('pre-fade');
+    targetScreen.classList.add('fade-in');
+    canvas.style.filter = 'brightness(0)';
+    canvas.style.pointerEvents = 'none';    
+    canvas.addEventListener('transitionend', handleCanvasFadeOut);
+    targetScreen.addEventListener('transitionend', handleTargetScreenFadeIn);
+}
+
+window.transitionFromCanvasToScreen = transitionFromCanvasToScreen;
+
+/**
+ * Initialises DOM state and classes for a canvas -> screen transition (no reflow yet).
+ */
+function initCanvasToScreenState(canvas, targetScreen) {
     targetScreen.classList.remove('fade-in', 'fade-out', 'pre-fade');
     canvas.classList.remove('canvas-visible');
     targetScreen.style.display = 'flex';
@@ -68,36 +87,45 @@ function transitionFromCanvasToScreen(canvas, targetScreen) {
         const controls = document.querySelector('.system-controls-container');
         if (controls) controls.classList.add('d-none');
     }
-    void targetScreen.offsetWidth;
-    targetScreen.classList.remove('pre-fade');
-    targetScreen.classList.add('fade-in');
-    canvas.style.filter = 'brightness(0)';
-    canvas.style.pointerEvents = 'none';
-    canvas.addEventListener('transitionend', function handler(event) {
-        if (event.propertyName === 'filter') {
-            canvas.classList.remove('fade-out');
-            canvas.classList.remove('canvas-visible');
-            canvas.removeEventListener('transitionend', handler);
-        }
-    });
-    targetScreen.addEventListener('transitionend', function handler(event) {
-        if (event.propertyName === 'filter') {
-            targetScreen.classList.remove('fade-in');
-            targetScreen.classList.remove('d-none');
-            targetScreen.style.display = '';
-            targetScreen.removeEventListener('transitionend', handler);
-            if (targetScreen.id === 'start_screen' && typeof window.setupStartScreenButtons === 'function') {
-                window.setupStartScreenButtons();
-            }
-            if (targetScreen.id === 'canvas' && typeof window.showSystemButtons === 'function') {
-                window.showSystemButtons();
-            }
-        }
-    });
 }
 
-window.transitionFromCanvasToScreen = transitionFromCanvasToScreen;
+window.initCanvasToScreenState = initCanvasToScreenState;
 
+/**
+ * Handles the fade-out of the canvas (game view) once the filter transition ends.
+ */
+function handleCanvasFadeOut(event) {
+    if (event.propertyName !== 'filter') return;
+    const canvas = event.currentTarget;
+    canvas.removeEventListener('transitionend', handleCanvasFadeOut);
+    canvas.classList.remove('fade-out');
+    canvas.classList.remove('canvas-visible');
+}
+
+window.handleCanvasFadeOut = handleCanvasFadeOut;
+
+/**
+ * Handles the fade-in completion of a target overlay screen.
+ */
+function handleTargetScreenFadeIn(event) {
+    if (event.propertyName !== 'filter') return;
+    const screen = event.currentTarget;
+    screen.removeEventListener('transitionend', handleTargetScreenFadeIn);
+    screen.classList.remove('fade-in');
+    screen.classList.remove('d-none');
+    screen.style.display = '';
+    if (screen.id === 'start_screen' && typeof window.setupStartScreenButtons === 'function') {
+        window.setupStartScreenButtons();
+    }
+    if (screen.id === 'canvas' && typeof window.showSystemButtons === 'function') {
+        window.showSystemButtons();
+    }
+}
+window.handleTargetScreenFadeIn = handleTargetScreenFadeIn;
+
+/** 
+ * Transitions from any screen back to the start screen.
+ */
 function transitionToStartScreen(fromScreen) {
     const startScreen = document.getElementById('start_screen');
     if (!startScreen || !fromScreen) return;
@@ -110,22 +138,38 @@ function transitionToStartScreen(fromScreen) {
     startScreen.classList.remove('pre-fade');
     fromScreen.classList.add('fade-out');
     startScreen.classList.add('fade-in');
-    fromScreen.addEventListener('transitionend', function handler(event) {
-        if (event.propertyName === 'filter') {
-            fromScreen.classList.add('d-none');
-            fromScreen.classList.remove('fade-out');
-            fromScreen.style.display = '';
-            fromScreen.removeEventListener('transitionend', handler);
-        }
-    });
-    startScreen.addEventListener('transitionend', function handler(event) {
-        if (event.propertyName === 'filter') {
-            startScreen.classList.remove('fade-in');
-            startScreen.classList.remove('d-none');
-            startScreen.style.display = '';
-            startScreen.removeEventListener('transitionend', handler);
-            if (typeof window.setupStartScreenButtons === 'function') window.setupStartScreenButtons();
-        }
-    });
+    fromScreen.addEventListener('transitionend', handlePreviousScreenFadeOut);
+    startScreen.addEventListener('transitionend', handleStartScreenFadeIn);
 }
+
 window.transitionToStartScreen = transitionToStartScreen;
+
+/**
+ * Handles the fade-out completion of the previous screen.
+ */
+function handlePreviousScreenFadeOut(event) {
+    if (event.propertyName !== 'filter') return;
+    const el = event.currentTarget;
+    el.removeEventListener('transitionend', handlePreviousScreenFadeOut);
+    el.classList.add('d-none');
+    el.classList.remove('fade-out');
+    el.style.display = '';
+}
+
+window.handlePreviousScreenFadeOut = handlePreviousScreenFadeOut;
+
+/**
+ * Handles the fade-in completion of the start screen.
+ */
+function handleStartScreenFadeIn(event) {
+    if (event.propertyName !== 'filter') return;
+    const el = event.currentTarget;
+    el.removeEventListener('transitionend', handleStartScreenFadeIn);
+    el.classList.remove('fade-in', 'd-none');
+    el.style.display = '';
+    if (typeof window.setupStartScreenButtons === 'function') {
+        window.setupStartScreenButtons();
+    }
+}
+
+window.handleStartScreenFadeIn = handleStartScreenFadeIn;

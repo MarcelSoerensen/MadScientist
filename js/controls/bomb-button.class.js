@@ -31,9 +31,7 @@ class BombButton {
             this.keyboard = window.keyboard;
             return;
         }
-
         const attempts = [100, 500, 1000, 2000, 3000];
-        
         attempts.forEach(delay => {
             setTimeout(() => {
                 if (!this.keyboard) {
@@ -61,7 +59,6 @@ class BombButton {
                     }
                 });
             });
-
             observer.observe(canvas, {
                 attributes: true,
                 attributeFilter: ['style']
