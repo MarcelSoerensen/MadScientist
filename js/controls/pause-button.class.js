@@ -2,10 +2,6 @@
 * PauseButtonManager Class
  */
 class PauseButtonManager {
-    static isPaused = false;
-    static prevAudioWasOn = null;
-    static prevMobileControlsVisible = null;
-
     /**
      * Initialize the pause button and its event listener
      */
@@ -55,9 +51,10 @@ class PauseButtonManager {
      * Pause the game and related activities
      */
     static pauseGame() {
+        PauseButtonManager.resetStartScreenAudioButton();
+        PauseButtonManager.setSystemButtonPauseState();
+        PauseButtonManager.setOtherAudioButtonsPauseState();
         ['pauseEndboss', 'pauseEnemyTwo', 'pauseEnemyOne'].forEach(m => PauseButtonManager[m]());
-        AudioButtonManager.configs.forEach(cfg => document.getElementById(cfg.btnId)?.setAttribute('disabled', 'disabled'));
-        document.getElementById('back-btn')?.setAttribute('disabled', 'disabled');
         window.isPaused = true;
         PauseButtonManager.prevAudioWasOn = !AudioButtonManager.muted;
         if (PauseButtonManager.prevAudioWasOn) AudioButtonManager.setMutedAll(true);
@@ -70,6 +67,58 @@ class PauseButtonManager {
             if (anyVisible) window.mobileOrientationManager?.setControlsVisibility(false);
         } catch {}
     }
+
+    /**
+     * Setzt die Pause-Darstellung für die System-Buttons (Canvas)
+     */
+    static setSystemButtonPauseState() {
+        const backBtn = document.getElementById('back-btn');
+        const backSvg = backBtn?.querySelector('svg');
+        if (backSvg) backSvg.style.color = 'rgb(125, 22, 14)';
+        if (backBtn) {
+            backBtn.setAttribute('disabled', 'disabled');
+            backBtn.classList.add('paused-border');
+        }
+        const canvasAudioBtn = document.getElementById('system-audio-btn');
+        if (canvasAudioBtn && canvasAudioBtn.closest('.system-controls-container')) {
+            const canvasAudioSvg = canvasAudioBtn.querySelector('svg');
+            if (canvasAudioSvg) canvasAudioSvg.style.color = 'rgb(125, 22, 14)';
+            canvasAudioBtn.setAttribute('disabled', 'disabled');
+            canvasAudioBtn.classList.add('paused-border');
+        }
+    }
+
+    /**
+     * Setzt den Audio-Button im Startscreen immer zurück
+     */
+    static resetStartScreenAudioButton() {
+        const startAudioBtn = document.getElementById('audio-toggle-btn');
+        if (startAudioBtn) {
+            startAudioBtn.classList.remove('paused-border');
+            startAudioBtn.querySelector('svg')?.style.setProperty('color', '');
+            startAudioBtn.removeAttribute('disabled');
+        }
+    }
+
+    /**
+     * Setzt alle weiteren Audio-Buttons auf Pause-Darstellung
+     */
+    static setOtherAudioButtonsPauseState() {
+        AudioButtonManager.configs.forEach(cfg => {
+            const btn = document.getElementById(cfg.btnId);
+            if (btn && btn.id !== 'system-audio-btn' && btn.id !== 'audio-toggle-btn') {
+                btn.setAttribute('disabled', 'disabled');
+                btn.classList.add('paused-border');
+            }
+        });
+    }
+
+    /**
+     * Indicates whether the game is currently paused.
+     */
+    static isPaused = false;
+    static prevAudioWasOn = null;
+    static prevMobileControlsVisible = null;
 
     /**
      * Pause the enemy one animations
@@ -121,9 +170,14 @@ class PauseButtonManager {
      * Resume the game and related activities
      */
     static resumeGame() {
+        [   'audio-toggle-btn', 'back-btn', 'system-audio-btn'].forEach(id => {
+            const btn = document.getElementById(id);
+            btn?.removeAttribute('disabled');
+            btn?.classList.remove('paused-border');
+            btn?.querySelector('svg')?.style.setProperty('color', '');
+        });
         ['resumeEndboss', 'resumeEnemyTwo', 'resumeEnemyOne'].forEach(m => PauseButtonManager[m]());
         AudioButtonManager.configs.forEach(cfg => document.getElementById(cfg.btnId)?.removeAttribute('disabled'));
-        document.getElementById('back-btn')?.removeAttribute('disabled');
         window.isPaused = false;
         if (PauseButtonManager.prevAudioWasOn) AudioButtonManager.setMutedAll(false);
         if (PauseButtonManager.prevMobileControlsVisible && window.mobileOrientationManager) {

@@ -9,6 +9,35 @@ if (typeof window !== 'undefined' && typeof window.inputDisabled === 'undefined'
 }
 
 /**
+ * Initializes the game, canvas and world.
+ */
+function init() {
+    canvas = document.getElementById('canvas');
+    world = new World(canvas, keyboard);
+    if (typeof window !== 'undefined') {
+        window.world = world;
+        world.setWorldReferenceForEnemies();
+        initBackgroundMusic();
+        enableInput();
+    }
+}
+
+/**
+ * Initializes and plays the background music, and sets up a listener for mute changes.
+ */
+function initBackgroundMusic() {
+    const bgMusic = window.backgroundMusic = SoundCacheManager.getBackgroundMusic();
+    bgMusic.currentTime = 0;
+    bgMusic.muted = SoundCacheManager.muted;
+    if (isCanvasVisible()) {
+        bgMusic.volume = bgMusic.muted ? 0 : 0.08;
+        bgMusic.play().catch(()=>{});
+    } else {
+        bgMusic.volume = 0;
+        bgMusic.pause();
+    }
+
+/**
  * disables game input (e.g. on game over / win screen / other overlays)
  */
 function disableInput() {
@@ -34,44 +63,12 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Initializes the game, canvas and world.
+ * Checks if the canvas is visible
  */
-function init() {
-    canvas = document.getElementById('canvas');
-    world = new World(canvas, keyboard);
-    if (typeof window !== 'undefined') {
-        window.world = world;
-        world.setWorldReferenceForEnemies();
-        initBackgroundMusic();
-        enableInput(); // Falls vorher deaktiviert
-    }
+function isCanvasVisible() {
+    const canvas = document.getElementById('canvas');
+    return canvas && !canvas.classList.contains('d-none');
 }
-
-/**
- * Initializes and plays the background music, and sets up a listener for mute changes.
- */
-function initBackgroundMusic() {
-    const bgMusic = window.backgroundMusic = SoundCacheManager.getBackgroundMusic();
-    bgMusic.currentTime = 0;
-    bgMusic.muted = SoundCacheManager.muted;
-    bgMusic.volume = bgMusic.muted ? 0 : 0.08;
-    bgMusic.play().catch(()=>{});
-    addMuteListener();
-}
-
-/**
- * Adds a listener for changes to the audio mute state.
- */
-function addMuteListener() {
-    if (window._bgMusicMuteListenerAdded) return;
-    window.addEventListener('audio-mute-changed', e => {
-        if (!window.backgroundMusic) return;
-        const muted = e.detail && e.detail.muted;
-        window.backgroundMusic.muted = !!muted;
-        window.backgroundMusic.volume = muted ? 0 : 0.08;
-        if (!muted) window.backgroundMusic.play().catch(()=>{});
-    });
-    window._bgMusicMuteListenerAdded = true;
 }
 
 /**
@@ -88,6 +85,9 @@ function restartGame() {
  */
 function cleanup() {
     if (world) {
+        if (world.level?.enemies) {
+            world.level.enemies = world.level.enemies.filter(e => e.visible !== false);
+        }
         world.performCleanup();
         world = null;
     }

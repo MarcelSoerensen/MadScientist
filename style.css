@@ -111,3 +111,6 @@ canvas {
         display: none;
     }
 }
+    .paused-border {
+    border: 2px solid rgb(125, 22, 14) !important;
+}
