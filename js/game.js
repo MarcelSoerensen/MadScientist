@@ -4,6 +4,34 @@ if (typeof window !== 'undefined') {
     window.world = world;
 }
 let keyboard = new Keyboard(); 
+if (typeof window !== 'undefined' && typeof window.inputDisabled === 'undefined') {
+    window.inputDisabled = false;
+}
+
+/**
+ * disables game input (e.g. on game over / win screen / other overlays)
+ */
+function disableInput() {
+    if (typeof window !== 'undefined') {
+        window.inputDisabled = true;
+    }
+    if (typeof resetKeyboard === 'function') {
+        resetKeyboard();
+    }
+}
+
+/**
+ * Activates game input again (e.g. when canvas becomes visible)
+ */
+function enableInput() {
+    if (typeof window !== 'undefined') {
+        window.inputDisabled = false;
+    }
+}
+if (typeof window !== 'undefined') {
+    window.disableInput = disableInput;
+    window.enableInput = enableInput;
+}
 
 /**
  * Initializes the game, canvas and world.
@@ -15,6 +43,7 @@ function init() {
         window.world = world;
         world.setWorldReferenceForEnemies();
         initBackgroundMusic();
+        enableInput(); // Falls vorher deaktiviert
     }
 }
 
@@ -97,8 +126,11 @@ function resetKeyboard() {
  */
 window.addEventListener('keydown', (event) => {
     if (window.isPaused) return;
+    if (window.inputDisabled && !['d', 'y', 's'].includes(event.key)) {
+        return;
+    }
     if (world && world.gameOver) {
-        if (['d', 'y', 's'].includes(event.key)) return;
+        if (!['d', 'y', 's'].includes(event.key)) return;
     }
     if (event.key === 'ArrowLeft') {
         keyboard.LEFT = true;
@@ -130,6 +162,7 @@ window.addEventListener('keydown', (event) => {
  * Event listener for keyup. Resets the corresponding keyboard flags.
  */
 window.addEventListener('keyup', (event) => {
+    if (window.inputDisabled) return;
     if (event.key === 'ArrowLeft') {
         keyboard.LEFT = false;
     }

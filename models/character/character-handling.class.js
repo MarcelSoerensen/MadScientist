@@ -164,6 +164,11 @@ class CharacterHandling {
      * Handles step sound effect.
      */
     handleStepSound(character) {
+        if (typeof window !== 'undefined' && window.inputDisabled) {
+            if (!this.sounds) this.sounds = new CharacterSounds();
+            this.sounds.stopStepSound(character);
+            return;
+        }
         const isWalking = character.world.keyboard.RIGHT || character.world.keyboard.LEFT;
         const isJumping = character.world.keyboard.UP;
         if (!this.sounds) this.sounds = new CharacterSounds();

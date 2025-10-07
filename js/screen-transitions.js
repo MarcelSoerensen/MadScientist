@@ -48,6 +48,7 @@ function transitionFromStartScreenToCanvas(startScreen, canvas) {
             startScreen.style.filter = '';
             canvas.classList.remove('fade-in');
             canvas.removeEventListener('transitionend', handler);
+            if (typeof window.enableInput === 'function') window.enableInput();
         }
     });
 }
@@ -67,6 +68,7 @@ function transitionFromCanvasToScreen(canvas, targetScreen) {
     canvas.style.pointerEvents = 'none';    
     canvas.addEventListener('transitionend', handleCanvasFadeOut);
     targetScreen.addEventListener('transitionend', handleTargetScreenFadeIn);
+    if (typeof window.disableInput === 'function') window.disableInput();
 }
 
 window.transitionFromCanvasToScreen = transitionFromCanvasToScreen;
@@ -119,6 +121,7 @@ function handleTargetScreenFadeIn(event) {
     }
     if (screen.id === 'canvas' && typeof window.showSystemButtons === 'function') {
         window.showSystemButtons();
+        if (typeof window.enableInput === 'function') window.enableInput();
     }
 }
 window.handleTargetScreenFadeIn = handleTargetScreenFadeIn;
