@@ -1,12 +1,27 @@
+.start-screen-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    bottom: clamp(-0.5rem , 1.2vw, 1rem);
+    transform: translateX(-50%);
+    width: 100%;
+    gap: clamp(1vw, 1vw, 5rem);
+    flex-wrap: wrap;
+}
+
 .start-screen-link {
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     cursor: pointer;
-    font-size: 1.1em;
-    transition: color 0.2s, transform 150ms;
+    font-size: clamp(0.9rem, 2vw, 1.5rem);
     font-family: 'Happy Monkey', Arial, sans-serif;
     transform: scale(1);
-    transition: transform 150ms, color 150ms;
+    transition: color 150ms, transform 150ms;
+    will-change: transform, color;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
 }
 
 .start-screen-link:hover {
@@ -15,27 +30,27 @@
 }
 
 .start-screen-link:active {
-    transform: scale(1);
-    
+    transform: scale(1); 
+}
+
+.start-screen-link:focus {
+    outline: none;
+}
+
+.start-screen-link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+@media (pointer: coarse) {
+    .start-screen-link:focus-visible {
+        outline-color: rgba(255,255,255,0.85);
+    }
 }
 
 .start-screen-link-separator {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 1.1em;
-    margin: 0 16px;
+    font-size: clamp(0.7rem, 0.8rem + 0.4vw, 1.1rem);
+    margin: 0 clamp(0.5rem, 1.2vw, 1rem);
 }
-
-.start-screen-links {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    left: 50%;
-    bottom: 12px;
-    transform: translateX(-50%);
-    margin: 0;
-    width: auto;
-    gap: 0px;
-}
-
-

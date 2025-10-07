@@ -43,13 +43,9 @@ class MobileOrientationManager {
         if (this.isMobile) {
             this.repositionControls();
         } else {
-            if (this.isPortrait && window.innerWidth <= 480) {
-                this.hideControls();
-                this.showOrientationOverlay();
-            } else {
-                this.hideControls();
-                this.hideOrientationOverlay();
-            }
+            // Desktop: niemals Turn-Display-Overlay zeigen
+            this.hideControls();
+            this.hideOrientationOverlay();
         }
     }
 

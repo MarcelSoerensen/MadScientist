@@ -46,6 +46,9 @@
     position: relative;
     overflow: hidden;
     pointer-events: auto !important;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
 }
 
 .story-screen-btn,
@@ -102,6 +105,40 @@
     transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
 
 }
+
+.start-screen-btn:focus,
+.story-screen-btn:focus,
+.control-screen-btn:focus,
+.game-over-screen-btn:focus,
+.win-screen-btn:focus,
+.legal-notice-btn:focus,
+.credits-btn:focus {
+    outline: none;
+}
+
+.start-screen-btn:focus-visible,
+.story-screen-btn:focus-visible,
+.control-screen-btn:focus-visible,
+.game-over-screen-btn:focus-visible,
+.win-screen-btn:focus-visible,
+.legal-notice-btn:focus-visible,
+.credits-btn:focus-visible {
+    outline: 3px solid rgba(255,255,255,0.85);
+    outline-offset: 3px;
+}
+
+@media (pointer: coarse) {
+    .start-screen-btn:focus-visible,
+    .story-screen-btn:focus-visible,
+    .control-screen-btn:focus-visible,
+    .game-over-screen-btn:focus-visible,
+    .win-screen-btn:focus-visible,
+    .legal-notice-btn:focus-visible,
+    .credits-btn:focus-visible {
+        outline-color: rgba(255,255,255,0.95);
+    }
+}
+
 .start-screen-btn::after,
 .story-screen-btn::after,
 .control-screen-btn::after,
@@ -146,5 +183,11 @@
     .legal-notice-btn,
     .credits-btn {
         font-size: clamp(0.8em, 4vw, 1.5em);
+    }
+}
+
+@media only screen and (max-height: 480px) {
+    .start-screen-btn-group {
+        justify-content: flex-start;
     }
 }
