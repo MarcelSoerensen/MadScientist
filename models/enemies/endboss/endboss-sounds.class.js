@@ -7,17 +7,66 @@ class EndbossSounds {
      */
     playXPositionSound(endboss) {
         if (!endboss.world?.character) return;
-        const charX = endboss.world.character.x;
-        const isMuted = window.SoundCacheManager ? SoundCacheManager.muted : false;
+        const x = endboss.world.character.x;
+        const muted = window.SoundCacheManager ? SoundCacheManager.muted : false;
         const THRESHOLD = 2300;
-        if (charX < THRESHOLD) {
+    this.xPositionSoundTransition(x >= THRESHOLD, muted);
+    }
+
+    /**
+     * Handles the transition of sounds based on the character's position.
+     */
+    xPositionSoundTransition(inBossZone, muted) {
+        if (inBossZone)
+            return this.pauseBackgroundMusic(),
+                   this.playEndbossMelody(muted),
+                   this.playCounterSound(muted);
+        const mel = window.endbossMelody, bg = window.backgroundMusic;
+        if (this._melodyFading || !mel || mel.paused || muted) {
             this.pauseEndbossMelody();
             this.stopXPositionSound();
+            if (!muted && bg) {
+                if (bg.paused) { bg.currentTime = 0; try { bg.play(); } catch(e) {} }
+                bg.volume = 0.08;
+            }
             return;
         }
-        this.pauseBackgroundMusic();
-        this.playEndbossMelody(isMuted);
-        this.playCounterSound(isMuted);
+    this.bossExitCrossfade(muted, mel, bg);
+    }
+
+    /**
+     * Initiates crossfade: fades out boss melody, primes background music and launches the loop.
+     */
+    bossExitCrossfade(muted, mel, bg) {
+        this._melodyFading = true; 
+        this.stopXPositionSound();
+        const steps = 12, interval = 35, 
+              start = mel.volume ?? 0.08, 
+              targetBg = muted ? 0 : 0.05;
+        if (!bg || muted)
+            return this.pauseEndbossMelody(), 
+        this._melodyFading = false;
+        if (bg.paused) { bg.currentTime = 0; try { bg.play(); } catch(e) {} }
+        bg.volume > 0.001 && (bg.volume = 0);
+        this.bossExitCrossfadeLoop({ mel, bg, steps, interval, start, targetBg });
+    }
+
+    /**
+     * Internal loop performing per-step volume interpolation (boss down, background up) and cleanup at completion.
+     */
+    bossExitCrossfadeLoop({ mel, bg, steps, interval, start, targetBg }) {
+        clearInterval(this._melodyFadeInterval);
+        let i = 0;
+        this._melodyFadeInterval = setInterval(() => {
+            const t = ++i / steps;
+            mel.volume = Math.max(0, start * (1 - t));
+            bg.volume = targetBg * t;
+            if (i >= steps) {
+                clearInterval(this._melodyFadeInterval);
+                this.pauseEndbossMelody();
+                this._melodyFading = false;
+            }
+        }, interval);
     }
 
     /**
