@@ -128,26 +128,9 @@ function setBodyTitleVisible(visible) {
 }
 
 /**
- * Updates the visibility of the body title based on the available space above the canvas.
- */
-function updateBodyTitleVisibilityBySpace(minSpacePx = 2000) {
-    const bodyTitle = document.querySelector('.body-title');
-    const canvas = document.getElementById('canvas');
-    if (!bodyTitle || !canvas) return;
-    const canvasRect = canvas.getBoundingClientRect();
-    const spaceAboveCanvas = canvasRect.top;
-    const fontSize = parseFloat(window.getComputedStyle(bodyTitle).fontSize) || minSpacePx;
-    const requiredSpace = fontSize * 3.0;
-    const titleRect = bodyTitle.getBoundingClientRect();
-    const titleFullyVisible = titleRect.top >= 0 && titleRect.bottom <= window.innerHeight;
-    setBodyTitleVisible(spaceAboveCanvas > requiredSpace && titleFullyVisible);
-}
-
-/**
  * Initializes the start screen and related UI elements on DOMContentLoaded.
  */
 function initStartScreen() {
-    updateBodyTitleVisibilityBySpace();
     setBodyTitleVisible(false);
     animateStartScreenCharacter();
     const startScreen = document.getElementById('start_screen');
@@ -156,7 +139,6 @@ function initStartScreen() {
     }
     const storyScreen = document.getElementById('story_screen');
     if (storyScreen) storyScreen.style.display = 'none';
-    window.addEventListener('resize', () => updateBodyTitleVisibilityBySpace());
 }
 
 /**
