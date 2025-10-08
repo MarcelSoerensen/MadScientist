@@ -21,7 +21,12 @@ class AudioButtonManager {
     /**
      * Global mute state for audio; defaults to true (muted) if not set.
      */
-    static muted = (typeof window.isAudioMuted !== 'undefined') ? window.isAudioMuted : (window.SoundCacheManager ? SoundCacheManager.muted : true);
+    static muted = (() => {
+        const stored = localStorage.getItem('audioMuted');
+        if (stored !== null) return stored === 'true';
+        if (typeof window.isAudioMuted !== 'undefined') return window.isAudioMuted;
+        return window.SoundCacheManager ? SoundCacheManager.muted : true;
+    })();
     static unlocked = false;
 
     /**
@@ -50,6 +55,7 @@ class AudioButtonManager {
     static setMutedAll(newMuted) {
         AudioButtonManager.muted = newMuted;
         window.isAudioMuted = AudioButtonManager.muted;
+        localStorage.setItem('audioMuted', AudioButtonManager.muted ? 'true' : 'false');
         AudioButtonManager.setIcons();
         if (window.SoundCacheManager?.setMuted) {
             SoundCacheManager.setMuted(AudioButtonManager.muted);
@@ -108,7 +114,12 @@ class AudioButtonManager {
      * Initializes the AudioButtonManager by setting icons and adding listeners.
      */
     static init() {
-        AudioButtonManager.setIcons();
+        const stored = localStorage.getItem('audioMuted');
+        if (stored !== null) {
+            AudioButtonManager.setMutedAll(stored === 'true');
+        } else {
+            AudioButtonManager.setIcons();
+        }
         AudioButtonManager.addListeners();
     }
 }
