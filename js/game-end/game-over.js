@@ -2,7 +2,7 @@
  * Fades out the canvas and shows the game over screen.
  */
 function showGameOverScreen() {
-    window.addEventListener('resize', () => checkBodyTitleSpace());
+    window.addEventListener('resize', checkBodyTitleSpace);
     setBodyTitleVisible(true);
     checkBodyTitleSpace();
     const canvas = document.getElementById('canvas');
@@ -33,7 +33,7 @@ function setupGameOverScreenButtons() {
             const gameOverScreen = document.getElementById('game_over_screen');
             if (!gameOverScreen) return;
             window.transitionToStartScreen(gameOverScreen);
-            window.removeEventListener('resize', () => checkBodyTitleSpace());
+            window.removeEventListener('resize', checkBodyTitleSpace);
             setBodyTitleVisible(false);
 
         });

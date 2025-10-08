@@ -2,7 +2,7 @@
  * Fades out the start screen and shows the control screen.
  */
 function showControlScreen() {
-    window.addEventListener('resize', () => checkBodyTitleSpace());
+    window.addEventListener('resize', checkBodyTitleSpace);
     setBodyTitleVisible(true);
     checkBodyTitleSpace();
     const startScreen = document.getElementById('start_screen');
@@ -37,7 +37,7 @@ function setupControlScreenBackButton() {
         const controlScreen = document.getElementById('control_screen');
         if (!controlScreen) return;
         window.transitionToStartScreen(controlScreen);
-        window.removeEventListener('resize', () => checkBodyTitleSpace());
+    window.removeEventListener('resize', checkBodyTitleSpace);
             setBodyTitleVisible(false);
 
     });

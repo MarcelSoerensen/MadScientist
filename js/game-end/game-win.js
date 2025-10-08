@@ -2,7 +2,7 @@
  * Fades out the canvas and shows the win screen.
  */
 function showWinScreen(scoreData = null) {
-    window.addEventListener('resize', () => checkBodyTitleSpace());
+    window.addEventListener('resize', checkBodyTitleSpace);
     setBodyTitleVisible(true);
     checkBodyTitleSpace();
     const canvas = document.getElementById('canvas');
@@ -52,7 +52,7 @@ function setupWinScreenButtons() {
             const winScreen = document.getElementById('win_screen');
             if (!winScreen) return;
             window.transitionToStartScreen(winScreen);
-            window.removeEventListener('resize', () => checkBodyTitleSpace());
+            window.removeEventListener('resize', checkBodyTitleSpace);
             setBodyTitleVisible(false);
         });
     }

@@ -2,7 +2,7 @@
  * Fades out the start screen and shows the story screen.
  */
 function showStoryScreen() {
-    window.addEventListener('resize', () => checkBodyTitleSpace());
+    window.addEventListener('resize', checkBodyTitleSpace);
     setBodyTitleVisible(true);
     checkBodyTitleSpace();
     const startScreen = document.getElementById('start_screen');
@@ -47,7 +47,7 @@ function setupBackButton() {
         newBackBtn.addEventListener('click', function() {
             const storyScreen = document.getElementById('story_screen');
             if (storyScreen) window.transitionToStartScreen(storyScreen);
-            window.removeEventListener('resize', () => checkBodyTitleSpace());
+            window.removeEventListener('resize', checkBodyTitleSpace);
                 setBodyTitleVisible(false);
 
         });

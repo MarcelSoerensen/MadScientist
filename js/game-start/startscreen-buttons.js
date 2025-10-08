@@ -38,7 +38,7 @@ function setupLegalNoticeLink() {
             if (e.cancelable) e.preventDefault();
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
             window.prepareAndTransitionToScreen(startScreen, document.getElementById('legal_notice_screen'));
-            window.addEventListener('resize', () => checkBodyTitleSpace());
+            window.addEventListener('resize', checkBodyTitleSpace);
             setBodyTitleVisible(true);
             checkBodyTitleSpace();
         };
@@ -56,7 +56,7 @@ function setupCreditsLink() {
             if (e.cancelable) e.preventDefault();
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
             window.prepareAndTransitionToScreen(startScreen, document.getElementById('credits_screen'));
-            window.addEventListener('resize', () => checkBodyTitleSpace());
+            window.addEventListener('resize', checkBodyTitleSpace);
             setBodyTitleVisible(true);
             checkBodyTitleSpace();
         };
@@ -71,7 +71,7 @@ function setupLegalNoticeBackButton() {
     if (legalNoticeBackBtn) {
         legalNoticeBackBtn.onclick = function() {
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons(); 
-            window.removeEventListener('resize', () => checkBodyTitleSpace());
+            window.removeEventListener('resize', checkBodyTitleSpace);
             setBodyTitleVisible(false);
             window.prepareAndTransitionToScreen(
                 document.getElementById('legal_notice_screen'),
@@ -89,7 +89,7 @@ function setupCreditsBackButton() {
     if (creditsBackBtn) {
         creditsBackBtn.onclick = function() {
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons(); 
-            window.removeEventListener('resize', () => checkBodyTitleSpace());
+            window.removeEventListener('resize', checkBodyTitleSpace);
             setBodyTitleVisible(false);
             window.prepareAndTransitionToScreen(
                 document.getElementById('credits_screen'),
