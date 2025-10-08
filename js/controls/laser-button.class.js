@@ -149,6 +149,19 @@ class LaserButton {
      * Handle tap/click to detect single vs double tap
      */
     handleTap() {
+        const worldRef = window.world;
+        const superShots = worldRef?.superShotBar?.getSuperShots?.() || 0;
+        if (superShots > 0) {
+            this.handleTapWithSuperlaser();
+        } else {
+            this.fireLaser();
+            this.lastTapTime = Date.now();        }
+    }
+
+    /**
+     * Handle tap with superlaser available (single vs double tap)
+     */
+    handleTapWithSuperlaser() {
         const currentTime = Date.now();
         const timeSinceLastTap = currentTime - this.lastTapTime;
         if (timeSinceLastTap < this.doubleTapDelay && this.singleTapTimeout) {
