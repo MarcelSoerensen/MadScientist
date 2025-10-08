@@ -5,8 +5,9 @@ function setupStartScreenButtons() {
     const { storyBtn, controlsBtn, playBtn } = resetStartScreenButtons();
     setupPlayButton(playBtn, storyBtn, controlsBtn);
     setupStoryButton(storyBtn, playBtn, controlsBtn);
-    setupControlsButton(controlsBtn, playBtn, storyBtn);    setupLegalAndCreditLinks();
-    setupLegalAndCreditLinks();
+    setupControlsButton(controlsBtn, playBtn, storyBtn);
+    setupLegalNoticeLink();
+    setupCreditsLink();
 }
 
 /**
@@ -29,23 +30,34 @@ function resetStartScreenButtons() {
 /**
  * Sets up the primary start screen buttons with their event listeners.
  */
-function setupLegalAndCreditLinks() {
+function setupLegalNoticeLink() {
     const startScreen = document.getElementById('start_screen');
     const legalNoticeLink = document.getElementById('legal-notice-link');
-    const creditsLink = document.getElementById('credits-link');
-    const go = (targetId) => {
-        if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
-        window.prepareAndTransitionToScreen(startScreen, document.getElementById(targetId));
-    };
     if (legalNoticeLink) {
-        legalNoticeLink.onclick = (e) => { if (e.cancelable) e.preventDefault(); go('legal_notice_screen');     
+        legalNoticeLink.onclick = (e) => {
+            if (e.cancelable) e.preventDefault();
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            window.prepareAndTransitionToScreen(startScreen, document.getElementById('legal_notice_screen'));
             setBodyTitleVisible(true);
- };
+            window.addEventListener('resize', () => checkBodyTitleSpace());
+        };
     }
+}
+
+/** 
+ * Sets up the credits link on the start screen.
+ */
+function setupCreditsLink() {
+    const startScreen = document.getElementById('start_screen');
+    const creditsLink = document.getElementById('credits-link');
     if (creditsLink) {
-        creditsLink.onclick = (e) => { if (e.cancelable) e.preventDefault(); go('credits_screen');     
+        creditsLink.onclick = (e) => {
+            if (e.cancelable) e.preventDefault();
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            window.prepareAndTransitionToScreen(startScreen, document.getElementById('credits_screen'));
             setBodyTitleVisible(true);
-};
+            window.addEventListener('resize', () => checkBodyTitleSpace());
+        };
     }
 }
 

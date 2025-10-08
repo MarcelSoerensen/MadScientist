@@ -3,6 +3,7 @@
  */
 function showStoryScreen() {
     setBodyTitleVisible(true);
+    window.addEventListener('resize', () => checkBodyTitleSpace());
     const startScreen = document.getElementById('start_screen');
     const storyScreen = document.getElementById('story_screen');
     const controlScreen = document.getElementById('control_screen');

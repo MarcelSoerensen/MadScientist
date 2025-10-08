@@ -128,6 +128,20 @@ function setBodyTitleVisible(visible) {
 }
 
 /**
+ * Checks if there is enough space above the canvas for the body title.
+ */
+function checkBodyTitleSpace(minSpacePx = 60) {
+    const bodyTitle = document.querySelector('.body-title');
+    const canvas = document.getElementById('canvas');
+    if (!bodyTitle || !canvas) return;
+    const canvasRect = canvas.getBoundingClientRect();
+    const spaceAboveCanvas = canvasRect.top;
+    const fontSize = parseFloat(window.getComputedStyle(bodyTitle).fontSize) || minSpacePx;
+    const requiredSpace = fontSize * 3;
+    setBodyTitleVisible(spaceAboveCanvas > requiredSpace);
+}
+
+/**
  * Initializes the start screen and related UI elements on DOMContentLoaded.
  */
 function initStartScreen() {

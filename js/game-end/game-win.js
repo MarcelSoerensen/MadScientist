@@ -3,6 +3,7 @@
  */
 function showWinScreen(scoreData = null) {
     setBodyTitleVisible(true)
+    window.addEventListener('resize', () => checkBodyTitleSpace());
     const canvas = document.getElementById('canvas');
     const winScreen = document.getElementById('win_screen');
     if (!canvas || !winScreen) return;
