@@ -2,6 +2,7 @@
  * Fades out the canvas and shows the win screen.
  */
 function showWinScreen(scoreData = null) {
+    setBodyTitleVisible(true)
     const canvas = document.getElementById('canvas');
     const winScreen = document.getElementById('win_screen');
     if (!canvas || !winScreen) return;
@@ -49,6 +50,7 @@ function setupWinScreenButtons() {
             const winScreen = document.getElementById('win_screen');
             if (!winScreen) return;
             window.transitionToStartScreen(winScreen);
+            setBodyTitleVisible(false);
         });
     }
 }

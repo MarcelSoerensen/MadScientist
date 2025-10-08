@@ -121,6 +121,7 @@ function animateStartScreenCharacter() {
 function setBodyTitleVisible(visible) {
     const bodyTitle = document.querySelector('.body-title');
     if (bodyTitle) {
+        bodyTitle.style.transition = 'opacity 2s cubic-bezier(.7,-0.2,.3,1.2)';
         bodyTitle.style.opacity = visible ? 1 : 0;
         bodyTitle.style.pointerEvents = visible ? 'auto' : 'none';
     }
@@ -147,6 +148,7 @@ function updateBodyTitleVisibilityBySpace(minSpacePx = 2000) {
  */
 function initStartScreen() {
     updateBodyTitleVisibilityBySpace();
+    setBodyTitleVisible(false);
     animateStartScreenCharacter();
     const startScreen = document.getElementById('start_screen');
     if (startScreen && !startScreen.classList.contains('d-none')) {
@@ -180,7 +182,6 @@ function prepareGameStart(canvas) {
         canvas.style.filter = 'brightness(0)';
         canvas.style.pointerEvents = 'none';
         showCanvas(canvas);
-        showBodyTitle();
     }
     startBackgroundMusic();
     runGameInit();
@@ -233,17 +234,6 @@ function runGameInit() {
         window.restartGame();
     } else if (typeof init === 'function') {
         init();
-    }
-}
-
-/**
- * Shows the body title by setting its opacity and pointer events.
- */
-function showBodyTitle() {
-    const bodyTitle = document.querySelector('.body-title');
-    if (bodyTitle) {
-        bodyTitle.style.opacity = 1;
-        bodyTitle.style.pointerEvents = 'auto';
     }
 }
 

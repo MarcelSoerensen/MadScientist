@@ -2,6 +2,7 @@
  * Fades out the start screen and shows the control screen.
  */
 function showControlScreen() {
+    setBodyTitleVisible(true);
     const startScreen = document.getElementById('start_screen');
     const controlScreen = document.getElementById('control_screen');
     const storyScreen = document.getElementById('story_screen');
@@ -34,6 +35,8 @@ function setupControlScreenBackButton() {
         const controlScreen = document.getElementById('control_screen');
         if (!controlScreen) return;
         window.transitionToStartScreen(controlScreen);
+            setBodyTitleVisible(false);
+
     });
 }
 

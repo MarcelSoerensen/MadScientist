@@ -64,7 +64,10 @@ class SystemButtonManager {
     static initSystemButtons() {
         const backBtn = document.getElementById('back-btn');
         if (backBtn) {
-            backBtn.onclick = SystemButtonManager.handleBackToStart;
+            backBtn.onclick = () => {
+                SystemButtonManager.handleBackToStart();
+                setBodyTitleVisible(false);
+            };
         }
     }
 

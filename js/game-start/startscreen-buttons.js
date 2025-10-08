@@ -38,10 +38,14 @@ function setupLegalAndCreditLinks() {
         window.prepareAndTransitionToScreen(startScreen, document.getElementById(targetId));
     };
     if (legalNoticeLink) {
-        legalNoticeLink.onclick = (e) => { if (e.cancelable) e.preventDefault(); go('legal_notice_screen'); };
+        legalNoticeLink.onclick = (e) => { if (e.cancelable) e.preventDefault(); go('legal_notice_screen');     
+            setBodyTitleVisible(true);
+ };
     }
     if (creditsLink) {
-        creditsLink.onclick = (e) => { if (e.cancelable) e.preventDefault(); go('credits_screen'); };
+        creditsLink.onclick = (e) => { if (e.cancelable) e.preventDefault(); go('credits_screen');     
+            setBodyTitleVisible(true);
+};
     }
 }
 
@@ -52,7 +56,8 @@ function setupLegalNoticeBackButton() {
     const legalNoticeBackBtn = document.querySelector('#legal_notice_screen .legal-notice-btn');
     if (legalNoticeBackBtn) {
         legalNoticeBackBtn.onclick = function() {
-            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons(); 
+            setBodyTitleVisible(false);
             window.prepareAndTransitionToScreen(
                 document.getElementById('legal_notice_screen'),
                 document.getElementById('start_screen')
@@ -68,7 +73,8 @@ function setupCreditsBackButton() {
     const creditsBackBtn = document.querySelector('#credits_screen .credits-btn');
     if (creditsBackBtn) {
         creditsBackBtn.onclick = function() {
-            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons(); 
+            setBodyTitleVisible(false);
             window.prepareAndTransitionToScreen(
                 document.getElementById('credits_screen'),
                 document.getElementById('start_screen')
