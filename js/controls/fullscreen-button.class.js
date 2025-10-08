@@ -63,8 +63,8 @@ class FullscreenManager {
     addTouchListeners() {
         if (!this.fullscreenButton) return;
         const btn = this.fullscreenButton;
-        const press = e => { e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); };
-        const release = e => { e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.toggleFullscreen(); };
+        const press = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); };
+        const release = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.toggleFullscreen(); };
         ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, press, { passive:false }));
         ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, release, { passive:false }));
     }

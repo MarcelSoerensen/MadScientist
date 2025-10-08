@@ -120,8 +120,8 @@ class JumpButton {
     addTouchListeners() {
         if (!this.jumpButton) return;
         const btn = this.jumpButton;
-        const press = e => { e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); this.startJumping(); };
-        const release = e => { e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.stopJumping(); };
+        const press = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); this.startJumping(); };
+        const release = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.stopJumping(); };
         ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, press, { passive:false }));
         ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, release, { passive:false }));
     }

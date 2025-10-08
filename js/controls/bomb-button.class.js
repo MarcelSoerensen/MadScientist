@@ -103,11 +103,11 @@ class BombButton {
     addBombTouchListeners() {
         if (!this.bombButton) return;
         const btn = this.bombButton;
-        const press = e => { e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); };
-        const release = e => { e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.throwBomb(); };
+        const press = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); };
+        const release = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.throwBomb(); };
         ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, press, { passive:false }));
         ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, release, { passive:false }));
-        btn.addEventListener('contextmenu', e => e.preventDefault());
+        btn.addEventListener('contextmenu', e => { if (e.cancelable) e.preventDefault(); });
     }
 
     /**

@@ -38,10 +38,10 @@ function setupLegalAndCreditLinks() {
         window.prepareAndTransitionToScreen(startScreen, document.getElementById(targetId));
     };
     if (legalNoticeLink) {
-        legalNoticeLink.onclick = (e) => { e.preventDefault(); go('legal_notice_screen'); };
+        legalNoticeLink.onclick = (e) => { if (e.cancelable) e.preventDefault(); go('legal_notice_screen'); };
     }
     if (creditsLink) {
-        creditsLink.onclick = (e) => { e.preventDefault(); go('credits_screen'); };
+        creditsLink.onclick = (e) => { if (e.cancelable) e.preventDefault(); go('credits_screen'); };
     }
 }
 

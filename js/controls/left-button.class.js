@@ -116,8 +116,8 @@ class LeftButton {
     addLeftTouchListeners() {
         if (!this.leftButton) return;
         const btn = this.leftButton;
-        const press = e => { e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); this.startMovingLeft(); };
-        const release = e => { e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.stopMovingLeft(); };
+        const press = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); this.startMovingLeft(); };
+        const release = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.stopMovingLeft(); };
         ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, press, { passive:false }));
         ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, release, { passive:false }));
     }

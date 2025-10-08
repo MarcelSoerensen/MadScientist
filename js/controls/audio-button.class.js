@@ -93,7 +93,7 @@ class AudioButtonManager {
     static addListeners() {
         AudioButtonManager.configs.forEach(cfg => {
             document.getElementById(cfg.btnId)?.addEventListener('click', e => {
-                e.preventDefault();
+                if (e.cancelable) e.preventDefault();
                 AudioButtonManager.unlockAudio();
                 AudioButtonManager.setMutedAll(!AudioButtonManager.muted);
                 window.dispatchEvent?.(new CustomEvent('audio-mute-changed', { detail: { muted: AudioButtonManager.muted } }));
