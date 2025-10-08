@@ -38,8 +38,9 @@ function setupLegalNoticeLink() {
             if (e.cancelable) e.preventDefault();
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
             window.prepareAndTransitionToScreen(startScreen, document.getElementById('legal_notice_screen'));
-            setBodyTitleVisible(true);
             window.addEventListener('resize', () => checkBodyTitleSpace());
+            setBodyTitleVisible(true);
+            checkBodyTitleSpace();
         };
     }
 }
@@ -55,8 +56,9 @@ function setupCreditsLink() {
             if (e.cancelable) e.preventDefault();
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
             window.prepareAndTransitionToScreen(startScreen, document.getElementById('credits_screen'));
-            setBodyTitleVisible(true);
             window.addEventListener('resize', () => checkBodyTitleSpace());
+            setBodyTitleVisible(true);
+            checkBodyTitleSpace();
         };
     }
 }

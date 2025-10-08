@@ -2,8 +2,9 @@
  * Fades out the start screen and shows the story screen.
  */
 function showStoryScreen() {
-    setBodyTitleVisible(true);
     window.addEventListener('resize', () => checkBodyTitleSpace());
+    setBodyTitleVisible(true);
+    checkBodyTitleSpace();
     const startScreen = document.getElementById('start_screen');
     const storyScreen = document.getElementById('story_screen');
     const controlScreen = document.getElementById('control_screen');

@@ -39,8 +39,9 @@ window.handleScreenTransition = handleScreenTransition;
  * Transitions from the start screen to the canvas.
  */
 function transitionFromStartScreenToCanvas(startScreen, canvas) {
-    setBodyTitleVisible(true);
     window.addEventListener('resize', () => checkBodyTitleSpace());
+    setBodyTitleVisible(true);
+    checkBodyTitleSpace();
     if (!startScreen || !canvas) return;
     startScreen.style.filter = 'brightness(0)';
     window.prepareAndTransitionToScreen(startScreen, canvas);

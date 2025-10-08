@@ -2,8 +2,9 @@
  * Fades out the canvas and shows the win screen.
  */
 function showWinScreen(scoreData = null) {
-    setBodyTitleVisible(true)
     window.addEventListener('resize', () => checkBodyTitleSpace());
+    setBodyTitleVisible(true);
+    checkBodyTitleSpace();
     const canvas = document.getElementById('canvas');
     const winScreen = document.getElementById('win_screen');
     if (!canvas || !winScreen) return;
