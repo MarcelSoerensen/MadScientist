@@ -31,10 +31,12 @@ function initBackgroundMusic() {
     bgMusic.muted = SoundCacheManager.muted;
     if (isCanvasVisible()) {
         bgMusic.volume = bgMusic.muted ? 0 : 0.08;
-        bgMusic.play().catch(()=>{});
+        bgMusic.play().catch(e => {
+            if (e.name !== 'AbortError') console.error(e);
+        });
     } else {
-        bgMusic.volume = 0;
-        bgMusic.pause();
+    bgMusic.volume = 0;
+    bgMusic.pause();
     }
 
 /**

@@ -83,7 +83,9 @@ function animateCountdownNumber(numberSpan, count) {
     void numberSpan.offsetWidth;
     numberSpan.style.transition = '';
     try {
-        SoundCacheManager.getAudio('sounds/counter.mp3').play();
+        SoundCacheManager.getAudio('sounds/counter.mp3').play().catch(e => {
+            if (e.name !== 'AbortError') console.error(e);
+        });
     } catch (e) {}
     setTimeout(() => { numberSpan.style.opacity = 1; numberSpan.style.transform = 'scale(1)'; }, 10);
     setTimeout(() => numberSpan.style.transform = 'scale(2)', 200);

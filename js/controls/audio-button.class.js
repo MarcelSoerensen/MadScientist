@@ -59,7 +59,9 @@ class AudioButtonManager {
             bgMusic.muted = AudioButtonManager.muted;
             bgMusic.volume = AudioButtonManager.muted ? 0 : 0.08;
             if (!AudioButtonManager.muted) {
-                bgMusic.play().catch(()=>{});
+                bgMusic.play().catch(e => {
+                    if (e.name !== 'AbortError') console.error(e);
+                });
             }
         }
     }
@@ -74,7 +76,9 @@ class AudioButtonManager {
                 ? SoundCacheManager.getAudio('sounds/laser-shot.mp3')
                 : new Audio('sounds/laser-shot.mp3');
             audio.volume = 0;
-            audio.play().catch(()=>{});
+            audio.play().catch(e => {
+                if (e.name !== 'AbortError') console.error(e);
+            });
         } catch (e) {}
         AudioButtonManager.unlocked = true;
         if (typeof window.CustomEvent === 'function') {

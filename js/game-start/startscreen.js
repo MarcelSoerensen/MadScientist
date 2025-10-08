@@ -75,7 +75,9 @@ function animateLaserFrames(img, frames, interval, done) {
  */
 function playLaserSound() {
     try {
-        SoundCacheManager.getAudio('sounds/laser-shot.mp3').play();
+        SoundCacheManager.getAudio('sounds/laser-shot.mp3').play().catch(e => {
+            if (e.name !== 'AbortError') console.error(e);
+        });
     } catch (e) {}
 }
 

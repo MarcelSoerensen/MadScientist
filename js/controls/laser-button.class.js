@@ -110,8 +110,8 @@ class LaserButton {
     addLaserTouchListeners() {
         if (!this.laserButton) return;
         const btn = this.laserButton;
-        const press = e => { e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); };
-        const release = e => { e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.handleTap(); };
+        const press = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.add('pressed'); };
+        const release = e => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); btn.classList.remove('pressed'); this.handleTap(); };
         ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, press, { passive:false }));
         ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev => btn.addEventListener(ev, release, { passive:false }));
         btn.addEventListener('contextmenu', e => e.preventDefault());
