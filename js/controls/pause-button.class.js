@@ -69,7 +69,7 @@ class PauseButtonManager {
     }
 
     /**
-     * Setzt die Pause-Darstellung für die System-Buttons (Canvas)
+     * Set the pause representation for the system buttons (canvas)
      */
     static setSystemButtonPauseState() {
         const backBtn = document.getElementById('back-btn');
@@ -100,8 +100,8 @@ class PauseButtonManager {
         }
     }
 
-    /**
-     * Setzt alle weiteren Audio-Buttons auf Pause-Darstellung
+    /** 
+     * set all other audio buttons to paused state
      */
     static setOtherAudioButtonsPauseState() {
         AudioButtonManager.configs.forEach(cfg => {
@@ -113,7 +113,7 @@ class PauseButtonManager {
         });
     }
 
-    /**
+    /** 
      * Indicates whether the game is currently paused.
      */
     static isPaused = false;

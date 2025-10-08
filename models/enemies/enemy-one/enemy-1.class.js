@@ -37,6 +37,25 @@ class EnemyOne extends CollidableObject {
         this.visible = false;
         this._waitingForCharacter = true;
         this._activateAt = activateAt;
+        this.animationStarted = false;
+        this.startProximityCheck();
+    }
+    /**
+     * (Re)starts the proximity check to trigger the enemy animation once the character is close enough.
+     */
+    startProximityCheck() {
+        if (this.animationStarted || this.checkProximityInterval) return;
+        this.checkProximityInterval = setInterval(() => {
+            const c = window.character;
+            if (!c || this.animationStarted) return;
+            if (Math.abs(this.x - c.x) > 1000) return;
+            this.animationStarted = true;
+            this._waitingForCharacter = false;
+            this.visible = true;
+            this.handler?.animateEnemyOne?.(this);
+            clearInterval(this.checkProximityInterval);
+            this.checkProximityInterval = null;
+        }, 100);
     }
 
     /**
