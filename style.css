@@ -34,13 +34,17 @@ body {
     font-family: 'Freckle Face', cursive, Arial, sans-serif;
 }
 .body-title {
-    margin-top: -30px;
+    position: absolute;
+    left: 50%;
+    top: 32px;
+    transform: translateX(-50%);
     font-size: 3em;
     color: #8e2a21;
     text-shadow: 4px 4px 4px rgba(255, 255, 255, 0.8);
     opacity: 0;
     pointer-events: none;
     transition: opacity 1s;
+    z-index: 10;
 }
 
 .d-none {
@@ -97,7 +101,8 @@ canvas {
     }
 
     .body-title{
-        display: none;
+        visibility: hidden;
+        height: auto;
     }
 }
 
@@ -108,7 +113,8 @@ canvas {
        max-height: 100vh;
    }
    .body-title {
-        display: none;
+        visibility: hidden;
+        height: auto;
     }
 }
     .paused-border {

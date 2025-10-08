@@ -120,17 +120,36 @@ function animateStartScreenCharacter() {
  */
 function setBodyTitleVisible(visible) {
     const bodyTitle = document.querySelector('.body-title');
+    const startScreen = document.getElementById('start_screen');
+    const startScreenVisible = startScreen && !startScreen.classList.contains('d-none') && startScreen.style.display !== 'none';
     if (bodyTitle) {
-        bodyTitle.style.opacity = visible ? 1 : 0;
-        bodyTitle.style.pointerEvents = visible ? 'auto' : 'none';
+        const showTitle = visible && !startScreenVisible;
+        bodyTitle.style.opacity = showTitle ? 1 : 0;
+        bodyTitle.style.pointerEvents = showTitle ? 'auto' : 'none';
     }
+}
+
+/**
+ * Updates the visibility of the body title based on the available space above the canvas.
+ */
+function updateBodyTitleVisibilityBySpace(minSpacePx = 60) {
+    const bodyTitle = document.querySelector('.body-title');
+    const canvas = document.getElementById('canvas');
+    if (!bodyTitle || !canvas) return;
+    const canvasRect = canvas.getBoundingClientRect();
+    const spaceAboveCanvas = canvasRect.top;
+    const fontSize = parseFloat(window.getComputedStyle(bodyTitle).fontSize) || minSpacePx;
+    const requiredSpace = fontSize * 2.2;
+    const titleRect = bodyTitle.getBoundingClientRect();
+    const titleFullyVisible = titleRect.top >= 0 && titleRect.bottom <= window.innerHeight;
+    setBodyTitleVisible(spaceAboveCanvas > requiredSpace && titleFullyVisible);
 }
 
 /**
  * Initializes the start screen and related UI elements on DOMContentLoaded.
  */
 function initStartScreen() {
-    setBodyTitleVisible(false);
+    updateBodyTitleVisibilityBySpace();
     animateStartScreenCharacter();
     const startScreen = document.getElementById('start_screen');
     if (startScreen && !startScreen.classList.contains('d-none')) {
@@ -138,6 +157,7 @@ function initStartScreen() {
     }
     const storyScreen = document.getElementById('story_screen');
     if (storyScreen) storyScreen.style.display = 'none';
+    window.addEventListener('resize', () => updateBodyTitleVisibilityBySpace());
 }
 
 /**
