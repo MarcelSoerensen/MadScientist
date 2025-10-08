@@ -38,13 +38,14 @@ body {
     left: 50%;
     top: 32px;
     transform: translateX(-50%);
-    font-size: 3em;
+    font-size: clamp(1.5em, 8vw, 3.5em);
+    margin-top: clamp(-1.2em, 3vw, 1.8em);
     color: #8e2a21;
     text-shadow: 4px 4px 4px rgba(255, 255, 255, 0.8);
     opacity: 0;
     pointer-events: none;
     transition: opacity 1s;
-    z-index: 10;
+    z-index: 9999;
 }
 
 .d-none {
@@ -78,7 +79,10 @@ canvas {
        width: 100%;
        max-width: 100vw;
    }
-    .start-screen-title, 
+    .start-screen-title {
+        z-index: 100;
+        position: relative;
+    }
     .story-screen-title,
     .control-screen-title,
     .game-over-screen-title,
@@ -100,10 +104,7 @@ canvas {
         top: -8%;   
     }
 
-    .body-title{
-        visibility: hidden;
-        height: auto;
-    }
+    
 }
 
 @media only screen and (max-height: 480px) {
@@ -112,10 +113,7 @@ canvas {
        height: 100vh;
        max-height: 100vh;
    }
-   .body-title {
-        visibility: hidden;
-        height: auto;
-    }
+   
 }
     .paused-border {
     border: 2px solid rgb(125, 22, 14) !important;

@@ -310,10 +310,6 @@
     #credits_textbox {
         top: -8%;   
     }
-
-    .body-title{
-        display: none;
-    }
 }
 
 @media only screen and (max-height: 480px){
