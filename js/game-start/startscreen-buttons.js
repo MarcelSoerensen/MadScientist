@@ -71,6 +71,7 @@ function setupLegalNoticeBackButton() {
     if (legalNoticeBackBtn) {
         legalNoticeBackBtn.onclick = function() {
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons(); 
+            window.removeEventListener('resize', () => checkBodyTitleSpace());
             setBodyTitleVisible(false);
             window.prepareAndTransitionToScreen(
                 document.getElementById('legal_notice_screen'),
@@ -88,6 +89,7 @@ function setupCreditsBackButton() {
     if (creditsBackBtn) {
         creditsBackBtn.onclick = function() {
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons(); 
+            window.removeEventListener('resize', () => checkBodyTitleSpace());
             setBodyTitleVisible(false);
             window.prepareAndTransitionToScreen(
                 document.getElementById('credits_screen'),

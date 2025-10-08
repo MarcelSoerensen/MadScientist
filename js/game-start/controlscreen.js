@@ -37,6 +37,7 @@ function setupControlScreenBackButton() {
         const controlScreen = document.getElementById('control_screen');
         if (!controlScreen) return;
         window.transitionToStartScreen(controlScreen);
+        window.removeEventListener('resize', () => checkBodyTitleSpace());
             setBodyTitleVisible(false);
 
     });

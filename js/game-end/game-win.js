@@ -52,6 +52,7 @@ function setupWinScreenButtons() {
             const winScreen = document.getElementById('win_screen');
             if (!winScreen) return;
             window.transitionToStartScreen(winScreen);
+            window.removeEventListener('resize', () => checkBodyTitleSpace());
             setBodyTitleVisible(false);
         });
     }

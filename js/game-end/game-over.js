@@ -33,6 +33,7 @@ function setupGameOverScreenButtons() {
             const gameOverScreen = document.getElementById('game_over_screen');
             if (!gameOverScreen) return;
             window.transitionToStartScreen(gameOverScreen);
+            window.removeEventListener('resize', () => checkBodyTitleSpace());
             setBodyTitleVisible(false);
 
         });

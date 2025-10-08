@@ -47,6 +47,7 @@ function setupBackButton() {
         newBackBtn.addEventListener('click', function() {
             const storyScreen = document.getElementById('story_screen');
             if (storyScreen) window.transitionToStartScreen(storyScreen);
+            window.removeEventListener('resize', () => checkBodyTitleSpace());
                 setBodyTitleVisible(false);
 
         });

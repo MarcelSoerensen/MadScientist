@@ -66,6 +66,7 @@ class SystemButtonManager {
         if (backBtn) {
             backBtn.onclick = () => {
                 SystemButtonManager.handleBackToStart();
+                window.removeEventListener('resize', () => checkBodyTitleSpace());
                 setBodyTitleVisible(false);
             };
         }
