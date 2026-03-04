@@ -7,7 +7,7 @@
     bottom: clamp(-0.5rem , 1.2vw, 1rem);
     transform: translateX(-50%);
     width: 100%;
-    gap: clamp(1vw, 1vw, 5rem);
+    gap: clamp(0.2rem, 0.6vw, 0.8rem);
     flex-wrap: wrap;
 }
 
@@ -52,5 +52,5 @@
 .start-screen-link-separator {
     color: rgba(255, 255, 255, 0.5);
     font-size: clamp(0.7rem, 0.8rem + 0.4vw, 1.1rem);
-    margin: 0 clamp(0.5rem, 1.2vw, 1rem);
+    margin: 0 clamp(0.15rem, 0.4vw, 0.4rem);
 }

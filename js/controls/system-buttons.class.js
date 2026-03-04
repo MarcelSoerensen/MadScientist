@@ -13,6 +13,7 @@ class SystemButtonManager {
             document.getElementById('story_screen'),
             document.getElementById('control_screen'),
             document.getElementById('legal_notice_screen'),
+            document.getElementById('privacy_policy_screen'),
             document.getElementById('credits_screen'),
             document.getElementById('orientation-overlay')
         ].filter(el => el && !el.classList.contains('d-none'));

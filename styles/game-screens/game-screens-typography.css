@@ -21,15 +21,18 @@
 #game_over_textbox p,
 #win_textbox p,
 #legal_notice_textbox p,
+#privacy_policy_textbox p,
 #credits_textbox p {
   text-align: center;
-  font-size: 1.2em;
+  font-size: 1.1em;
   line-height: 1.4em;
   margin: 0;
 }
 
 #legal_notice_textbox,
 #legal_notice_textbox p,
+#privacy_policy_textbox,
+#privacy_policy_textbox p,
 #credits_textbox,
 #credits_textbox p,
 #story_textbox,
@@ -41,8 +44,37 @@
 #legal_notice_textbox li,
 #legal_notice_textbox span,
 #legal_notice_textbox a,
+#privacy_policy_textbox p,
+#privacy_policy_textbox li,
+#privacy_policy_textbox span,
+#privacy_policy_textbox a,
 #credits_textbox a {
-  font-size: 1em;
+  font-size: 0.9em;
+}
+
+#legal_notice_textbox h1,
+#privacy_policy_textbox h1 {
+  font-size: 1.5em;
+  margin-top: 0;
+  margin-bottom: 0.4em;
+}
+
+#legal_notice_textbox h2,
+#privacy_policy_textbox h2 {
+  font-size: 1.3em;
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
+}
+
+#privacy_policy_textbox h3{
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-top: 0.6em;
+  margin-bottom: 0.5em;
+}
+
+#privacy_policy_textbox h4 {
+  margin-top: 1em;
 }
 
 #legal_notice_textbox p strong {
@@ -54,6 +86,7 @@
 }
 
 #legal_notice_textbox a,
+#privacy_policy_textbox a,
 #credits_textbox a {
   color: rgb(117, 252, 220);
   text-decoration: none;
@@ -66,7 +99,8 @@
 }
 
 #credits_textbox a:hover,
-#legal_notice_textbox a:hover {
+#legal_notice_textbox a:hover,
+#privacy_policy_textbox a:hover {
   color: rgba(117, 252, 220, 0.7);
   opacity: 0.7;
   text-decoration: none;
@@ -74,7 +108,8 @@
 }
 
 #credits_textbox a:active,
-#legal_notice_textbox a:active {
+#legal_notice_textbox a:active,
+#privacy_policy_textbox a:active {
   color: rgb(51, 81, 97);
   opacity: 0.85;
 }

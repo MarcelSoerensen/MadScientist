@@ -7,6 +7,7 @@ function setupStartScreenButtons() {
     setupStoryButton(storyBtn, playBtn, controlsBtn);
     setupControlsButton(controlsBtn, playBtn, storyBtn);
     setupLegalNoticeLink();
+    setupPrivacyPolicyLink();
     setupCreditsLink();
 }
 
@@ -38,6 +39,24 @@ function setupLegalNoticeLink() {
             if (e.cancelable) e.preventDefault();
             if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
             window.prepareAndTransitionToScreen(startScreen, document.getElementById('legal_notice_screen'));
+            window.addEventListener('resize', checkBodyTitleSpace);
+            setBodyTitleVisible(true);
+            checkBodyTitleSpace();
+        };
+    }
+}
+
+/**
+ * Sets up the privacy policy link on the start screen.
+ */
+function setupPrivacyPolicyLink() {
+    const startScreen = document.getElementById('start_screen');
+    const privacyLink = document.getElementById('privacy-policy-link');
+    if (privacyLink) {
+        privacyLink.onclick = (e) => {
+            if (e.cancelable) e.preventDefault();
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            window.prepareAndTransitionToScreen(startScreen, document.getElementById('privacy_policy_screen'));
             window.addEventListener('resize', checkBodyTitleSpace);
             setBodyTitleVisible(true);
             checkBodyTitleSpace();
@@ -102,8 +121,27 @@ function setupCreditsBackButton() {
 
 document.addEventListener('DOMContentLoaded', function() {
     setupLegalNoticeBackButton();
+    setupPrivacyPolicyBackButton();
     setupCreditsBackButton();
 });
+
+/**
+ * Sets up the back button on the privacy policy screen.
+ */
+function setupPrivacyPolicyBackButton() {
+    const privacyBackBtn = document.querySelector('#privacy_policy_screen .privacy-policy-btn');
+    if (privacyBackBtn) {
+        privacyBackBtn.onclick = function() {
+            if (typeof window.hideSystemButtons === 'function') window.hideSystemButtons();
+            window.removeEventListener('resize', checkBodyTitleSpace);
+            setBodyTitleVisible(false);
+            window.prepareAndTransitionToScreen(
+                document.getElementById('privacy_policy_screen'),
+                document.getElementById('start_screen')
+            );
+        };
+    }
+}
 
 /**
  * Disables all start screen buttons to prevent multiple clicks and race conditions.

@@ -9,6 +9,7 @@
 #game_over_screen .game-over-screen-title,
 #win_screen .win-screen-title,
 #legal_notice_screen .legal-notice-title,
+#privacy_policy_screen .privacy-policy-title,
 #credits_screen .credits-title {
   opacity: 0;
   transform: translateX(-50%) scale(0.7);

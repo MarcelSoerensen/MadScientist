@@ -29,6 +29,7 @@
 .game-over-screen-btn,
 .win-screen-btn,
 .legal-notice-btn,
+.privacy-policy-btn,
 .credits-btn {
   font-family: "Happy Monkey", "Freckle Face", cursive, Arial, sans-serif;
   max-height: 50px;
@@ -63,6 +64,7 @@
 .game-over-screen-btn,
 .win-screen-btn,
 .legal-notice-btn,
+.privacy-policy-btn,
 .credits-btn {
   width: 6.5em;
 }
@@ -73,6 +75,7 @@
 .game-over-screen-btn:hover,
 .win-screen-btn:hover,
 .legal-notice-btn:hover,
+.privacy-policy-btn:hover,
 .credits-btn:hover {
   background: rgba(47, 104, 116, 0.8) !important;
   color: #fff !important;
@@ -109,6 +112,7 @@
 .game-over-screen-btn:active,
 .win-screen-btn:active,
 .legal-notice-btn:active,
+.privacy-policy-btn:active,
 .credits-btn:active {
   transform: scale(0.94) translateY(4px);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
@@ -132,6 +136,7 @@
 .game-over-screen-btn:focus,
 .win-screen-btn:focus,
 .legal-notice-btn:focus,
+.privacy-policy-btn:focus,
 .credits-btn:focus {
   outline: none;
 }
@@ -142,6 +147,7 @@
 .game-over-screen-btn:focus-visible,
 .win-screen-btn:focus-visible,
 .legal-notice-btn:focus-visible,
+.privacy-policy-btn:focus-visible,
 .credits-btn:focus-visible {
   outline: 3px solid rgba(255, 255, 255, 0.85);
   outline-offset: 3px;
@@ -165,6 +171,7 @@
 .game-over-screen-btn::after,
 .win-screen-btn::after,
 .legal-notice-btn::after,
+.privacy-policy-btn::after,
 .credits-btn::after {
   content: "";
   position: absolute;
@@ -192,6 +199,7 @@
 .game-over-screen-btn:hover::after,
 .win-screen-btn:hover::after,
 .legal-notice-btn:hover::after,
+.privacy-policy-btn:hover::after,
 .credits-btn:hover::after {
   opacity: 1;
   animation: glass-reflect-diag 0.7s linear;
