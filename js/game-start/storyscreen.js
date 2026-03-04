@@ -82,7 +82,6 @@ function getCurrentStoryTextPercent(storyText) {
         const elapsed = performance.now() - (storyText._storyAnimStart || 0);
         return Math.max(-100, Math.min(30 - 130 * (elapsed / duration), 30));
     }
-    if (anim === 'story-scroll-down-reverse') return 30;
     return -100;
 }
 

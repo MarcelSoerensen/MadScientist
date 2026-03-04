@@ -1,0 +1,55 @@
+.start-screen-title {
+  opacity: 0;
+  transform: scale(0.7);
+  animation: title-grow-fade 2s cubic-bezier(0.7, -0.2, 0.3, 1.2) 0.1s forwards;
+}
+
+#story_screen .story-screen-title,
+#control_screen .control-screen-title,
+#game_over_screen .game-over-screen-title,
+#win_screen .win-screen-title,
+#legal_notice_screen .legal-notice-title,
+#credits_screen .credits-title {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.7);
+  animation: overlay-title-grow-fade 2s cubic-bezier(0.7, -0.2, 0.3, 1.2) 0.1s
+    forwards;
+}
+
+#story_textbox p {
+  animation: story-scroll-up 60s linear 0.2s both;
+  will-change: transform, opacity;
+}
+
+@keyframes title-grow-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes overlay-title-grow-fade {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes story-scroll-up {
+  0% {
+    opacity: 1;
+    transform: translateY(calc(30%));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(calc(-100%));
+  }
+}

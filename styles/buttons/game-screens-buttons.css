@@ -1,26 +1,26 @@
 .start-screen-btn-group {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 1.5em;
-    margin-top: 1.2em;
-    margin-left: 1.2em;
-    padding-bottom:  2em;
-} 
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.5em;
+  margin-top: 1.2em;
+  margin-left: 1.2em;
+  padding-bottom: 2em;
+}
 
 .story-screen-buttons,
 .control-screen-buttons,
 .game-over-screen-buttons,
 .win-screen-buttons {
-    display: flex;
-    flex-direction: row;
-    gap: 2em;
-    justify-content: center;
-    align-items: center;
-    bottom: -0.2em;
-    margin-top: -0.5em;
+  display: flex;
+  flex-direction: row;
+  gap: 2em;
+  justify-content: center;
+  align-items: center;
+  bottom: -0.2em;
+  margin-top: -1.5em;
 }
 
 .start-screen-btn,
@@ -30,25 +30,32 @@
 .win-screen-btn,
 .legal-notice-btn,
 .credits-btn {
-    font-family: 'Happy Monkey', 'Freckle Face', cursive, Arial, sans-serif;
-    max-height: 50px;
-    max-width: 130%;
-    width: 130%;
-    font-size: 1.5em;
-    cursor: pointer;
-    border: 3px solid rgba(255,255,255,1);
-    border-radius: 0.25em;
-    background: rgba(240, 179, 83, 0.9);
-    padding: 0.3em 1.2em;
-    color: rgba(10, 19, 29, 1);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2), 18px 16px 32px 0 rgba(0,0,0,0.6), 6px 8px 16px 0 rgba(0,0,0,0.13);
-    transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
-    position: relative;
-    overflow: hidden;
-    pointer-events: auto !important;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    user-select: none;
+  font-family: "Happy Monkey", "Freckle Face", cursive, Arial, sans-serif;
+  max-height: 50px;
+  max-width: 130%;
+  width: 130%;
+  font-size: 1.5em;
+  cursor: pointer;
+  border: 3px solid rgba(255, 255, 255, 1);
+  border-radius: 0.25em;
+  background: rgba(240, 179, 83, 0.9);
+  padding: 0.3em 1.2em;
+  color: rgba(10, 19, 29, 1);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    18px 16px 32px 0 rgba(0, 0, 0, 0.6),
+    6px 8px 16px 0 rgba(0, 0, 0, 0.13);
+  transition:
+    background 150ms,
+    color 150ms,
+    box-shadow 150ms,
+    transform 150ms;
+  position: relative;
+  overflow: hidden;
+  pointer-events: auto !important;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .story-screen-btn,
@@ -57,7 +64,7 @@
 .win-screen-btn,
 .legal-notice-btn,
 .credits-btn {
-    width: 6.5em;
+  width: 6.5em;
 }
 
 .start-screen-btn:hover,
@@ -67,28 +74,34 @@
 .win-screen-btn:hover,
 .legal-notice-btn:hover,
 .credits-btn:hover {
-    background: rgba(47, 104, 116, 0.8) !important;
-    color: #fff !important;
-    transform: scale(1.06);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.18), 6px 6px 12px 0 rgba(0,0,0,0.18);
-    transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
+  background: rgba(47, 104, 116, 0.8) !important;
+  color: #fff !important;
+  transform: scale(1.06);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.18),
+    6px 6px 12px 0 rgba(0, 0, 0, 0.18);
+  transition:
+    background 150ms,
+    color 150ms,
+    box-shadow 150ms,
+    transform 150ms;
 }
-    @keyframes glass-reflect-diag {
-        0% {
-            transform: rotate(25deg) translateX(-100%) translateY(100%);
-            opacity: 0.2;
-        }
-        40% {
-            opacity: 0.7;
-        }
-        60% {
-            opacity: 0.7;
-        }
-        100% {
-            transform: rotate(25deg) translateX(100%) translateY(-100%);
-            opacity: 0;
-        }
-    }
+@keyframes glass-reflect-diag {
+  0% {
+    transform: rotate(25deg) translateX(-100%) translateY(100%);
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  60% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: rotate(25deg) translateX(100%) translateY(-100%);
+    opacity: 0;
+  }
+}
 
 .start-screen-btn:active,
 .story-screen-btn:active,
@@ -97,13 +110,20 @@
 .win-screen-btn:active,
 .legal-notice-btn:active,
 .credits-btn:active {
-    transform: scale(0.94) translateY(4px);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-    background: #2f6874 !important;
-    color: #222 !important;
-    transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
-    transition: background 150ms, color 150ms, box-shadow 150ms, transform 150ms;
-
+  transform: scale(0.94) translateY(4px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  background: #2f6874 !important;
+  color: #222 !important;
+  transition:
+    background 150ms,
+    color 150ms,
+    box-shadow 150ms,
+    transform 150ms;
+  transition:
+    background 150ms,
+    color 150ms,
+    box-shadow 150ms,
+    transform 150ms;
 }
 
 .start-screen-btn:focus,
@@ -113,7 +133,7 @@
 .win-screen-btn:focus,
 .legal-notice-btn:focus,
 .credits-btn:focus {
-    outline: none;
+  outline: none;
 }
 
 .start-screen-btn:focus-visible,
@@ -123,20 +143,20 @@
 .win-screen-btn:focus-visible,
 .legal-notice-btn:focus-visible,
 .credits-btn:focus-visible {
-    outline: 3px solid rgba(255,255,255,0.85);
-    outline-offset: 3px;
+  outline: 3px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
 }
 
 @media (pointer: coarse) {
-    .start-screen-btn:focus-visible,
-    .story-screen-btn:focus-visible,
-    .control-screen-btn:focus-visible,
-    .game-over-screen-btn:focus-visible,
-    .win-screen-btn:focus-visible,
-    .legal-notice-btn:focus-visible,
-    .credits-btn:focus-visible {
-        outline-color: rgba(255,255,255,0.95);
-    }
+  .start-screen-btn:focus-visible,
+  .story-screen-btn:focus-visible,
+  .control-screen-btn:focus-visible,
+  .game-over-screen-btn:focus-visible,
+  .win-screen-btn:focus-visible,
+  .legal-notice-btn:focus-visible,
+  .credits-btn:focus-visible {
+    outline-color: rgba(255, 255, 255, 0.95);
+  }
 }
 
 .start-screen-btn::after,
@@ -146,17 +166,24 @@
 .win-screen-btn::after,
 .legal-notice-btn::after,
 .credits-btn::after {
-    content: '';
-    position: absolute;
-    bottom: -120%;
-    left: -120%;
-    width: 250%;
-    height: 250%;
-    background: linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.15) 100%);
-    opacity: 0;
-    pointer-events: none;
-    transform: rotate(25deg) translateX(-100%) translateY(100%);
-    transition: opacity 150ms, background 150ms;
+  content: "";
+  position: absolute;
+  bottom: -120%;
+  left: -120%;
+  width: 250%;
+  height: 250%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(25deg) translateX(-100%) translateY(100%);
+  transition:
+    opacity 150ms,
+    background 150ms;
 }
 
 .start-screen-btn:hover::after,
@@ -166,28 +193,30 @@
 .win-screen-btn:hover::after,
 .legal-notice-btn:hover::after,
 .credits-btn:hover::after {
-    opacity: 1;
-    animation: glass-reflect-diag 0.7s linear;
-    transition: opacity 150ms, background 150ms;
+  opacity: 1;
+  animation: glass-reflect-diag 0.7s linear;
+  transition:
+    opacity 150ms,
+    background 150ms;
 }
 
 @media only screen and (max-width: 720px) {
-    .start-screen-btn-group{
-        gap: 1em;
-    }
-    .start-screen-btn,
-    .story-screen-btn,
-    .control-screen-btn,
-    .game-over-screen-btn,
-    .win-screen-btn,
-    .legal-notice-btn,
-    .credits-btn {
-        font-size: clamp(0.8em, 4vw, 1.5em);
-    }
+  .start-screen-btn-group {
+    gap: 1em;
+  }
+  .start-screen-btn,
+  .story-screen-btn,
+  .control-screen-btn,
+  .game-over-screen-btn,
+  .win-screen-btn,
+  .legal-notice-btn,
+  .credits-btn {
+    font-size: clamp(0.8em, 4vw, 1.5em);
+  }
 }
 
 @media only screen and (max-height: 480px) {
-    .start-screen-btn-group {
-        justify-content: flex-start;
-    }
+  .start-screen-btn-group {
+    justify-content: flex-start;
+  }
 }

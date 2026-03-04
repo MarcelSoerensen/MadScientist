@@ -1,0 +1,62 @@
+@media only screen and (max-width: 720px) {
+  canvas,
+  #start_screen {
+    width: 100%;
+    max-width: 100vw;
+  }
+  .start-screen-title {
+    margin-bottom: 4vw;
+  }
+
+  #story_textbox p,
+  #game_over_textbox p,
+  #win_textbox p,
+  #legal_notice_textbox p,
+  #credits_textbox p {
+    font-size: clamp(0.8em, 2.5vh, 1.3em);
+  }
+
+  #legal_notice_textbox p,
+  #credits_textbox p {
+    font-size: clamp(0.5em, 3.35vw, 1.5em) !important;
+  }
+
+  #control_textbox li {
+    font-size: clamp(0.9em, 3vw, 1.4em) !important;
+  }
+
+  #story_screen .story-screen-title,
+  #control_screen .control-screen-title,
+  #game_over_screen .game-over-screen-title,
+  #win_screen .win-screen-title,
+  #legal_notice_screen .legal-notice-title,
+  #credits_screen .credits-title {
+    top: 0%;
+  }
+
+  #story_screen .story-screen-buttons,
+  #control_screen .control-screen-buttons,
+  #game_over_screen .game-over-screen-buttons,
+  #win_screen .win-screen-buttons,
+  #legal_notice_screen .legal-notice-screen-buttons,
+  #credits_screen .credits-screen-buttons {
+    bottom: 3%;
+  }
+
+  #story_screen #story_textbox,
+  #control_screen #control_textbox,
+  #game_over_screen #game_over_textbox,
+  #win_screen #win_textbox,
+  #legal_notice_screen #legal_notice_textbox,
+  #credits_screen #credits_textbox {
+    top: 20%;
+    bottom: 21%;
+  }
+}
+
+@media only screen and (max-height: 480px) {
+  #legal_notice_textbox p,
+  #credits_textbox p {
+    font-size: clamp(1em, 2.5vh, 1.3em);
+  }
+}

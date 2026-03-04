@@ -1,0 +1,80 @@
+.control-list {
+  list-style-type: none;
+  padding-left: 0;
+  width: 70%;
+}
+
+.control-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 1.4em;
+}
+
+#control_textbox,
+.control-list,
+.control-list li {
+  font-family: "Happy Monkey", "Freckle Face", cursive, Arial, sans-serif;
+  font-size: 1.15em;
+}
+
+#game_over_textbox p,
+#win_textbox p,
+#legal_notice_textbox p,
+#credits_textbox p {
+  text-align: center;
+  font-size: 1.2em;
+  line-height: 1.4em;
+  margin: 0;
+}
+
+#legal_notice_textbox,
+#legal_notice_textbox p,
+#credits_textbox,
+#credits_textbox p,
+#story_textbox,
+#story_textbox p {
+  font-family: "Happy Monkey", "Freckle Face", cursive, Arial, sans-serif;
+}
+
+#legal_notice_textbox p,
+#legal_notice_textbox li,
+#legal_notice_textbox span,
+#legal_notice_textbox a,
+#credits_textbox a {
+  font-size: 1em;
+}
+
+#legal_notice_textbox p strong {
+  display: inline-block;
+  margin-top: 0.6em;
+  margin-bottom: 0.5em;
+  font-size: 1.1em;
+  font-weight: 700;
+}
+
+#legal_notice_textbox a,
+#credits_textbox a {
+  color: rgb(117, 252, 220);
+  text-decoration: none;
+  pointer-events: auto;
+  cursor: pointer !important;
+  transition:
+    color 150ms,
+    opacity 150ms;
+  opacity: 1;
+}
+
+#credits_textbox a:hover,
+#legal_notice_textbox a:hover {
+  color: rgba(117, 252, 220, 0.7);
+  opacity: 0.7;
+  text-decoration: none;
+  transform: scale(1.1);
+}
+
+#credits_textbox a:active,
+#legal_notice_textbox a:active {
+  color: rgb(51, 81, 97);
+  opacity: 0.85;
+}
